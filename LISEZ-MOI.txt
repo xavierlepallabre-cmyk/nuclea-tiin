@@ -1,6 +1,23 @@
-Nucléa TIIN v0.2 — navigation mobile améliorée
+Nucléa TIIN v0.3
 
-Déployer TOUS les fichiers de ce dossier à la racine du dépôt GitHub Pages, en remplaçant les fichiers de la v0.1.
-Vider/recharger la page si le service worker affiche encore une ancienne version.
-En portrait : miniature interactive, glissement horizontal/vertical, boutons de zoom et fiche isotope en panneau.
-Sur GitHub Pages : Settings > Pages > Deploy from branch > main / root.
+PUBLICATION SUR GITHUB PAGES
+1. Extraire l’archive.
+2. Copier tous les fichiers du dossier nuclea-tiin à la racine du dépôt, en remplaçant ceux de la v0.2. index.html doit se trouver directement à la racine publiée.
+3. Activer GitHub Pages pour la branche et le dossier contenant index.html (par exemple main / root).
+4. Ouvrir l’adresse HTTPS du site. Aucun outil de compilation ni serveur applicatif n’est nécessaire.
+
+MISE À JOUR DE LA PWA
+Le cache v0.3 remplace les anciens caches Nucléa TIIN. Après publication, recharger la page puis la rouvrir. Le premier chargement nécessite une connexion ; la consultation suivante fonctionne hors connexion.
+
+NAVIGATION
+Téléphone jusqu’à 700 px : fiche en panneau bas, navigation principale en bas.
+Tablette : panneau latéral plus large et tableau déplaçable.
+Ordinateur à partir de 1024 px : tableau ajusté entièrement à la largeur disponible au démarrage et lors du redimensionnement. Recentrer rétablit cet ajustement après un zoom manuel.
+Le bouton Fermer reste en haut de la fiche pendant son défilement. Échap, Retour navigateur/Android et clic sur le fond ferment la fiche. Avancer rouvre la fiche. Le zoom et la position du tableau sont conservés.
+Le défilement tactile et le zoom du navigateur restent natifs ; les boutons − et + règlent la taille des cases.
+
+CONTENU
+118 éléments, données isotopiques sélectionnées et six rubriques du formulaire conservés à l’identique depuis la v0.2.
+
+VALIDATION
+Voir TESTS.txt. Le geste Retour physique sur un appareil Android reste à confirmer sur appareil réel.

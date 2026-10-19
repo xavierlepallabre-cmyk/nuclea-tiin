@@ -1,0 +1,17 @@
+Validation v0.3 — 19 octobre 2026
+
+Tests automatisés dans Microsoft Edge (moteur Chromium), fenêtres de 390 × 900, 820 × 900 et 1440 × 900 pixels : réussis.
+- Chargement des 118 boutons d’éléments et des six rubriques.
+- Sélection et rendu des isotopes de l’uranium.
+- Fermeture par bouton visible, Échap et fond extérieur.
+- Retour ferme la fiche ; Avancer la rouvre.
+- Conservation exacte du zoom et des positions de défilement.
+- Navigation Tableau / Formulaire.
+- Tableau sans défilement horizontal à 1440 px avec ajustement initial.
+- Rechargement hors connexion après installation du service worker.
+- Aucune erreur JavaScript observée.
+- Contrôle visuel des fiches mobile et ordinateur.
+- Comparaison à l’archive v0.2 : elements.json identique octet par octet ; objets des isotopes et six rubriques inchangés.
+- Vérification syntaxique JavaScript réussie.
+
+Limites : formats téléphone/tablette simulés dans le navigateur ; pas de test sur Android physique, de geste système réel ni de publication effective sur GitHub Pages. Retour est relié à popstate, événement utilisé par la navigation historique du navigateur Android.
