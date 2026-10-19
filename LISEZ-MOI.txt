@@ -1,0 +1,27 @@
+NUCLÉA TIIN — prototype PWA v0.1
+
+CONTENU
+index.html : interface ; style.css : présentation ; app.js : logique et formulaire
+ elements.json : 118 éléments ; sw.js : cache hors connexion
+manifest.webmanifest et icon.svg : installation PWA
+
+TEST LOCAL
+Dans le dossier de l'application, lancer : python -m http.server 8000
+Ouvrir http://localhost:8000 dans le navigateur.
+Ne pas ouvrir index.html directement en file:// (chargement JSON bloqué).
+
+INSTALLATION SUR ANDROID
+Publier l'ensemble du dossier sur un hébergement HTTPS (par exemple GitHub Pages).
+Ouvrir l'URL dans Chrome sur Android, puis utiliser « Installer l'application »
+(ou « Ajouter à l'écran d'accueil » selon la version).
+Le cache hors connexion fonctionne après un premier chargement réussi.
+
+PÉRIMÈTRE ET LIMITES
+- 118 éléments ; masses atomiques indicatives issues de la bibliothèque RDKit.
+- Isotopes pédagogiques sélectionnés : H, C, O, Co, Tc, I, Cs, Rn, U, Pu.
+- Pour les autres éléments, isotope de référence indicatif sans propriété radioactive déduite.
+- Formules reprises de la fiche de référence TIIN v7.3, avec reformulations d'affichage.
+- Pas encore de calculateurs, d'exercices ni de suivi de progression.
+- Les périodes et modes de désintégration sont des valeurs pédagogiques arrondies,
+  à vérifier sur des tables nucléaires de référence avant diffusion institutionnelle.
+- Cette application ne doit pas être utilisée pour une décision opérationnelle de radioprotection.
