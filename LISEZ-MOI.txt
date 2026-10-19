@@ -1,3 +1,5 @@
+Nucléa TIIN v0.7 — parcours de désintégration
+
 Nucléa TIIN v0.6
 
 PUBLICATION SUR GITHUB PAGES
@@ -41,3 +43,12 @@ DESIGN v0.6 — identité Lycée Alexis de Tocqueville
 - Formulaire en cartes numérotées ; page À propos avec les logos Tocqueville et Bac Pro TIIN.
 - Nouvelles icônes d’application (PNG 192/512 et maskable) dans assets/.
 Fonctionnement, données et comportements (fiche, Retour, familles, zoom, hors connexion) inchangés.
+
+
+VERSION v0.7 — PARCOURS DE DÉSINTÉGRATION
+Base : archive v0.6 fournie, design clair/sombre et logos conservés.
+Dans une fiche d’élément : choisir un isotope, puis Tracer la désintégration.
+Lire les cartes de haut en bas jusqu’au premier noyau stable sur la branche suivie. Les menus de branche permettent d’explorer les autres voies. Changer l’isotope recalcule le tracé. Masquer le parcours revient à la lecture de la fiche.
+Parcours isotopique simplifié : voir SOURCES.md et les précisions affichées. Les états excités ne sont pas tous résolus. Donnée manquante ou fission : arrêt explicite.
+Fonction disponible hors connexion après le premier chargement.
+Publication : copier TOUS les fichiers du dossier nuclea-tiin dans le dossier publié par GitHub Pages, en remplaçant la version précédente. Inclure le nouveau fichier decay-chain.js et recharger la PWA après la mise à jour.

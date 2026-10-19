@@ -31,3 +31,24 @@ Les fichiers CSV originaux et leurs empreintes SHA-256 sont inclus dans sources/
 ## Définitions des familles — v0.5
 
 Définitions pédagogiques rédigées pour cette application. Repères : OpenStax, Chemistry 2e, section 2.5, https://openstax.org/books/chemistry-2e/pages/2-5-the-periodic-table et Royal Society of Chemistry, https://periodic-table.rsc.org/ . Le regroupement suit le champ family de elements.json hérité de la v0.2. Les catégories métalloïdes et métaux pauvres ainsi que les éléments superlourds sont signalés avec leurs limites de classification et de connaissance.
+
+
+## Parcours de désintégration — v0.7
+
+Le parcours est calculé localement depuis l’isotope choisi ; les données isotopiques de la v0.6 sont conservées. Chaque étape porte un lien AIEA et la date de son extraction. Seul le marqueur stable explicite de la source permet de conclure à un noyau stable.
+
+Les flèches appliquent les bilans des modes de désintégration aux nombres A et Z, puis recherchent le noyau fils dans le jeu embarqué. Il s’agit d’un parcours isotopique simplifié : faute de schémas de niveaux complets, le noyau fils est représenté à l’état fondamental ; les cascades rapides et la plupart des isomères intermédiaires ne sont pas détaillés. Par exemple, le parcours U-238 représente Pa-234 au niveau isotopique et ne résout pas Pa-234m. Les périodes affichées sont celles de l’état effectivement représenté, pas une durée totale de filiation.
+
+Les états Tc-99m et Ba-137m déjà embarqués peuvent servir de point de départ ; leur transition isomérique est suivie vers leur fondamental. Les autres transitions isomériques sans niveau inférieur identifié interrompent le tracé.
+
+Pour Cs-137, trois branches β− vers les niveaux du Ba-137 sont décrites explicitement selon NNDC / ENSDF :
+https://www.nndc.bnl.gov/nudat3/getdecaydataset.jsp?dsid=137cs+bM+decay&nucleus=137BA
+Consulté le 19 octobre 2026 ; évaluation E. Browne et J. K. Tuli, NDS 108, 2173 (2007), limite bibliographique 1 octobre 2006.
+- 94.7 %, incertitude ENSDF 2 : niveau métastable 661.659 keV.
+- 5.3 %, incertitude ENSDF 2 : niveau fondamental.
+- 0.00058 %, incertitude ENSDF 8 : niveau 283.50 keV, puis retour rapide au fondamental, transition γ non dessinée.
+Les valeurs sont reprises arrondies telles que publiées et ne somment donc pas nécessairement exactement à 100. Elles sont des probabilités locales, sans calcul de probabilité cumulée. La transition isomérique du Ba-137m inclut émission γ et conversion interne, sans imposer un photon γ pour chaque transition.
+
+La branche numérique la plus probable est choisie par défaut si tous les pourcentages du nœud sont des nombres non qualifiés. Si des pourcentages sont inconnus ou qualifiés, l’ordre de la source est conservé. Le choix peut être changé à chaque embranchement ; les choix en aval sont alors recalculés.
+
+Une fission n’a pas de fils unique et interrompt le parcours. Donnée absente, mode non pris en charge, boucle ou limite de 64 noyaux : arrêt explicite sans affirmer une stabilité. Aucune durée totale ni date de désintégration d’un noyau individuel n’est déduite des périodes.

@@ -33,3 +33,26 @@ Tests Edge/Chromium réussis aux largeurs 390, 820 et 1440 px :
 - Ouverture et fermeture de la fiche uranium dans les actinides sans perdre le filtre.
 - Désactivation du filtre : restauration exacte du zoom et des positions de défilement.
 - Tous les tests de navigation et de consultation des isotopes hors connexion de la v0.4 repassent.
+
+
+VALIDATION v0.7 — 19 octobre 2026
+Moteur de parcours :
+- H-3 → He-3 ; C-14 → N-14 ; Co-60 → Ni-60.
+- Sr-90 → Y-90 → Zr-90.
+- Tc-99m → Tc-99 → Ru-99.
+- Cs-137 → Ba-137m → Ba-137 ; branche directe vers Ba-137.
+- U-238 → Pb-206 (15 noyaux représentés), U-235 → Pb-207 et Th-232 → Pb-208, au niveau isotopique simplifié.
+- Départ stable : zéro transition.
+- Branche de fission : arrêt explicite.
+- Donnée manquante, boucle artificielle, mode inconnu et limite d’étapes : arrêt explicite.
+- Parcours des 3 385 fiches sans erreur ni dépassement de 64 noyaux ; 3 165 parcours par défaut atteignent un noyau explicitement stable, 101 s’arrêtent sur donnée manquante, 3 sur transition de niveau non résolue, 116 sur fission. Ces nombres décrivent l’algorithme et ne constituent pas une validation indépendante des données nucléaires.
+
+Interface Edge/Chromium : trois largeurs 390, 820 et 1440 pixels, thèmes clair/sombre.
+- Cs-137 et changement de branche, U-238 et fission, isotope stable, changement d’isotope et masquage du tracé.
+- Filtres de famille conservés, fiches accessibles, Retour/Avancer et Échap.
+- 118 éléments et six rubriques du formulaire présents.
+- Rechargement hors connexion, tracé Cs-137 disponible.
+- Aucun débordement horizontal de la fiche ni erreur JavaScript.
+- Contrôle visuel des captures mobile clair et ordinateur sombre.
+- Données isotopiques et assets du design v0.6 conservés à l’identique.
+Pas de nouvelle validation sur appareil Android physique ni de schéma complet des niveaux excités.

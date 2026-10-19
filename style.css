@@ -326,3 +326,22 @@ main{flex:1;width:100%;max-width:1320px;margin:0 auto;padding:28px 24px 40px}
   .footer{padding-bottom:96px}
 }
 @media (max-width:380px){.brand-sep,.brand-text .eyebrow{display:none}}
+
+/* v0.7 — fil de désintégration, couleurs du thème v0.6. */
+.chain-launch{display:grid;gap:8px;margin:22px 0}.chain-launch small{color:var(--muted)}
+#decayPanel{border-top:1px solid var(--line);padding-top:18px;margin-bottom:24px;scroll-margin-top:85px}
+.chain-heading{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.chain-method,.chain-precision{font-size:12px;color:var(--muted)}
+.chain-status{padding:12px;border-radius:var(--r-md);font-size:13px;font-weight:500;margin:14px 0}
+.chain-success{background:var(--ok-soft);color:var(--ok);border:1px solid var(--ok-line)}
+.chain-stop{background:var(--accent-soft);color:var(--accent-text);border:1px solid var(--accent)}
+.decay-path{list-style:none;margin:18px 0;padding:0}.chain-step{margin:0;padding:0}
+.chain-card{display:grid;gap:5px;border:1px solid var(--line);border-left:4px solid var(--brand-text);border-radius:var(--r-md);padding:14px;background:var(--surface-2);font-size:12px;overflow-wrap:anywhere}
+.chain-card.chain-stable{border-color:var(--ok-line);border-left-color:var(--ok);background:var(--ok-soft)}
+.chain-index{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chain-nuclide{font-size:24px;color:var(--ink)}.chain-stable-label{font-size:12px;color:var(--ok);vertical-align:middle;margin-left:8px}
+.chain-arrow{display:grid;gap:6px;margin:6px 0;padding:6px 12px 14px 20px;border-left:2px solid var(--line);font-size:13px}.chain-arrow>span{font-size:26px;line-height:1;color:var(--accent-text)}.chain-arrow small{color:var(--muted);font-size:11px}
+.chain-arrow select{width:100%;min-width:0;max-width:100%;font-size:12px}
+.chain-precision{padding:12px;border:1px solid var(--line);border-radius:var(--r-md)}.chain-precision summary{cursor:pointer;font-weight:600}.chain-precision p{margin-top:10px}
+
+.btn-primary{background:var(--primary);color:var(--on-primary)}.btn-primary:hover{background:var(--primary-hover)}.chain-arrow select{min-height:44px;padding:10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)}

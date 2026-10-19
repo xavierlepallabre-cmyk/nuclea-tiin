@@ -1,6 +1,6 @@
-const CACHE="nuclea-tiin-v06";
+const CACHE="nuclea-tiin-v07";
 const FONT_CACHE="nuclea-tiin-fonts";
-const ASSETS=["./","./index.html","./style.css","./app.js","./isotopes.js","./SOURCES.md","./elements.json","./icon.svg","./manifest.webmanifest","./assets/logo-tocqueville.png","./assets/logo-bac-pro-tiin.png","./assets/icon-192.png","./assets/icon-512.png","./assets/icon-maskable-512.png"];
+const ASSETS=["./","./index.html","./style.css","./app.js","./decay-chain.js","./isotopes.js","./SOURCES.md","./elements.json","./icon.svg","./manifest.webmanifest","./assets/logo-tocqueville.png","./assets/logo-bac-pro-tiin.png","./assets/icon-192.png","./assets/icon-512.png","./assets/icon-maskable-512.png"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith("nuclea-tiin-")&&k!==CACHE&&k!==FONT_CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener("fetch",e=>{
