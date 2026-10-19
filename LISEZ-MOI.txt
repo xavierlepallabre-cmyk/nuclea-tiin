@@ -1,4 +1,4 @@
-Nucléa TIIN v0.4
+Nucléa TIIN v0.5
 
 PUBLICATION SUR GITHUB PAGES
 1. Extraire l’archive.
@@ -7,7 +7,7 @@ PUBLICATION SUR GITHUB PAGES
 4. Ouvrir l’adresse HTTPS du site. Aucun outil de compilation ni serveur applicatif n’est nécessaire.
 
 MISE À JOUR DE LA PWA
-Le cache v0.4 remplace les anciens caches Nucléa TIIN. Après publication, recharger la page puis la rouvrir. Le premier chargement nécessite une connexion ; la consultation suivante fonctionne hors connexion.
+Le cache v0.5 remplace les anciens caches Nucléa TIIN. Après publication, recharger la page puis la rouvrir. Le premier chargement nécessite une connexion ; la consultation suivante fonctionne hors connexion.
 
 NAVIGATION
 Téléphone jusqu’à 700 px : fiche en panneau bas, navigation principale en bas.
@@ -25,5 +25,8 @@ Voir TESTS.txt. Le geste Retour physique sur un appareil Android reste à confir
 Version 0.3.1 : sur ordinateur avec souris ou pavé tactile et fenêtre supérieure à 700 px, affichage direct du tableau ajusté, sans miniature ni barre de zoom.
 Retour Android confirmé fonctionnel par l’utilisateur.
 
-ISOTOPES v0.4
+ISOTOPES v0.5
 3 385 fiches (3 383 états fondamentaux et Tc-99m / Ba-137m) pour les 118 éléments. Consulter SOURCES.md pour les références, dates et règles de transformation. Le dossier sources contient les données originales.
+
+FAMILLES v0.5
+Cliquer sur une famille affiche une définition et redessine une grille compacte ne contenant que ses éléments, triés par numéro atomique. Un second clic sur la famille active rétablit les 118 éléments et la vue précédente. Un clic sur une autre famille change le filtre. Le bouton Afficher les 118 éléments rétablit également le tableau complet. La recherche est conservée et agit dans la famille choisie. Les fiches isotopiques restent disponibles.

@@ -27,3 +27,7 @@ Les deux états métastables sont sélectionnés par leur énergie dans les fich
 - Les six rubriques du formulaire et elements.json sont conservés depuis la v0.3.1.
 
 Les fichiers CSV originaux et leurs empreintes SHA-256 sont inclus dans sources/. Ils servent à vérifier la traçabilité ; isotopes.js contient les données utilisées hors connexion par l’application. Le code de l’application ne requiert aucune connexion à l’API AIEA lors de la consultation.
+
+## Définitions des familles — v0.5
+
+Définitions pédagogiques rédigées pour cette application. Repères : OpenStax, Chemistry 2e, section 2.5, https://openstax.org/books/chemistry-2e/pages/2-5-the-periodic-table et Royal Society of Chemistry, https://periodic-table.rsc.org/ . Le regroupement suit le champ family de elements.json hérité de la v0.2. Les catégories métalloïdes et métaux pauvres ainsi que les éléments superlourds sont signalés avec leurs limites de classification et de connaissance.

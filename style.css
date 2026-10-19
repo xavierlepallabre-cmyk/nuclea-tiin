@@ -27,3 +27,18 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid 
 }
 
 #iso{width:100%;margin-top:8px}.isotope-source{margin-top:20px;padding:12px;border:1px solid #cbd7e5;border-radius:10px;font-size:13px;overflow-wrap:anywhere}.isotope-source summary{cursor:pointer;font-weight:650}.decay-list{padding-left:20px}.decay-list li{margin:10px 0}.isotope-count{font-size:12px}a{color:#0767a3}
+
+/* v0.5: toggleable family buttons and compact family table. */
+.legend{max-height:none;overflow:visible}
+.legend button{font:inherit;font-size:11px;border-radius:30px;padding:9px 12px;background:var(--bg);border:2px solid transparent;cursor:pointer;color:#17283c;min-height:36px}
+.legend button[aria-pressed="true"]{border-color:#1257af;box-shadow:0 0 0 1px #1257af;font-weight:700}
+.family-definition{border:1px solid #cad7e5;border-left:5px solid #1257af;background:var(--bg);padding:16px;border-radius:12px;margin:12px 0 18px}
+.family-definition p{color:#233e58;margin:8px 0}.family-definition small{display:block;margin-top:12px}.family-help{font-size:13px}
+#clearFamily{font:inherit;border:1px solid #9eb5cd;background:white;border-radius:8px;padding:10px 14px;cursor:pointer}
+.family-filtered .overview,.family-filtered .table-tools,.family-filtered .table-hint{display:none}
+.family-filtered .scroll{height:auto;min-height:0;max-height:none;overflow:auto}
+.family-filtered .periodic{grid-template-columns:repeat(auto-fit,minmax(90px,1fr));grid-template-rows:none;grid-auto-rows:minmax(105px,auto);min-width:0;width:100%;gap:8px}
+.family-filtered .element{grid-column:auto;grid-row:auto;padding:8px}
+.family-filtered .element .symbol{margin-top:12px;font-size:28px}
+.element-name{display:block;font-size:11px;margin-top:5px;overflow-wrap:anywhere}
+@media(max-width:700px){.legend{gap:6px}.legend button{min-height:44px}.family-filtered .periodic{grid-template-columns:repeat(auto-fit,minmax(82px,1fr))}}
