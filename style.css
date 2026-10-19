@@ -25,3 +25,5 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid 
   .overview,.table-tools,.table-hint{display:none}
   .scroll{height:auto;max-height:none;min-height:0;margin-top:16px}
 }
+
+#iso{width:100%;margin-top:8px}.isotope-source{margin-top:20px;padding:12px;border:1px solid #cbd7e5;border-radius:10px;font-size:13px;overflow-wrap:anywhere}.isotope-source summary{cursor:pointer;font-weight:650}.decay-list{padding-left:20px}.decay-list li{margin:10px 0}.isotope-count{font-size:12px}a{color:#0767a3}

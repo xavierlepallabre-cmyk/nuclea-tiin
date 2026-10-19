@@ -1,19 +1,25 @@
-Validation v0.3 — 19 octobre 2026
+Nucléa TIIN v0.4 — validation du 19 octobre 2026
 
-Tests automatisés dans Microsoft Edge (moteur Chromium), fenêtres de 390 × 900, 820 × 900 et 1440 × 900 pixels : réussis.
-- Chargement des 118 boutons d’éléments et des six rubriques.
-- Sélection et rendu des isotopes de l’uranium.
-- Fermeture par bouton visible, Échap et fond extérieur.
-- Retour ferme la fiche ; Avancer la rouvre.
-- Conservation exacte du zoom et des positions de défilement.
+Tests automatisés Microsoft Edge / Chromium aux formats 390 × 900, 820 × 900 et 1440 × 900 : réussis.
+- 118 éléments et six rubriques du formulaire.
+- Liste enrichie de l’uranium et sélection U-238.
+- Tc-99m : 6.0072 h, énergie 142.6836 keV, lien vers les niveaux AIEA, date d’extraction.
+- H-1 : stabilité et abondance de la source.
+- Ba-137m : 2.552 min, sélection et données accessibles après rechargement hors connexion.
+- Fermeture par bouton, Échap, clic extérieur ; Retour/Avancer.
+- Conservation du zoom et de la position du tableau.
 - Navigation Tableau / Formulaire.
-- Tableau sans défilement horizontal à 1440 px avec ajustement initial.
-- Rechargement hors connexion après installation du service worker.
-- Aucune erreur JavaScript observée.
-- Contrôle visuel des fiches mobile et ordinateur.
-- Comparaison à l’archive v0.2 : elements.json identique octet par octet ; objets des isotopes et six rubriques inchangés.
-- Vérification syntaxique JavaScript réussie.
+- Miniature et zoom masqués sur ordinateur ; ajustement du tableau à 1440 px.
+- Absence d’erreur JavaScript ; syntaxe app.js et isotopes.js vérifiée.
+- Contrôle visuel de la fiche uranium sur mobile.
 
-Limites : formats téléphone/tablette simulés dans le navigateur ; pas de test sur Android physique, de geste système réel ni de publication effective sur GitHub Pages. Retour est relié à popstate, événement utilisé par la navigation historique du navigateur Android.
+Contrôles des données :
+- 3 385 fiches, 118 éléments, identifiants (A, état) uniques par élément.
+- 3 383 états fondamentaux issus du CSV AIEA ; exclusion des trois lignes Z = 0.
+- Tc-99m et Ba-137m sélectionnés par énergie et état distinct de leur fondamental.
+- Contrôle des premières colonnes unc_hl : 9 pour Tc-99m, 1 pour Ba-137m ; aucune confusion avec la colonne d’incertitude en secondes.
+- Seul le marqueur STABLE entraîne un affichage stable.
+- elements.json et six rubriques du formulaire identiques à la v0.3.1.
+- Fichiers CSV sources et empreintes SHA-256 fournis.
 
-Validation v0.3.1 : nouvelle exécution des tests aux trois largeurs réussie ; miniature, commandes de zoom et aide masquées sur ordinateur à 820 et 1440 px. Retour Android confirmé fonctionnel par l’utilisateur sur la v0.3.
+Limites : aucune contre-évaluation indépendante des milliers de valeurs ; les dates des jeux AIEA sont affichées et documentées dans SOURCES.md. Tests par formats simulés, pas de nouvelle validation Android physique pour cette version. Le geste Retour Android de la v0.3 a été confirmé par l’utilisateur.
