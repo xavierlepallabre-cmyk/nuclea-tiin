@@ -103,6 +103,27 @@
         <p class="lead">Les six rubriques de la fiche TIIN v7.3, avec leurs hypothèses d’application.</p>
       </div>
     </div>
+    <article id="decayCalculator" class="card rd-calculator" aria-labelledby="rdTitle">
+<div class="rd-head"><div><p class="tag">Calcul guidé</p><h2 id="rdTitle">Décroissance radioactive</h2></div><button id="rdExample" type="button" class="btn btn-ghost">Charger un exemple</button></div>
+<p>Calcule l’activité restante ou le temps nécessaire pour atteindre une activité donnée.</p>
+<p class="rd-assumption">Un seul radionucléide, sans apport de matière ni production par un noyau parent. Le calcul porte sur son activité propre ; il n’inclut pas l’activité des descendants.</p>
+<form id="rdForm" novalidate>
+<div class="rd-field"><label for="rdMode">Je cherche</label><select id="rdMode"><option value="activity">L’activité restante après une durée</option><option value="time">La durée pour atteindre une activité</option></select></div>
+<div class="rd-fields"><div class="rd-field"><label for="rdHalf">Période radioactive T½</label><div class="rd-input-pair"><input id="rdHalf" type="text" inputmode="decimal" value="8" autocomplete="off" required><select id="rdHalfUnit" aria-label="Unité : Période radioactive T½"><option value="as" >attosecondes</option><option value="ps" >picosecondes</option><option value="ns" >nanosecondes</option><option value="us" >microsecondes</option><option value="ms" >millisecondes</option><option value="s" >secondes</option><option value="min" >minutes</option><option value="h" >heures</option><option value="d" selected>jours</option><option value="y" >années</option></select></div></div><div class="rd-field"><label for="rdInitial">Activité initiale A₀</label><div class="rd-input-pair"><input id="rdInitial" type="text" inputmode="decimal" value="800" autocomplete="off" required><select id="rdInitialUnit" aria-label="Unité : Activité initiale A₀"><option >Bq</option><option selected>kBq</option><option >MBq</option><option >GBq</option><option >TBq</option></select></div></div><div id="rdDurationGroup"><div class="rd-field"><label for="rdDuration">Durée écoulée t</label><div class="rd-input-pair"><input id="rdDuration" type="text" inputmode="decimal" value="24" autocomplete="off" required><select id="rdDurationUnit" aria-label="Unité : Durée écoulée t"><option value="as" >attosecondes</option><option value="ps" >picosecondes</option><option value="ns" >nanosecondes</option><option value="us" >microsecondes</option><option value="ms" >millisecondes</option><option value="s" >secondes</option><option value="min" >minutes</option><option value="h" >heures</option><option value="d" selected>jours</option><option value="y" >années</option></select></div></div></div><div id="rdTargetGroup" hidden><div class="rd-field"><label for="rdTarget">Activité visée A</label><div class="rd-input-pair"><input id="rdTarget" type="text" inputmode="decimal" value="100" autocomplete="off" required><select id="rdTargetUnit" aria-label="Unité : Activité visée A"><option >Bq</option><option selected>kBq</option><option >MBq</option><option >GBq</option><option >TBq</option></select></div></div></div><div class="rd-field" id="rdOutputTimeGroup" hidden><label for="rdOutputTime">Unité du résultat en durée</label><select id="rdOutputTime"><option value="as" >attosecondes</option><option value="ps" >picosecondes</option><option value="ns" >nanosecondes</option><option value="us" >microsecondes</option><option value="ms" >millisecondes</option><option value="s" >secondes</option><option value="min" >minutes</option><option value="h" >heures</option><option value="d" selected>jours</option><option value="y" >années</option></select></div></div>
+<p id="rdOrigin" class="rd-origin"></p><p class="rd-convention">Convention : 1 année = 365,25 jours. Les valeurs calculées utilisent la période nominale, sans propagation de son incertitude.</p>
+<button class="btn btn-primary" type="submit">Calculer</button>
+<p id="rdError" class="rd-error" role="alert"></p>
+</form>
+<div id="rdResults" hidden>
+<div class="rd-answer" role="status" aria-live="polite"><span id="rdAnswerLabel"></span><strong id="rdAnswer"></strong><span id="rdFraction"></span></div>
+<details class="rd-explanation" open><summary>Comprendre le calcul</summary><ol id="rdSteps"></ol></details>
+<div class="rd-plot-head"><h3>Courbe de décroissance</h3><span>Activité restante en % de A₀</span></div>
+<div id="rdChart" class="rd-chart"></div><p id="rdChartNote" class="rd-convention"></p>
+<label for="rdExplore">Explorer la courbe : de 0 à 10 périodes</label><input id="rdExplore" class="rd-explore" type="range" min="0" max="10" step="0.05" value="3"><output id="rdExploreValue" for="rdExplore"></output>
+<details class="rd-table-details"><summary>Repères : divisions successives par deux</summary><div class="rd-table-wrap"><table><thead><tr><th scope="col">Périodes</th><th scope="col">Durée</th><th scope="col">Activité</th><th scope="col">Restante</th></tr></thead><tbody id="rdMilestones"></tbody></table></div></details>
+</div>
+<p class="rd-convention">Relation : A(t) = A₀ × 2⁻⁽ᵗ/ᵀ½⁾. <a href="https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay" target="_blank" rel="noopener noreferrer">Référence : OpenStax — Radioactive Decay</a>.</p>
+</article>
     <div id="formulaList" class="formula-grid"></div>
   </section>
 
@@ -147,12 +168,13 @@
 </main>
 
 <footer class="footer">
-  <span>Nucléa TIIN · v0.7</span>
+  <span>Nucléa TIIN · v0.8</span>
   <span>Lycée Alexis de Tocqueville · Cherbourg-en-Cotentin</span>
   <span>Ne remplace pas les documents de radioprotection réglementaires.</span>
 </footer>
 <script src="isotopes.js" defer></script>
 <script src="decay-chain.js" defer></script>
+<script src="decay-calculator.js" defer></script>
 <script src="app.js" defer></script>
 </body>
 </html>

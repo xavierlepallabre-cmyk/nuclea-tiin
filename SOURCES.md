@@ -52,3 +52,16 @@ Les valeurs sont reprises arrondies telles que publiées et ne somment donc pas 
 La branche numérique la plus probable est choisie par défaut si tous les pourcentages du nœud sont des nombres non qualifiés. Si des pourcentages sont inconnus ou qualifiés, l’ordre de la source est conservé. Le choix peut être changé à chaque embranchement ; les choix en aval sont alors recalculés.
 
 Une fission n’a pas de fils unique et interrompt le parcours. Donnée absente, mode non pris en charge, boucle ou limite de 64 noyaux : arrêt explicite sans affirmer une stabilité. Aucune durée totale ni date de désintégration d’un noyau individuel n’est déduite des périodes.
+
+
+## Calculateur de décroissance — v0.8
+
+Référence des relations : OpenStax, University Physics Volume 3, section 10.3 Radioactive Decay : https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay . Relations : A(t) = A0 exp(−λt), λ = ln(2)/T½ ; inversion t = T½[ln(A0) − ln(A)]/ln(2).
+
+Modèle : activité propre d’un seul radionucléide, sans production par un parent ni apport de matière. L’activité des descendants n’est pas calculée. Les périodes nominales transférées depuis les fiches proviennent des données AIEA déjà embarquées ; le lien et la date d’extraction sont affichés. Les incertitudes sont rappelées mais ne sont pas propagées.
+
+Conversions : seconde, attoseconde, picoseconde, nanoseconde, microseconde, milliseconde, minute = 60 s, heure = 3 600 s, jour = 86 400 s, année conventionnelle = 365,25 jours (31 557 600 s). Cette convention est explicitement affichée. Pour une période source donnée en années, la valeur nominale en années est conservée, sans présenter cette conversion conventionnelle comme la colonne half_life_sec de l’AIEA.
+
+Les périodes absentes ou données seulement comme limites ne sont pas préremplies. Les valeurs approximatives AP sont acceptées et signalées. Les isotopes stables n’activent pas le calcul de décroissance.
+
+Le calcul inverse est effectué par différence de logarithmes pour éviter de déborder lors du quotient A0/A. Une activité positive peut tomber sous la précision numérique lors d’un calcul direct ; elle est alors signalée, sans conclure à une extinction physique. La courbe porte sur dix périodes ; un résultat situé au-delà est annoncé hors de la courbe. Les points de repère sont également disponibles sous forme de tableau accessible.

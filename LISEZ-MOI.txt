@@ -1,3 +1,5 @@
+Nucléa TIIN v0.8 — calculateur de décroissance radioactive
+
 Nucléa TIIN v0.7 — parcours de désintégration
 
 Nucléa TIIN v0.6
@@ -52,3 +54,16 @@ Lire les cartes de haut en bas jusqu’au premier noyau stable sur la branche su
 Parcours isotopique simplifié : voir SOURCES.md et les précisions affichées. Les états excités ne sont pas tous résolus. Donnée manquante ou fission : arrêt explicite.
 Fonction disponible hors connexion après le premier chargement.
 Publication : copier TOUS les fichiers du dossier nuclea-tiin dans le dossier publié par GitHub Pages, en remplaçant la version précédente. Inclure le nouveau fichier decay-chain.js et recharger la PWA après la mise à jour.
+
+
+NOUVEAUTÉ v0.8
+Formulaire > Décroissance radioactive :
+- Choisir activité restante ou durée pour atteindre une activité visée.
+- Saisir la période et l’activité initiale, puis la durée ou l’activité visée.
+- Les unités sont converties automatiquement ; virgule et notation scientifique sont acceptées.
+- Lire le résultat, le nombre de périodes, la fraction restante et les étapes du calcul.
+- Déplacer le curseur pour explorer la courbe sur dix périodes ; consulter le tableau des divisions par deux.
+- Charger un exemple : 800 kBq, période 8 jours, durée 24 jours → 100 kBq.
+Depuis une fiche isotopique, Étudier sa décroissance ouvre le formulaire avec la période nominale, la provenance et sa date. L’activité initiale reste à adapter au problème posé.
+Le modèle ne calcule pas l’activité totale des descendants. La convention d’année et l’absence de propagation des incertitudes sont affichées.
+Publication : remplacer l’ensemble du dossier publié, incluant decay-calculator.js, puis recharger la PWA.

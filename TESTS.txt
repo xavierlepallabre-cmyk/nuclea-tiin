@@ -56,3 +56,26 @@ Interface Edge/Chromium : trois largeurs 390, 820 et 1440 pixels, thèmes clair/
 - Contrôle visuel des captures mobile clair et ordinateur sombre.
 - Données isotopiques et assets du design v0.6 conservés à l’identique.
 Pas de nouvelle validation sur appareil Android physique ni de schéma complet des niveaux excités.
+
+
+VALIDATION v0.8 — 19 octobre 2026
+Calculs :
+- 800 kBq, période de 8 jours, durée 24 jours : 100 kBq ; 12,5 % ; 3 périodes.
+- Calcul inverse avec activité visée 0,1 MBq : 24 jours.
+- Période 12,5 h et durée 750 min : une période, activité divisée par deux.
+- Durée nulle et activité visée égale à A0 : résultats limites corrects.
+- Virgule décimale, notation scientifique, conversion année = 365,25 jours.
+- Rejet période non positive, activité initiale non positive, durée négative, cible nulle/négative/supérieure à A0, valeurs absentes/non numériques, unités inconnues et débordements.
+- Quotient extrême 1e300/1e-300 résolu sans débordement par différence de logarithmes.
+- Sous-flux du calcul direct détecté.
+
+Interface Edge/Chromium, 390, 820 et 1440 px :
+- Deux modes du calculateur, saisie en unités mixtes, erreurs expliquées et suppression des résultats périmés en cas d’erreur.
+- Courbe SVG, curseur d’exploration et sept repères tabulaires.
+- Transfert depuis Tc-99m : période 6.0072 h et source de niveaux AIEA ; suppression de cette provenance après modification manuelle de la période.
+- Bouton de transfert désactivé pour C-12 stable.
+- Calculateur accessible après rechargement hors connexion en thème sombre ; absence de débordement horizontal du composant.
+- Tests des chaînes, branches, filtre actinides, Retour/Avancer, Échap et fiches isotopiques de la v0.7 conservés.
+- Contrôle visuel mobile sombre ; aucun message d’erreur JavaScript.
+- Six rubriques du formulaire, données isotopiques, moteur de filiation et logos conservés.
+Limites : aucune propagation d’incertitudes, pas de calcul de filiation radioactive temporelle, pas de nouvelle validation sur appareil Android physique.
