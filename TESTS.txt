@@ -15,3 +15,5 @@ Tests automatisés dans Microsoft Edge (moteur Chromium), fenêtres de 390 × 90
 - Vérification syntaxique JavaScript réussie.
 
 Limites : formats téléphone/tablette simulés dans le navigateur ; pas de test sur Android physique, de geste système réel ni de publication effective sur GitHub Pages. Retour est relié à popstate, événement utilisé par la navigation historique du navigateur Android.
+
+Validation v0.3.1 : nouvelle exécution des tests aux trois largeurs réussie ; miniature, commandes de zoom et aide masquées sur ordinateur à 820 et 1440 px. Retour Android confirmé fonctionnel par l’utilisateur sur la v0.3.

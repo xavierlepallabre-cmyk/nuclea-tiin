@@ -1,4 +1,4 @@
-Nucléa TIIN v0.3
+Nucléa TIIN v0.3.1
 
 PUBLICATION SUR GITHUB PAGES
 1. Extraire l’archive.
@@ -21,3 +21,6 @@ CONTENU
 
 VALIDATION
 Voir TESTS.txt. Le geste Retour physique sur un appareil Android reste à confirmer sur appareil réel.
+
+Version 0.3.1 : sur ordinateur avec souris ou pavé tactile et fenêtre supérieure à 700 px, affichage direct du tableau ajusté, sans miniature ni barre de zoom.
+Retour Android confirmé fonctionnel par l’utilisateur.

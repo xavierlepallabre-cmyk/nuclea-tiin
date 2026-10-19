@@ -73,7 +73,7 @@ document.addEventListener("keydown",e=>{
 });
 function fitTable(){
   const available=viewport.clientWidth-16;
-  if(window.matchMedia("(min-width: 1024px)").matches){
+  if(window.matchMedia("(min-width: 701px) and (hover: hover) and (pointer: fine)").matches){
     setZoom(Math.max(.5,Math.min(1.8,(available-68)/(18*56))));
   }else setZoom(1);
   requestAnimationFrame(()=>centerAt(0,0));
@@ -86,7 +86,9 @@ new ResizeObserver(()=>{
   const width=viewport.clientWidth;
   if(width&&width!==lastViewportWidth){
     lastViewportWidth=width;
-    if(window.matchMedia("(min-width:1024px)").matches&&!detailOpen)fitTable();
+    if(window.matchMedia("(min-width: 701px) and (hover: hover) and (pointer: fine)").matches&&!detailOpen)fitTable();
     else updateWindow();
   }
 }).observe(viewport);
+
+window.matchMedia("(hover: hover) and (pointer: fine)").addEventListener("change",()=>{if(!detailOpen)fitTable()});
