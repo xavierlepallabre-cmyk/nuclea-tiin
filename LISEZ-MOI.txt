@@ -1,4 +1,4 @@
-Nucléa TIIN v0.5
+Nucléa TIIN v0.6
 
 PUBLICATION SUR GITHUB PAGES
 1. Extraire l’archive.
@@ -30,3 +30,14 @@ ISOTOPES v0.5
 
 FAMILLES v0.5
 Cliquer sur une famille affiche une définition et redessine une grille compacte ne contenant que ses éléments, triés par numéro atomique. Un second clic sur la famille active rétablit les 118 éléments et la vue précédente. Un clic sur une autre famille change le filtre. Le bouton Afficher les 118 éléments rétablit également le tableau complet. La recherche est conservée et agit dans la famille choisie. Les fiches isotopiques restent disponibles.
+
+DESIGN v0.6 — identité Lycée Alexis de Tocqueville
+- Couleurs du logo : bleu Tocqueville #1A3C89 et orange #F18A52 ; police Lexend (Google Fonts, mise en cache par le service worker au premier chargement, repli sur la police système).
+- En-tête avec le logo du lycée (toujours sur fond blanc), navigation à onglets avec icônes (barre du bas sur téléphone).
+- Thème clair / sombre : suit le réglage de l’appareil, bouton lune/soleil pour forcer un thème (mémorisé sur l’appareil).
+- Pastille « Hors ligne » affichée uniquement quand le réseau est coupé.
+- Tableau : noms des éléments visibles dès que les cases sont assez larges, repères 57–71 et 89–103, séries f séparées.
+- Fiche élément : protons / neutrons / nucléons / électrons avec les couleurs des particules, notation nucléaire A/Z, informations en liste.
+- Formulaire en cartes numérotées ; page À propos avec les logos Tocqueville et Bac Pro TIIN.
+- Nouvelles icônes d’application (PNG 192/512 et maskable) dans assets/.
+Fonctionnement, données et comportements (fiche, Retour, familles, zoom, hors connexion) inchangés.
