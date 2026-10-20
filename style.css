@@ -376,7 +376,7 @@ main{flex:1;width:100%;max-width:1320px;margin:0 auto;padding:28px 24px 40px}
 .exponent-btn{justify-self:start;font-size:11px;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;cursor:pointer;padding:5px 9px}.formula>summary{cursor:pointer;list-style:none}.formula>summary .formula-head{margin:0}.formula>summary::after{content:'Développer / replier';font-size:11px;color:var(--muted)}.formula .formula-item summary{cursor:pointer}.formula .formula-item p{padding:4px 8px}details.formula[open]>.formula-item{margin-top:12px}
 #energyTool{scroll-margin-top:100px;margin-bottom:24px}#energyTool>h2{margin-bottom:12px}#energyIsotope{display:block;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);max-width:100%;margin:10px 0}#energyResult{padding:16px;background:var(--surface-2);border-radius:12px;margin:14px 0;font-size:13px;overflow-wrap:anywhere}.aston-plot svg{width:100%;height:auto;touch-action:pan-y}.aston-plot text{font:12px var(--font);fill:var(--muted)}.aston-point{fill:var(--brand-text);opacity:.45}.aston-selected{fill:var(--accent);stroke:var(--ink);stroke-width:1}.aston-region{fill:var(--ok);opacity:.09}#astonCandidates{display:flex;gap:5px;flex-wrap:wrap;margin:12px 0}#astonCandidates button{font-size:11px}
 #dateTool{margin:24px 0;scroll-margin-top:100px}#dateTool h2,#dateTool h3,#dateTool h4{margin:12px 0}.tool-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.tool-tabs [aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}#dateTool input:not([type="range"]),#dateTool select{max-width:100%;width:100%;min-height:44px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:9px}#dateTool label{display:block;font-size:13px;margin:8px 0}#dateTool details{padding:12px;border:1px solid var(--line);border-radius:10px;margin:12px 0}#dateTool summary{cursor:pointer}.prep-phase{border:1px solid var(--line);border-radius:12px;padding:14px;margin:18px 0}.prep-phase legend{font-weight:600}.data-table-wrap{overflow-x:auto}.data-table-wrap table{border-collapse:collapse;font-size:12px;width:100%}.data-table-wrap th,.data-table-wrap td{border-bottom:1px solid var(--line);padding:10px;white-space:nowrap;text-align:left}#dtResult,#prepResults,#prepComparison{background:var(--surface-2);border-radius:12px;padding:14px;margin:14px 0;font-size:13px}#prepError,#dtError{color:var(--accent-text)}#prepStatus{font-size:12px;color:var(--muted)}
-#exerciseTools input,#exerciseTools select{width:100%;min-height:44px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}#exerciseQuestion{font-size:19px;line-height:1.6;margin:20px 0}#exerciseFeedback{margin-top:14px;color:var(--brand-text)}#exerciseHints{padding-left:20px}#exerciseHints li{margin:12px 0}
+#exerciseTools input,#exerciseTools select{width:100%;min-height:48px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px}
 .update-bar{position:fixed;bottom:85px;left:12px;right:12px;max-width:850px;margin:auto;padding:16px;z-index:150;display:flex;gap:12px;flex-wrap:wrap;align-items:center;border:1px solid var(--accent);border-radius:14px;background:var(--surface);box-shadow:var(--shadow-lg);font-size:13px}.update-bar span{flex:1;min-width:200px}
 
 #energyOutputUnit{display:block;min-height:44px;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);margin:8px 0;max-width:100%}@media(max-width:420px){.brand-text .eyebrow{font-size:8px;letter-spacing:.04em;white-space:normal;max-width:180px}.brand-text{min-width:0}.brand{min-width:0}}
@@ -404,3 +404,50 @@ body.visual-open{overflow:hidden}
 .visual-bar strong{font-size:17px;font-weight:600;color:var(--brand-text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .visual-viewer iframe{flex:1;width:100%;border:0;background:var(--bg)}
 @media (max-width:700px){.visual-bar .close-detail{width:auto;padding:8px 14px;border-radius:var(--r-md)}.visual-bar .close-detail span{display:inline}}
+
+/* ---------- Exercices v0.11 : choisir en deux touches, répondre, vérifier ---------- */
+#exerciseTools{display:grid;gap:16px}
+.ex-pick{display:grid;gap:18px;padding:18px 20px}
+.ex-step{display:grid;gap:10px}
+.ex-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.ex-themes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media(min-width:700px){.ex-themes{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.ex-theme{display:flex;align-items:center;gap:10px;min-height:56px;padding:10px 12px;text-align:left;font:inherit;font-size:14px;font-weight:500;line-height:1.25;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-md);cursor:pointer}
+.ex-theme svg{flex:none;width:24px;height:24px;fill:none;stroke:var(--muted);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ex-theme[aria-checked="true"]{border-color:var(--brand-text);background:var(--surface-2);color:var(--brand-text);font-weight:600}
+.ex-theme[aria-checked="true"] svg{stroke:var(--accent-text)}
+.ex-levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1.5px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+.ex-level{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-height:56px;padding:6px;font:inherit;color:var(--ink);background:var(--surface);border:0;border-left:1.5px solid var(--line);cursor:pointer}
+.ex-level:first-child{border-left:0}
+.ex-level b{font-size:19px;line-height:1.1}
+.ex-level span{font-size:12.5px;color:var(--muted)}
+.ex-level[aria-checked="true"]{background:var(--primary);color:var(--on-primary)}
+.ex-level[aria-checked="true"] span{color:var(--on-primary);opacity:.85}
+.ex-level-hint{margin:0;font-size:13px;color:var(--muted)}
+.ex-theme:focus-visible,.ex-level:focus-visible,.ex-link:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.ex-card{display:grid;gap:14px;padding:18px 20px}
+.ex-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.ex-meta{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--accent-text)}
+#exerciseQuestion{font-size:19px;line-height:1.55;font-weight:600;color:var(--ink);margin:0}
+.ex-answer{display:grid;grid-template-columns:minmax(0,1fr) minmax(120px,.55fr);gap:10px 10px;align-items:end}
+.ex-field{display:grid;gap:6px;min-width:0}
+.ex-field label{font-size:13px;font-weight:500;color:var(--muted)}
+.ex-field:first-child{position:relative}
+.ex-field .exponent-btn{position:absolute;right:6px;bottom:6px;min-height:36px}
+.ex-field:first-child input{padding-right:64px}
+.ex-check{grid-column:1/-1;min-height:50px;font-size:16px}
+@media(min-width:700px){.ex-answer{grid-template-columns:minmax(0,1fr) 180px auto}.ex-check{grid-column:auto;min-width:140px}}
+.ex-feedback{display:grid;gap:2px;padding:12px 14px;border-radius:var(--r-md);background:var(--accent-soft);color:var(--ink);border:1px solid transparent}
+.ex-feedback strong{color:var(--accent-text);font-size:16px}
+.ex-feedback.is-ok{background:var(--ok-soft);border-color:var(--ok-line)}
+.ex-feedback.is-ok strong{color:var(--ok)}
+.ex-next{justify-self:start;min-height:48px}
+.ex-hints{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.ex-hints:empty{display:none}
+.ex-hints li{padding:10px 12px;border-radius:var(--r-md);background:var(--surface-2);line-height:1.5}
+.ex-hints li b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--brand-text)}
+.ex-tools{display:flex;flex-wrap:wrap;gap:4px 14px;border-top:1px solid var(--line);padding-top:8px}
+.ex-link{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:4px 2px;font:inherit;font-size:14px;font-weight:600;color:var(--brand-text);background:none;border:0;cursor:pointer}
+.ex-link svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ex-link:disabled{color:var(--muted);cursor:default}
+.ex-note{margin:0;font-size:12.5px;color:var(--muted)}

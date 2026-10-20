@@ -1,1 +1,1 @@
-{"name":"nuclea-tiin","version":"0.10.0","private":true,"scripts":{"test":"node tests/run.cjs","test:ui":"node tests/ui.cjs && node tests/touch-update.cjs && node tests/security.cjs"},"devDependencies":{"playwright":"1.62.1"}}
+{"name":"nuclea-tiin","version":"0.11.0","private":true,"scripts":{"test":"node tests/run.cjs","test:ui":"node tests/ui.cjs && node tests/touch-update.cjs && node tests/security.cjs"},"devDependencies":{"playwright":"1.62.1"}}
