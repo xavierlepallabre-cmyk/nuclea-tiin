@@ -374,7 +374,7 @@ main{flex:1;width:100%;max-width:1320px;margin:0 auto;padding:28px 24px 40px}
 .reference-a{display:none;font-size:8px}.periodic[data-density="far"] .z,.periodic[data-density="far"] .mass,.periodic[data-density="far"] .element-name{display:none}.periodic[data-density="far"] .symbol{font-size:15px;margin-top:0}.periodic[data-density="medium"] .mass,.periodic[data-density="medium"] .element-name{display:none}.periodic[data-density="near"] .reference-a{display:block}.family-filtered .periodic .z,.family-filtered .periodic .mass,.family-filtered .periodic .element-name{display:block}.family-filtered .periodic .reference-a{display:none}
 @media(max-width:700px){.tabs button{font-size:10px}.top-actions{gap:4px}.top-actions .icon-btn{width:36px}}
 .exponent-btn{justify-self:start;font-size:11px;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;cursor:pointer;padding:5px 9px}.formula>summary{cursor:pointer;list-style:none}.formula>summary .formula-head{margin:0}.formula>summary::after{content:'Développer / replier';font-size:11px;color:var(--muted)}.formula .formula-item summary{cursor:pointer}.formula .formula-item p{padding:4px 8px}details.formula[open]>.formula-item{margin-top:12px}
-#energyTool{scroll-margin-top:100px;margin-bottom:24px}#energyTool>h2{margin-bottom:12px}#energyIsotope{display:block;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);max-width:100%;margin:10px 0}#energyResult{padding:16px;background:var(--surface-2);border-radius:12px;margin:14px 0;font-size:13px;overflow-wrap:anywhere}.aston-plot svg{width:100%;height:auto;touch-action:pan-y}.aston-plot text{font:12px var(--font);fill:var(--muted)}.aston-point{fill:var(--brand-text);opacity:.45}.aston-selected{fill:var(--accent);stroke:var(--ink);stroke-width:1}.aston-region{fill:var(--ok);opacity:.09}#astonCandidates{display:flex;gap:5px;flex-wrap:wrap;margin:12px 0}#astonCandidates button{font-size:11px}
+#energyTool{scroll-margin-top:100px;margin-bottom:24px}#energyTool>h2{margin-bottom:12px}#energyIsotope{display:block;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);max-width:100%;margin:10px 0}#energyResult{padding:0;margin:14px 0;font-size:13px;overflow-wrap:anywhere}
 #dateTool{margin:24px 0;scroll-margin-top:100px}#dateTool h2,#dateTool h3,#dateTool h4{margin:12px 0}.tool-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.tool-tabs [aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}#dateTool input:not([type="range"]),#dateTool select{max-width:100%;width:100%;min-height:44px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:9px}#dateTool label{display:block;font-size:13px;margin:8px 0}#dateTool details{padding:12px;border:1px solid var(--line);border-radius:10px;margin:12px 0}#dateTool summary{cursor:pointer}.prep-phase{border:1px solid var(--line);border-radius:12px;padding:14px;margin:18px 0}.prep-phase legend{font-weight:600}.data-table-wrap{overflow-x:auto}.data-table-wrap table{border-collapse:collapse;font-size:12px;width:100%}.data-table-wrap th,.data-table-wrap td{border-bottom:1px solid var(--line);padding:10px;white-space:nowrap;text-align:left}#dtResult,#prepResults,#prepComparison{background:var(--surface-2);border-radius:12px;padding:14px;margin:14px 0;font-size:13px}#prepError,#dtError{color:var(--accent-text)}#prepStatus{font-size:12px;color:var(--muted)}
 #exerciseTools input,#exerciseTools select{width:100%;min-height:48px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px}
 .update-bar{position:fixed;bottom:85px;left:12px;right:12px;max-width:850px;margin:auto;padding:16px;z-index:150;display:flex;gap:12px;flex-wrap:wrap;align-items:center;border:1px solid var(--accent);border-radius:14px;background:var(--surface);box-shadow:var(--shadow-lg);font-size:13px}.update-bar span{flex:1;min-width:200px}
@@ -451,3 +451,39 @@ body.visual-open{overflow:hidden}
 .ex-link svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .ex-link:disabled{color:var(--muted);cursor:default}
 .ex-note{margin:0;font-size:12.5px;color:var(--muted)}
+
+/* ---------- Courbe d’Aston lisible sur téléphone (v0.13) ---------- */
+.energy-intro{margin:0 0 12px;color:var(--muted)}
+.energy-pick{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:10px;align-items:end}
+.energy-field{display:grid;gap:6px;min-width:0}.energy-field label{font-size:13px;font-weight:500;color:var(--muted)}
+#energyTool #energyIsotope,#energyTool #energyOutputUnit{width:100%;min-height:48px;margin:0;padding:10px 12px;font:inherit;font-size:16px;color:var(--ink);border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.energy-key{display:grid;gap:2px;padding:14px 16px;border-radius:12px;background:var(--surface-2)}
+.energy-nuclide{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-text)}
+.energy-key strong{font-size:22px;line-height:1.25;color:var(--brand-text);font-weight:700}
+.energy-key span:last-child{font-size:14px;color:var(--muted)}
+.energy-details{margin-top:8px;padding:10px 14px;border:1px solid var(--line);border-radius:12px}
+.energy-details summary{cursor:pointer;font-weight:600;color:var(--brand-text);min-height:32px;display:flex;align-items:center}
+.aston-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px}
+.aston-zoom{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.aston-zoom button{min-height:40px;padding:6px 12px;font:inherit;font-size:13px;font-weight:600;color:var(--brand-text);background:var(--surface);border:0;cursor:pointer}
+.aston-zoom button+button{border-left:1px solid var(--line)}
+.aston-zoom button[aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}
+.aston-hint{margin:6px 0 8px;font-size:13px;color:var(--muted)}
+.aston-plot{width:100%;overflow:hidden}
+.aston-plot svg{display:block;width:100%;height:auto;stroke:none;stroke-width:0;fill:var(--muted);touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.aston-plot text{font:12px var(--font);fill:var(--muted)}
+.aston-plot .aston-axis{font-size:11.5px}
+.aston-grid line{stroke:var(--line);stroke-width:1}
+.aston-points circle{fill:var(--brand-text);opacity:.5}
+.aston-region{fill:var(--ok);opacity:.1}
+.aston-max{fill:none;stroke:var(--ok);stroke-width:2}
+.aston-plot .aston-tag{font-size:12px;font-weight:600;fill:var(--accent-text)}
+.aston-guide{stroke:var(--accent);stroke-width:1.5;stroke-dasharray:4 4}
+.aston-selected{fill:var(--accent);stroke:var(--surface);stroke-width:2.5}
+.aston-label-bg{fill:var(--ink);opacity:.92}
+.aston-plot .aston-label{font-size:12.5px;font-weight:600;fill:var(--surface)}
+#astonCandidates{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0}
+.aston-chip{min-height:36px;padding:4px 10px;font:inherit;font-size:12.5px;color:var(--brand-text);background:var(--surface);border:1px solid var(--line);border-radius:999px;cursor:pointer}
+.aston-more{margin:12px 0;padding:10px 14px;border:1px solid var(--line);border-radius:12px}
+.aston-more summary{cursor:pointer;font-weight:600;color:var(--brand-text)}
+#astonMaximum{font-size:13px;color:var(--muted);margin:10px 0 0}
