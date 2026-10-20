@@ -487,3 +487,6 @@ body.visual-open{overflow:hidden}
 .aston-more{margin:12px 0;padding:10px 14px;border:1px solid var(--line);border-radius:12px}
 .aston-more summary{cursor:pointer;font-weight:600;color:var(--brand-text)}
 #astonMaximum{font-size:13px;color:var(--muted);margin:10px 0 0}
+
+.qcm-dialog{max-width:600px;width:calc(100% - 24px);padding:22px;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink)}.qcm-dialog::backdrop{background:var(--scrim)}.qcm-dialog input{width:100%;max-width:100%;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:9px;color:var(--ink)}.qcm-dialog li{margin:12px 0}
+.card:has(#joinCollective){margin-bottom:16px}
