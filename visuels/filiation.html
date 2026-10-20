@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="stylesheet" href="../assets/fonts/lexend.css">
+<script>try{const t=localStorage.getItem("nuclea-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}
+if(window.self!==window.top)document.documentElement.classList.add("embedded");</script>
+<title>Chaîne de filiation</title>
+</head>
+<body>
+<style>
+
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+.embedded header h1{display:none}
+.embedded body{padding-top:12px}
+/* Layout : régime en bandeau, analogie des réservoirs en pleine largeur, instruments, puis courbes A(t) */
+:root{
+  --bg:#F4F6FA; --panel:#FFFFFF; --ink:#0E1B36; --muted:#4A5A75; --line:#D5DDEA;
+  --pere:#E0661F; --fils:#2556B8; --stable:#8E9AAD; --glass:#EAF0F8; --ok:#1E7A4F;
+  --f-disp:Lexend,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:Lexend,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0A1430; --panel:#12204A; --ink:#EEF2FA; --muted:#A9B6D3; --line:#2B3F72;
+  --pere:#F6A06E; --fils:#8FB0F5; --stable:#AEB8C8; --glass:#1A2C5C; --ok:#7FD6A8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A1430; --panel:#12204A; --ink:#EEF2FA; --muted:#A9B6D3; --line:#2B3F72;
+  --pere:#F6A06E; --fils:#8FB0F5; --stable:#AEB8C8; --glass:#1A2C5C; --ok:#7FD6A8; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px}
+.wrap{max-width:1080px;margin:0 auto;display:grid;gap:16px}
+header h1{font-family:var(--f-disp);font-weight:700;font-size:clamp(26px,4vw,36px);margin:0;letter-spacing:.01em;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted);max-width:65ch}
+.controls{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.field{display:grid;gap:4px;min-width:0}
+.field.grow{flex:1 1 170px}
+label,.lab{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500}
+select,input[type=range]{font:inherit;color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--pere)}
+select{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px;max-width:100%}
+.val{font-family:var(--f-mono);font-size:13px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--ink)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button{font-family:var(--f-disp);font-weight:700;font-size:16px;letter-spacing:.03em;border-radius:4px;padding:8px 16px;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:var(--bg)}
+button.ghost{background:transparent;color:var(--ink)}
+button.fils{background:var(--fils);border-color:var(--fils);color:var(--panel)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--pere);outline-offset:2px}
+.regime{display:flex;gap:14px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--chip,var(--ok));border-radius:6px;padding:12px 16px}
+.regime b{font-family:var(--f-disp);font-size:20px;display:block}
+.regime p{margin:2px 0 0;color:var(--muted);max-width:80ch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px;display:grid;gap:10px;min-width:0}
+.card h2{font-family:var(--f-disp);font-size:18px;margin:0;font-weight:700}
+.head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.seg{display:flex;border:1px solid var(--ink);border-radius:4px;overflow:hidden}
+.seg button{border:0;border-radius:0;font-size:14px;padding:5px 12px;background:transparent;color:var(--ink)}
+.seg button.on{background:var(--ink);color:var(--bg)}
+canvas{width:100%;display:block;max-width:100%}
+#tanks{aspect-ratio:1000/370}
+#plot{aspect-ratio:16/8}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.ro{background:var(--panel);padding:10px 14px}
+.ro span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.ro b{font-family:var(--f-mono);font-weight:600;font-size:20px;font-variant-numeric:tabular-nums}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.sw{display:inline-block;width:16px;height:4px;vertical-align:middle;margin-right:6px;border-radius:2px}
+.eq{font-family:var(--f-mono);font-size:14px;color:var(--muted)}
+.eq strong{color:var(--ink);font-weight:600}
+.eq span{display:block;margin-top:4px}
+footer{font-size:13px;color:var(--muted);max-width:75ch}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Chaîne de filiation</h1>
+    <p>Le noyau père se désintègre en un noyau fils lui-même radioactif. Le fils est fabriqué au rythme de l'activité du père et disparaît au rythme de sa propre activité.</p>
+  </header>
+
+  <div class="controls">
+    <div class="field"><label for="ex">Filiation</label><select id="ex"></select></div>
+    <div class="field grow" id="cT1" hidden><label for="t1">T½ du père : <span class="val" id="t1V"></span></label><input id="t1" type="range" min="-1" max="3" step="0.02" value="1.3"></div>
+    <div class="field grow" id="cT2" hidden><label for="t2">T½ du fils : <span class="val" id="t2V"></span></label><input id="t2" type="range" min="-1" max="3" step="0.02" value="0.3"></div>
+    <div class="field grow"><label for="speed">Vitesse</label><input id="speed" type="range" min="0.2" max="3" step="0.1" value="1"></div>
+    <div class="btns">
+      <button id="play">Pause</button>
+      <button id="elute" class="fils">Séparer le fils</button>
+      <button id="reset" class="ghost">Réinitialiser</button>
+    </div>
+  </div>
+
+  <div class="regime" id="regime"><div><b id="rgT"></b><p id="rgD"></p></div></div>
+
+  <section class="card">
+    <h2>Analogie des réservoirs</h2>
+    <canvas id="tanks" width="1000" height="370"></canvas>
+    <div class="legend"><span>Le débit de chaque jet représente l'activité, à la même échelle pour les deux.</span><span>À l'équilibre, ce qui entre dans le réservoir fils égale ce qui en sort.</span></div>
+  </section>
+
+  <div class="readout">
+    <div class="ro"><span>Temps t</span><b id="rT"></b></div>
+    <div class="ro"><span>Activité du père</span><b id="rA1" style="color:var(--pere)"></b></div>
+    <div class="ro"><span>Activité du fils</span><b id="rA2" style="color:var(--fils)"></b></div>
+    <div class="ro"><span>A fils / A père</span><b id="rR"></b></div>
+    <div class="ro"><span>Rapport à l'équilibre</span><b id="rE"></b></div>
+  </div>
+
+  <section class="card">
+    <div class="head"><h2>Activités au cours du temps</h2>
+      <div class="seg" role="group" aria-label="Échelle de l'axe des activités">
+        <button id="lin" class="on" aria-pressed="true">Linéaire</button><button id="log" aria-pressed="false">Semi-log</button>
+      </div></div>
+    <canvas id="plot" width="1000" height="500"></canvas>
+    <div class="legend"><span><i class="sw" style="background:var(--pere)"></i><span id="lgP">Père</span></span><span><i class="sw" style="background:var(--fils)"></i><span id="lgF">Fils</span></span><span><i class="sw" style="background:var(--muted);opacity:.5"></i>Évolution prévue</span></div>
+    <div class="eq"><strong>dN₂/dt = λ₁N₁ − λ₂N₂</strong> &nbsp;·&nbsp; <strong>A₂(t) = A₁(0) · λ₂/(λ₂−λ₁) · (e<sup>−λ₁t</sup> − e<sup>−λ₂t</sup>)</strong>
+      <span>Activités en % de l'activité initiale du père A₀. Fils absent au départ (ou après séparation).</span></div>
+  </section>
+
+  <footer>Rapports d'embranchement pris en compte : 94,4 % des désintégrations du ¹³⁷Cs donnent le ¹³⁷ᵐBa, 87,6 % de celles du ⁹⁹Mo donnent le ⁹⁹ᵐTc. Les autres branches mènent directement à un noyau stable.</footer>
+</div>
+
+<script>
+const EXS=[
+  {id:"cs",p:"¹³⁷Cs",f:"¹³⁷ᵐBa",s:"¹³⁷Ba",T1:30.08*365.25*24*60,T2:2.552,u:"min",br:0.944,note:"La raie γ de 662 keV attribuée au césium est en réalité émise par le ¹³⁷ᵐBa."},
+  {id:"sr",p:"⁹⁰Sr",f:"⁹⁰Y",s:"⁹⁰Zr",T1:28.8*365.25,T2:2.67,u:"j",br:1,note:"Le ⁹⁰Y, β⁻ énergétique, domine l'irradiation β d'une source de ⁹⁰Sr."},
+  {id:"mo",p:"⁹⁹Mo",f:"⁹⁹ᵐTc",s:"⁹⁹Tc",T1:65.94,T2:6.01,u:"h",br:0.876,note:"Générateur de technétium des services de médecine nucléaire : on « trait » le ⁹⁹ᵐTc chaque jour, il se reforme."},
+  {id:"bi",p:"²¹⁰Bi",f:"²¹⁰Po",s:"²⁰⁶Pb",T1:5.01,T2:138.4,u:"j",br:1,note:"Le père a disparu en quelques semaines ; il reste le polonium qui décroît avec sa propre période."},
+  {id:"cu",p:"Père",f:"Fils",s:"stable",T1:20,T2:2,u:"u.t.",br:1,note:"Règle les deux périodes pour passer d'un régime à l'autre."}
+];
+const $=id=>document.getElementById(id);
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const fmt=(x,d)=>x.toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d});
+function rgb(h){h=h.replace("#","");const n=parseInt(h,16);return[n>>16&255,n>>8&255,n&255]}
+const rgba=(h,a)=>{const c=rgb(h);return`rgba(${c[0]},${c[1]},${c[2]},${a})`};
+EXS.forEach((e,i)=>{const o=document.createElement("option");o.value=i;o.textContent=e.id==="cu"?"Périodes au choix":`${e.p} → ${e.f} → ${e.s}`;$("ex").appendChild(o)});
+$("ex").value=2;
+
+let E,l1,l2,tmax,t,N1,N2,N1i,hist,pred,running=true,logMode=false,N2scale,last=0,eluted=0;
+function fmtT(T,u){if(u==="min"&&T>60*24*365)return`${fmt(T/525960,1)} ans`;if(u==="j"&&T>730)return`${fmt(T/365.25,1)} ans`;return`${fmt(T,T<10?2:1)} ${u}`}
+function step(n1,n2,h){
+  const e1=Math.exp(-l1*h),e2=Math.exp(-l2*h);
+  const src=Math.abs(l2-l1)<1e-12*Math.max(l1,l2)?E.br*l1*n1*h*e1:E.br*l1*n1*(e1-e2)/(l2-l1);
+  return[n1*e1,n2*e2+src];
+}
+function predict(t0,n1,n2){const pts=[];for(let i=0;i<=240;i++){const tt=t0+(tmax-t0)*i/240,[a,b]=step(n1,n2,tt-t0);pts.push([tt,l1*a,l2*b])}return pts}
+function regime(){
+  const r=E.T1/E.T2;
+  if(r>=100)return{k:"Équilibre séculaire",c:"--ok",d:`T½ du père (${fmtT(E.T1,E.u)}) ≫ T½ du fils (${fmtT(E.T2,E.u)}). Au bout de 7 à 10 périodes du fils, l'activité du fils rejoint celle du père et la suit : A fils = A père${E.br<1?` × ${fmt(E.br,3)} (embranchement)`:""}.`};
+  if(r>1)return{k:"Équilibre transitoire",c:"--fils",d:`T½ du père (${fmtT(E.T1,E.u)}) > T½ du fils (${fmtT(E.T2,E.u)}). Le fils dépasse le père puis les deux décroissent ensemble, avec la période du père, dans un rapport constant.`};
+  return{k:"Pas d'équilibre",c:"--pere",d:`T½ du père (${fmtT(E.T1,E.u)}) < T½ du fils (${fmtT(E.T2,E.u)}). Le père disparaît le premier ; il ne reste que le fils, qui décroît avec sa propre période.`};
+}
+function reset(){
+  E=EXS[+$("ex").value];
+  if(E.id==="cu"){E.T1=Math.pow(10,+$("t1").value);E.T2=Math.pow(10,+$("t2").value);$("t1V").textContent=`${fmt(E.T1,E.T1<10?2:1)} u.t.`;$("t2V").textContent=`${fmt(E.T2,E.T2<10?2:1)} u.t.`}
+  $("cT1").hidden=$("cT2").hidden=E.id!=="cu";
+  l1=Math.LN2/E.T1;l2=Math.LN2/E.T2;
+  const r=E.T1/E.T2;tmax=r>=20?10*E.T2:(r>1?2.5*E.T1:4*E.T2);
+  t=0;N1=N1i=1/l1;N2=0;hist=[[0,1,0]];eluted=0;pred=predict(0,N1,N2);
+  N2scale=Math.max(...pred.map(p=>p[2]/l2))*1.12;
+  const rg=regime();$("rgT").textContent=rg.k;$("rgD").textContent=`${rg.d} ${E.note}`;$("regime").style.setProperty("--chip",`var(${rg.c})`);
+  $("lgP").textContent=`Père ${E.p} (T½ = ${fmtT(E.T1,E.u)})`;$("lgF").textContent=`Fils ${E.f} (T½ = ${fmtT(E.T2,E.u)})`;
+  $("rE").textContent=r>1?fmt(E.br*l2/(l2-l1),3):"aucun";
+}
+function advance(h){if(t>=tmax)return;h=Math.min(h,tmax-t);[N1,N2]=step(N1,N2,h);t+=h;hist.push([t,l1*N1,l2*N2]);if(t>=tmax){running=false;$("play").textContent="Relancer"}}
+
+// ----- réservoirs -----
+function tank(g,x,y,w,h,fill,col,label,sub){
+  const ink=css("--ink");
+  g.fillStyle=css("--glass");g.fillRect(x,y,w,h);
+  const lv=Math.max(0,Math.min(1,fill))*h,now=performance.now()/600;
+  if(lv>0.5){g.fillStyle=rgba(col,.78);g.beginPath();g.moveTo(x,y+h);
+    for(let i=0;i<=w;i+=4)g.lineTo(x+i,y+h-lv+Math.sin(i/22+now)*Math.min(3,lv/4));g.lineTo(x+w,y+h);g.closePath();g.fill()}
+  g.strokeStyle=ink;g.lineWidth=2.5;g.beginPath();g.moveTo(x,y);g.lineTo(x,y+h);g.lineTo(x+w,y+h);g.lineTo(x+w,y);g.stroke();
+  g.fillStyle=ink;g.font="600 22px ui-monospace, Menlo, Consolas, monospace";g.textAlign="center";g.fillText(label,x+w/2,y-28);
+  g.font="16px ui-monospace, Menlo, Consolas, monospace";g.fillStyle=css("--muted");g.fillText(sub,x+w/2,y-8);
+}
+function stream(g,pts,w,col){
+  if(w<0.6)return;
+  g.lineCap="round";g.lineJoin="round";g.strokeStyle=rgba(col,.85);g.lineWidth=w;g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.stroke();
+  g.strokeStyle="rgba(255,255,255,.45)";g.lineWidth=Math.max(1,w*.3);g.setLineDash([6,14]);g.lineDashOffset=-performance.now()/25;g.stroke();g.setLineDash([]);g.lineCap="butt";
+}
+function drawTanks(){
+  const c=$("tanks"),g=c.getContext("2d"),W=c.width,H=c.height,ink=css("--ink"),mut=css("--muted");
+  g.clearRect(0,0,W,H);
+  const A1=l1*N1,A2=l2*N2,wOf=a=>Math.min(46,a*40),P=css("--pere"),F=css("--fils");
+  const t1={x:70,y:70,w:230,h:220},t2={x:470,y:150,w:220,h:170};
+  // tuyaux
+  g.strokeStyle=mut;g.lineWidth=14;g.beginPath();g.moveTo(t1.x+t1.w,t1.y+t1.h-12);g.lineTo(560,t1.y+t1.h-12);g.stroke();
+  g.beginPath();g.moveTo(t2.x+t2.w,t2.y+t2.h-12);g.lineTo(840,t2.y+t2.h-12);g.stroke();
+  // jets
+  stream(g,[[t1.x+t1.w-6,t1.y+t1.h-12],[560,t1.y+t1.h-12],[566,t2.y+t2.h-Math.max(4,Math.min(1,N2/N2scale)*t2.h)]],wOf(A1*E.br),P);
+  stream(g,[[t2.x+t2.w-6,t2.y+t2.h-12],[840,t2.y+t2.h-12],[846,H-30]],wOf(A2),F);
+  tank(g,t1.x,t1.y,t1.w,t1.h,N1/N1i,P,`Père ${E.p}`,`N₁ : ${fmt(N1/N1i*100,1)} % du départ`);
+  tank(g,t2.x,t2.y,t2.w,t2.h,N2/N2scale,F,`Fils ${E.f}`,"niveau à son échelle");
+  // descendant stable
+  g.fillStyle=css("--stable");g.fillRect(780,H-30,170,22);g.fillStyle=ink;g.font="600 18px ui-monospace, Menlo, Consolas, monospace";g.textAlign="center";g.fillText(`${E.s} (stable)`,865,H-38-Math.min(40,wOf(A2)/2));
+  // étiquettes de débit
+  g.font="600 18px ui-monospace, Menlo, Consolas, monospace";g.textAlign="left";
+  g.fillStyle=P;g.fillText(`A₁ = ${fmt(A1*100,1)} %`,t1.x+t1.w+16,t1.y+t1.h-34);
+  g.fillStyle=F;g.fillText(`A₂ = ${fmt(A2*100,1)} %`,t2.x+t2.w+16,t2.y+t2.h-34);
+  if(E.br<1){g.fillStyle=mut;g.font="15px ui-monospace, Menlo, Consolas, monospace";g.fillText(`dont ${fmt(E.br*100,1)} % vers le fils`,t1.x+t1.w+16,t1.y+t1.h+18)}
+}
+
+// ----- courbes -----
+function drawPlot(){
+  const c=$("plot"),g=c.getContext("2d"),W=c.width,H=c.height,L=80,R=24,T=20,B=60,pw=W-L-R,ph=H-T-B;
+  const ink=css("--ink"),mut=css("--muted"),line=css("--line"),P=css("--pere"),F=css("--fils");
+  const allMax=Math.max(1,...pred.map(p=>p[2]),...hist.map(p=>p[2]));
+  const yTop=logMode?Math.pow(10,Math.ceil(Math.log10(allMax*1.05)+0.0001)):Math.ceil(allMax*1.1*10)/10;
+  const yBot=1e-3;
+  const X=v=>L+v/tmax*pw,Y=logMode?v=>T+ph-Math.log10(Math.max(v,yBot)/yBot)/Math.log10(yTop/yBot)*ph:v=>T+ph-v/yTop*ph;
+  g.clearRect(0,0,W,H);g.font="19px ui-monospace, Menlo, Consolas, monospace";g.lineWidth=1;
+  for(let i=0;i<=8;i++){const v=tmax*i/8;g.strokeStyle=line;g.beginPath();g.moveTo(X(v),T);g.lineTo(X(v),T+ph);g.stroke();
+    g.fillStyle=mut;g.textAlign="center";g.fillText(fmt(v,v<10?1:0),X(v),H-B+28)}
+  g.textAlign="right";g.fillText(`t (${E.u})`,L+pw,H-6);
+  const yt=logMode?Array.from({length:Math.round(Math.log10(yTop/yBot))+1},(_,k)=>yBot*10**k):Array.from({length:6},(_,k)=>yTop*k/5);
+  yt.forEach(v=>{g.strokeStyle=line;g.beginPath();g.moveTo(L,Y(v));g.lineTo(L+pw,Y(v));g.stroke();
+    g.fillStyle=mut;g.textAlign="right";g.fillText(`${fmt(v*100,v<.01?1:0)} %`,L-8,Y(v)+6)});
+  g.save();g.beginPath();g.rect(L,T,pw,ph);g.clip();
+  const line2=(pts,k,col,w,a)=>{g.globalAlpha=a;g.strokeStyle=col;g.lineWidth=w;g.beginPath();pts.forEach((p,i)=>i?g.lineTo(X(p[0]),Y(p[k])):g.moveTo(X(p[0]),Y(p[k])));g.stroke();g.globalAlpha=1};
+  g.setLineDash([7,7]);line2(pred,1,P,2,.45);line2(pred,2,F,2,.45);g.setLineDash([]);
+  line2(hist,1,P,3.5,1);line2(hist,2,F,3.5,1);
+  g.strokeStyle=ink;g.globalAlpha=.4;g.beginPath();g.moveTo(X(t),T);g.lineTo(X(t),T+ph);g.stroke();g.globalAlpha=1;
+  [[1,P],[2,F]].forEach(([k,col])=>{const v=k===1?l1*N1:l2*N2;g.fillStyle=col;g.beginPath();g.arc(X(t),Y(v),7,0,7);g.fill()});
+  g.restore();
+}
+
+function readouts(){
+  const A1=l1*N1,A2=l2*N2;
+  $("rT").textContent=fmtT(t,E.u);
+  $("rA1").textContent=`${fmt(A1*100,A1<.1?2:1)} %`;$("rA2").textContent=`${fmt(A2*100,A2<.1?2:1)} %`;
+  $("rR").textContent=A1>1e-9?fmt(A2/A1,3):"—";
+}
+function loop(now){
+  const dt=Math.min((now-last)/1000,.05);last=now;
+  if(running)advance(dt*+$("speed").value*tmax/20);
+  drawTanks();drawPlot();readouts();requestAnimationFrame(loop);
+}
+function setScale(l){logMode=l;$("lin").classList.toggle("on",!l);$("log").classList.toggle("on",l);$("lin").setAttribute("aria-pressed",!l);$("log").setAttribute("aria-pressed",l)}
+$("lin").onclick=()=>setScale(false);$("log").onclick=()=>setScale(true);
+$("play").onclick=()=>{if(t>=tmax){reset();running=true}else running=!running;$("play").textContent=running?"Pause":"Reprendre"};
+$("reset").onclick=()=>{reset();running=true;$("play").textContent="Pause"};
+$("elute").onclick=()=>{N2=0;hist.push([t,l1*N1,0]);pred=predict(t,N1,0);eluted++};
+const restart=()=>{reset();running=true;$("play").textContent="Pause"};
+$("ex").onchange=restart;$("t1").oninput=restart;$("t2").oninput=restart;
+reset();for(let i=0;i<40;i++)advance(tmax*0.25/40);
+requestAnimationFrame(n=>{last=n;loop(n)});
+</script>
+
+<script>window.addEventListener("storage",e=>{if(e.key==="nuclea-theme"){if(e.newValue==="light"||e.newValue==="dark")document.documentElement.dataset.theme=e.newValue;else delete document.documentElement.dataset.theme}})</script>
+</body>
+</html>

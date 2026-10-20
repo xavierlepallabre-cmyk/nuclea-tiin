@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="stylesheet" href="../assets/fonts/lexend.css">
+<script>try{const t=localStorage.getItem("nuclea-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}
+if(window.self!==window.top)document.documentElement.classList.add("embedded");</script>
+<title>Débit de dose et distance</title>
+</head>
+<body>
+<style>
+
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+.embedded header h1{display:none}
+.embedded body{padding-top:12px}
+/* Layout : vue de dessus du local (carte de débit de dose) en pleine largeur, instruments, puis courbe D(d) */
+:root{
+  --bg:#F4F6FA; --panel:#FFFFFF; --ink:#0E1B36; --muted:#4A5A75; --line:#D5DDEA;
+  --hot:#E0661F; --src:#F2B84B; --ref1:#1A3C89; --ref2:#7A4FB8; --op:#0E1B36;
+  --f-disp:Lexend,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:Lexend,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0A1430; --panel:#12204A; --ink:#EEF2FA; --muted:#A9B6D3; --line:#2B3F72;
+  --hot:#F6A06E; --src:#F2C14E; --ref1:#9DB8F5; --ref2:#C3A6F0; --op:#EEF2FA; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A1430; --panel:#12204A; --ink:#EEF2FA; --muted:#A9B6D3; --line:#2B3F72;
+  --hot:#F6A06E; --src:#F2C14E; --ref1:#9DB8F5; --ref2:#C3A6F0; --op:#EEF2FA; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px}
+.wrap{max-width:1080px;margin:0 auto;display:grid;gap:16px}
+header h1{font-family:var(--f-disp);font-weight:700;font-size:clamp(26px,4vw,36px);margin:0;letter-spacing:.01em;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted);max-width:65ch}
+.controls{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.field{display:grid;gap:4px;min-width:0}
+.field.grow{flex:1 1 180px}
+label,.lab{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500}
+select,input[type=range]{font:inherit;color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--hot)}
+select{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px}
+.val{font-family:var(--f-mono);font-size:13px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--ink)}
+button{font-family:var(--f-disp);font-weight:700;letter-spacing:.03em;cursor:pointer}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
+.seg{display:flex;border:1px solid var(--ink);border-radius:4px;overflow:hidden;width:max-content}
+.seg button{border:0;border-radius:0;font-size:15px;padding:6px 14px;background:transparent;color:var(--ink)}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px;display:grid;gap:10px;min-width:0}
+.card h2{font-family:var(--f-disp);font-size:18px;margin:0;font-weight:700}
+.head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+canvas{width:100%;display:block;max-width:100%}
+#map{aspect-ratio:1000/460;touch-action:pan-y;cursor:ew-resize}
+#plot{aspect-ratio:16/8}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.ro{background:var(--panel);padding:10px 14px}
+.ro span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.ro b{font-family:var(--f-mono);font-weight:600;font-size:20px;font-variant-numeric:tabular-nums}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);align-items:center}
+.sw{display:inline-block;width:16px;height:3px;vertical-align:middle;margin-right:6px}
+.sw.dash{background:none!important;border-top:3px dashed currentColor;height:0}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:6px}
+.ramp{display:inline-block;width:90px;height:10px;border-radius:2px;vertical-align:middle;margin-right:6px;border:1px solid var(--line)}
+.eq{font-family:var(--f-mono);font-size:14px;color:var(--muted)}
+.eq strong{color:var(--ink);font-weight:600}
+.eq span{display:block;margin-top:4px}
+footer{font-size:13px;color:var(--muted);max-width:75ch}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Débit de dose et distance</h1>
+    <p>S'éloigner de la source est la protection la moins chère. Mais le gain dépend de la géométrie : une source ponctuelle et une tuyauterie ne se comportent pas pareil.</p>
+  </header>
+
+  <div class="controls">
+    <div class="field"><span class="lab">Géométrie de la source</span>
+      <div class="seg" role="group" aria-label="Géométrie de la source">
+        <button id="mPt" class="on" aria-pressed="true">Ponctuelle</button><button id="mLn" aria-pressed="false">Linéaire</button>
+      </div></div>
+    <div class="field"><label for="d1">Débit mesuré à 1 m</label>
+      <select id="d1"><option value="10">10 µSv/h</option><option value="100" selected>100 µSv/h</option><option value="1000">1 mSv/h</option><option value="10000">10 mSv/h</option></select></div>
+    <div class="field grow" id="lenF" hidden><label for="len">Longueur de la tuyauterie : <span class="val" id="lenV"></span></label>
+      <input id="len" type="range" min="1" max="12" step="0.5" value="6"></div>
+    <div class="field grow"><label for="dist">Distance d : <span class="val" id="distV"></span></label>
+      <input id="dist" type="range" min="0.5" max="10" step="0.05" value="2"></div>
+    <div class="field grow"><label for="dur">Durée d'intervention : <span class="val" id="durV"></span></label>
+      <input id="dur" type="range" min="5" max="240" step="5" value="30"></div>
+  </div>
+
+  <section class="card">
+    <h2>Vue de dessus du local</h2>
+    <canvas id="map" width="1000" height="460" aria-label="Carte du débit de dose autour de la source. Faire glisser l'intervenant pour changer la distance."></canvas>
+    <div class="legend"><span><i class="ramp" id="rampSw"></i>Débit de dose : chaque bande = débit divisé par 2</span><span><i class="dot" style="background:var(--op)"></i>Intervenant (à faire glisser)</span></div>
+  </section>
+
+  <div class="readout">
+    <div class="ro"><span>Distance d</span><b id="rD"></b></div>
+    <div class="ro"><span>Débit de dose à d</span><b id="rR"></b></div>
+    <div class="ro"><span>Gain par rapport à 1 m</span><b id="rG"></b></div>
+    <div class="ro"><span>Dose reçue</span><b id="rH"></b></div>
+    <div class="ro"><span>Loi locale D ∝ 1/dⁿ</span><b id="rN"></b></div>
+  </div>
+
+  <section class="card">
+    <div class="head"><h2>Débit de dose selon la distance</h2>
+      <div class="seg" role="group" aria-label="Échelle des axes">
+        <button id="lin" class="on" aria-pressed="true">Linéaire</button><button id="log" aria-pressed="false">Log-log</button>
+      </div></div>
+    <canvas id="plot" width="1000" height="500"></canvas>
+    <div class="legend">
+      <span style="color:var(--ink)"><i class="sw" style="background:var(--ink)"></i>Source simulée</span>
+      <span style="color:var(--ref2)"><i class="sw dash"></i>Loi en 1/d²</span>
+      <span style="color:var(--ref1)"><i class="sw dash"></i>Loi en 1/d</span>
+      <span><i class="dot" style="background:var(--hot)"></i>Intervenant</span></div>
+    <div class="eq" id="eq"></div>
+  </section>
+
+  <footer>Débits calculés sans atténuation par l'air ni écran, dans l'axe perpendiculaire passant par le milieu de la tuyauterie. La tuyauterie est modélisée comme une ligne de longueur finie : elle se comporte en 1/d de près et en 1/d² de loin.</footer>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const fmt=(x,d)=>x.toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d});
+function rgb(h){h=h.replace("#","");if(h.length===3)h=[...h].map(c=>c+c).join("");const n=parseInt(h,16);return[n>>16&255,n>>8&255,n&255]}
+
+let mode="pt",D1=100,L=6,d=2,dur=30,logMode=false;
+const DMIN=0.5,DMAX=10;
+// géométrie de la carte (m → px)
+const W=1000,H=460,PPM=88,X0=80,YC=230;
+
+// intensité relative en un point situé à h (perpendiculaire) et y (le long de l'axe de la ligne)
+function fieldAt(px,py){
+  const h=Math.max(Math.abs(px),0.06);
+  if(mode==="pt"){const r2=px*px+py*py;return 1/Math.max(r2,0.0036)}
+  const a=(L/2-py),b=(-L/2-py);
+  return (Math.atan(a/h)-Math.atan(b/h))/h/2; // ligne finie de longueur L
+}
+const f1=()=>fieldAt(1,0);
+const rate=x=>D1*fieldAt(x,0)/f1();
+function nLocal(x){const e=1.01;return -Math.log(rate(x*e)/rate(x))/Math.log(e)}
+function fmtRate(v){return v>=1000?`${fmt(v/1000,v>=10000?1:2)} mSv/h`:`${fmt(v,v<10?2:v<100?1:0)} µSv/h`}
+function fmtDose(v){return v>=1000?`${fmt(v/1000,2)} mSv`:`${fmt(v,v<10?2:v<100?1:0)} µSv`}
+
+let heat=null;
+function buildHeat(){
+  const cw=500,ch=230,img=new ImageData(cw,ch),bg=rgb(css("--bg")),hot=rgb(css("--hot"));
+  const ref=f1(),lo=Math.log2(fieldAt(DMAX,0)/ref),hi=Math.log2(fieldAt(0.3,0)/ref);
+  for(let j=0;j<ch;j++)for(let i=0;i<cw;i++){
+    const mx=((i+.5)*W/cw-X0)/PPM,my=(YC-(j+.5)*H/ch)/PPM;
+    const v=Math.log2(fieldAt(mx,my)/ref);
+    const band=Math.floor(v);
+    let t=Math.min(1,Math.max(0,(band-lo)/(hi-lo)));
+    t=Math.pow(t,1.2)*.92+(band%2===0?.04:0);
+    const k=(j*cw+i)*4;
+    for(let c=0;c<3;c++)img.data[k+c]=bg[c]+(hot[c]-bg[c])*t;
+    img.data[k+3]=255;
+  }
+  const off=document.createElement("canvas");off.width=cw;off.height=ch;off.getContext("2d").putImageData(img,0,0);
+  heat=off;
+  $("rampSw").style.background=`linear-gradient(90deg,${css("--bg")},${css("--hot")})`;
+}
+
+function drawMap(){
+  const g=$("map").getContext("2d"),ink=css("--ink"),mut=css("--muted");
+  g.clearRect(0,0,W,H);g.imageSmoothingEnabled=false;g.drawImage(heat,0,0,W,H);
+  g.font="20px ui-monospace, Menlo, Consolas, monospace";g.textAlign="center";
+  // règle en mètres
+  g.strokeStyle=ink;g.fillStyle=ink;g.lineWidth=1.5;
+  for(let m=0;m<=10;m++){const x=X0+m*PPM;g.beginPath();g.moveTo(x,H-18);g.lineTo(x,H-(m%5?26:34));g.stroke();if(m%2===0&&m)g.fillText(`${m} m`,x,H-40)}
+  g.beginPath();g.moveTo(X0,H-18);g.lineTo(X0+10*PPM,H-18);g.stroke();
+  // source
+  g.fillStyle=css("--src");g.strokeStyle=ink;g.lineWidth=2;
+  if(mode==="pt"){g.beginPath();g.arc(X0,YC,14,0,7);g.fill();g.stroke();g.fillStyle=ink;g.textAlign="left";g.fillText("source ponctuelle",X0+20,YC-26)}
+  else{
+    const y1=YC-L/2*PPM,y2=YC+L/2*PPM;
+    g.lineCap="round";g.lineWidth=22;g.strokeStyle=ink;g.beginPath();g.moveTo(X0,y1);g.lineTo(X0,y2);g.stroke();
+    g.lineWidth=16;g.strokeStyle=css("--src");g.stroke();g.lineCap="butt";
+    g.fillStyle=ink;g.textAlign="left";g.fillText(`tuyauterie L = ${fmt(L,1)} m`,X0+20,Math.max(y1,24)+6);
+  }
+  // distance
+  const ox=X0+d*PPM;
+  g.setLineDash([8,6]);g.strokeStyle=ink;g.lineWidth=2;g.beginPath();g.moveTo(X0+16,YC);g.lineTo(ox-18,YC);g.stroke();g.setLineDash([]);
+  g.fillStyle=ink;g.textAlign="center";g.fillText(`d = ${fmt(d,2)} m`,(X0+ox)/2,YC-12);
+  // intervenant
+  g.fillStyle=css("--op");g.beginPath();g.arc(ox,YC,15,0,7);g.fill();
+  g.strokeStyle=css("--bg");g.lineWidth=3;g.stroke();
+  g.fillStyle=ink;g.font="600 20px ui-monospace, Menlo, Consolas, monospace";g.fillText(fmtRate(rate(d)),ox,YC+46);
+}
+
+function drawPlot(){
+  const g=$("plot").getContext("2d"),PW=1000,PH=500,Lm=100,R=24,T=20,B=60;
+  const pw=PW-Lm-R,ph=PH-T-B,ink=css("--ink"),mut=css("--muted"),line=css("--line");
+  const yTop=logMode?rate(DMIN)*1.15:Math.max(rate(DMIN),D1/DMIN)*1.05;
+  const yBot=logMode?Math.min(rate(DMAX),D1/DMAX/DMAX)*0.85:0;
+  const X=logMode?v=>Lm+Math.log(v/DMIN)/Math.log(DMAX/DMIN)*pw:v=>Lm+(v-DMIN)/(DMAX-DMIN)*pw;
+  const Y=logMode?v=>T+ph-Math.log(Math.max(v,1e-12)/yBot)/Math.log(yTop/yBot)*ph:v=>T+ph-v/yTop*ph;
+  g.clearRect(0,0,PW,PH);g.font="20px ui-monospace, Menlo, Consolas, monospace";g.lineWidth=1;
+  const xt=logMode?[0.5,1,2,5,10]:[0.5,1,2,3,4,5,6,7,8,9,10];
+  xt.forEach(v=>{g.strokeStyle=line;g.beginPath();g.moveTo(X(v),T);g.lineTo(X(v),T+ph);g.stroke();
+    g.fillStyle=mut;g.textAlign="center";g.fillText(fmt(v,v<1?1:0),X(v),PH-B+28)});
+  g.textAlign="right";g.fillText("d (m)",Lm+pw,PH-6);
+  let yt=[];
+  if(logMode){for(let e=Math.floor(Math.log10(yBot));e<=Math.ceil(Math.log10(yTop));e++)[1,2,5].forEach(m=>{const v=m*10**e;if(v>=yBot&&v<=yTop)yt.push(v)})}
+  else{const step=[1,2,5].map(m=>m*10**Math.floor(Math.log10(yTop/5))).find(s=>yTop/s<=8)||10**Math.ceil(Math.log10(yTop/5));for(let v=0;v<=yTop;v+=step)yt.push(v)}
+  yt.forEach(v=>{g.strokeStyle=line;g.beginPath();g.moveTo(Lm,Y(v));g.lineTo(Lm+pw,Y(v));g.stroke();
+    g.fillStyle=mut;g.textAlign="right";g.fillText(v>=1000?`${fmt(v/1000,v%1000?1:0)}k`:fmt(v,v<1?2:v<10&&v%1?1:0),Lm-10,Y(v)+7)});
+  g.textAlign="left";g.fillText("µSv/h",4,T+12);
+  g.save();g.beginPath();g.rect(Lm,T,pw,ph);g.clip();
+  const curve=(fn,col,w,dash)=>{g.strokeStyle=col;g.lineWidth=w;g.setLineDash(dash);g.beginPath();
+    for(let i=0;i<=300;i++){const v=logMode?DMIN*Math.pow(DMAX/DMIN,i/300):DMIN+(DMAX-DMIN)*i/300;i?g.lineTo(X(v),Y(fn(v))):g.moveTo(X(v),Y(fn(v)))}
+    g.stroke();g.setLineDash([])};
+  curve(v=>D1/v/v,css("--ref2"),2,[8,7]);
+  curve(v=>D1/v,css("--ref1"),2,[8,7]);
+  curve(rate,ink,3.5,[]);
+  const r=rate(d);
+  g.strokeStyle=css("--hot");g.lineWidth=1.5;g.setLineDash([4,5]);g.beginPath();g.moveTo(X(d),T+ph);g.lineTo(X(d),Y(r));g.lineTo(Lm,Y(r));g.stroke();g.setLineDash([]);
+  g.fillStyle=css("--hot");g.beginPath();g.arc(X(d),Y(r),8,0,7);g.fill();
+  g.restore();
+}
+
+function update(){
+  $("distV").textContent=`${fmt(d,2)} m`;$("lenV").textContent=`${fmt(L,1)} m`;
+  $("durV").textContent=dur>=60?`${Math.floor(dur/60)} h ${String(dur%60).padStart(2,"0")}`:`${dur} min`;
+  const r=rate(d),gain=D1/r;
+  $("rD").textContent=`${fmt(d,2)} m`;
+  $("rR").textContent=fmtRate(r);
+  $("rG").textContent=gain>=1?`÷ ${fmt(gain,gain<10?2:1)}`:`× ${fmt(1/gain,2)}`;
+  $("rH").textContent=fmtDose(r*dur/60);
+  $("rN").textContent=`n ≈ ${fmt(nLocal(d),2)}`;
+  $("eq").innerHTML=(mode==="pt"
+    ?`<strong>D(d) = D₁ · (1 / d)²</strong> &nbsp;·&nbsp; doubler la distance divise le débit par 4`
+    :`<strong>D(d) ≈ D₁ · (1 / d)</strong> près de la ligne &nbsp;·&nbsp; doubler la distance divise le débit par 2`)
+    +(logMode?`<span>En log-log, une loi en 1/dⁿ est une droite de pente −n : −2 pour un point, −1 pour une ligne infinie.</span>`:`<span>Dose reçue = débit × durée &nbsp;·&nbsp; D₁ = débit mesuré à 1 m</span>`);
+  drawMap();drawPlot();
+}
+function params(){D1=+$("d1").value;L=+$("len").value;d=+$("dist").value;dur=+$("dur").value;buildHeat();update()}
+
+function setMode(m){mode=m;$("mPt").classList.toggle("on",m==="pt");$("mLn").classList.toggle("on",m==="ln");
+  $("mPt").setAttribute("aria-pressed",m==="pt");$("mLn").setAttribute("aria-pressed",m==="ln");$("lenF").hidden=m==="pt";params()}
+function setScale(l){logMode=l;$("lin").classList.toggle("on",!l);$("log").classList.toggle("on",l);
+  $("lin").setAttribute("aria-pressed",!l);$("log").setAttribute("aria-pressed",l);update()}
+$("mPt").onclick=()=>setMode("pt");$("mLn").onclick=()=>setMode("ln");
+$("lin").onclick=()=>setScale(false);$("log").onclick=()=>setScale(true);
+$("d1").onchange=params;$("len").oninput=params;
+$("dist").oninput=()=>{d=+$("dist").value;update()};$("dur").oninput=()=>{dur=+$("dur").value;update()};
+
+// glisser l'intervenant sur la carte
+const map=$("map");let drag=false;
+function fromPointer(e){const r=map.getBoundingClientRect(),px=(e.clientX-r.left)*W/r.width;
+  d=Math.min(DMAX,Math.max(DMIN,Math.round((px-X0)/PPM*20)/20));$("dist").value=d;update()}
+map.addEventListener("pointerdown",e=>{drag=true;map.setPointerCapture(e.pointerId);fromPointer(e)});
+map.addEventListener("pointermove",e=>{if(drag)fromPointer(e)});
+map.addEventListener("pointerup",()=>drag=false);map.addEventListener("pointercancel",()=>drag=false);
+
+const redraw=()=>{buildHeat();update()};
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",redraw);
+new MutationObserver(redraw).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+params();
+</script>
+
+<script>window.addEventListener("storage",e=>{if(e.key==="nuclea-theme"){if(e.newValue==="light"||e.newValue==="dark")document.documentElement.dataset.theme=e.newValue;else delete document.documentElement.dataset.theme}})</script>
+</body>
+</html>

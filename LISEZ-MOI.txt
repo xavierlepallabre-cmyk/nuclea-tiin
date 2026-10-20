@@ -1,3 +1,13 @@
+Nucléa TIIN v0.10 — Phénomènes animés
+
+Nouveautés : rubrique « Phénomènes animés » en tête de l'onglet Explorer, avec cinq visuels interactifs (décroissance radioactive, atténuation des gamma, débit de dose et distance, désintégrations α/β/γ, chaîne de filiation). Chaque visuel s'ouvre en plein écran ; « Fermer » ou le bouton Retour du téléphone ramènent à Explorer. Les visuels suivent le thème clair/sombre et fonctionnent hors connexion.
+
+Réparation : l'arborescence avait été aplatie lors d'un envoi précédent (polices Lexend et tests à la racine). Les polices sont de retour dans assets/fonts/, les tests dans tests/, les captures dans test-results/. Sans ce dossier assets/fonts/, la police ne se chargeait pas et le mode hors connexion ne s'installait pas.
+
+IMPORTANT pour publier : envoyer le contenu en conservant les dossiers (assets/fonts, visuels, sources, tests). Sur github.com, glisser les dossiers eux-mêmes dans la zone d'envoi, et non seulement les fichiers qu'ils contiennent.
+
+---------------------------------------------------------------------
+
 Nucléa TIIN v0.9 — version issue de votre archive v0.8
 
 Déposer le CONTENU de ce dossier (celui qui contient index.html) dans la racine publiée par GitHub Pages. Aucun outil de compilation n’est nécessaire. Ne pas oublier les nouveaux scripts et les polices de assets/fonts/.
