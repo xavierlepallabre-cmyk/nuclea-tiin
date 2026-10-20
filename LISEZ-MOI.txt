@@ -1,3 +1,9 @@
+Nucléa TIIN v0.14 — Entrée « QCM de classe »
+
+Ajout d’une carte « QCM de classe » en tête de l’onglet Exercices : elle explique comment rejoindre une séance organisée par l’enseignant et ouvre l’adresse locale du PC enseignant (réseau de la classe, adresse privée terminée par /eleve/). Aucun appel automatique à un serveur ; les outils scientifiques et les exercices individuels sont inchangés. Le programme Enseignant (Windows) n’est jamais publié ici.
+
+---------------------------------------------------------------------
+
 Nucléa TIIN v0.13 — Courbe d’Aston lisible sur téléphone
 
 Le graphique est dessiné à la taille réelle de l’écran : textes et points gardent leur taille, la courbe est plus haute en mode portrait. Bouton « Zoom 7–9 MeV » pour séparer les noyaux autour du maximum. Toucher ou glisser le doigt le long des points sélectionne l’isotope le plus proche, avec une étiquette sur la courbe. Le résultat (E/A et E) s’affiche en premier, le calcul détaillé est replié.
