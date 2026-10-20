@@ -1,0 +1,7 @@
+const assert=require('assert');const D=require('../date-model.js');
+const p={id:'a',name:'Test',workers:2,work:1,retreat:0,phases:[{name:'Phase1',minutes:30,work:null,retreat:null,positions:['retreat','work','absent']},{name:'Relève',minutes:30,work:null,retreat:null,positions:['retreat','absent','work']}]};
+const r=D.validate(p);assert.equal(r.collective,1);assert.equal(r.totals['Intervenant 1'],.5);assert.equal(r.totals['Intervenant 2'],.5);
+const single=JSON.parse(JSON.stringify(p));single.phases=[{name:'Sans relève',minutes:60,work:null,retreat:null,positions:['retreat','work','absent']}];assert.equal(D.validate(single).collective,1);assert.equal(D.compare(single,p).gain,0);
+const change=JSON.parse(JSON.stringify(p));change.phases[0].work=.2;assert.equal(D.validate(change).collective,.2);
+const e=D.explore({rate:1,distance:2,activity:100,minutes:60,transmission:50,setup:10,removal:10,workers:2,installers:2});assert.equal(e.bare,.25);assert.equal(e.without,.5);assert(Math.abs(e.installation-1/6)<1e-12);assert(Math.abs(e.withShield-5/12)<1e-12);
+const bad=JSON.parse(JSON.stringify(p));bad.phases[0].positions[0]='absent';assert.throws(()=>D.validate(bad));bad.phases[0].positions=['work','absent','absent'];assert.throws(()=>D.validate(bad));assert.throws(()=>D.restore('[{"name":"<script>"}]'));assert.throws(()=>D.validate({...p,retreat:2}));assert.throws(()=>D.validate({...p,work:''}));assert.deepEqual(D.restore(JSON.stringify([p])),[p]);console.log('DATE : doses, collective, relèves, propagation, écrans, invariants et restauration OK');

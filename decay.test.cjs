@@ -1,0 +1,13 @@
+const assert=require('assert');const D=require('../decay-calculator.js');
+const base={mode:'activity',half:'8',halfUnit:'d',initial:'800',initialUnit:'kBq',duration:'24',durationUnit:'d',target:'100',targetUnit:'kBq'};
+const near=(a,b)=>assert(Math.abs(a-b)<=Math.max(Math.abs(b)*1e-12,1e-12),`${a} != ${b}`);
+let r=D.calculate(base);near(r.final,100000);near(r.n,3);near(r.fraction,.125);
+r=D.calculate({...base,mode:'time',target:'.1',targetUnit:'MBq'});near(r.seconds,24*86400);
+r=D.calculate({...base,duration:'0'});assert.equal(r.final,800000);
+r=D.calculate({...base,mode:'time',target:'800'});near(r.seconds,0);
+r=D.calculate({...base,half:'12,5',halfUnit:'h',duration:'750',durationUnit:'min',initial:'1e6',initialUnit:'Bq'});near(r.final,500000);
+for(const change of [{half:'0'},{half:'-1'},{duration:'-1'},{initial:'0'},{half:''},{half:'NaN'},{half:'Infinity'},{half:'1.2.3'},{mode:'time',target:'0'},{mode:'time',target:'900'},{mode:'time',target:'-1'},{initial:'1e308',initialUnit:'TBq'},{halfUnit:'bad'}])assert.throws(()=>D.calculate({...base,...change}),JSON.stringify(change));
+r=D.calculate({...base,mode:'time',initial:'1e300',initialUnit:'Bq',target:'1e-300',targetUnit:'Bq'});assert(Number.isFinite(r.seconds));assert(r.n>1900);
+r=D.calculate({...base,duration:'100000',durationUnit:'y'});assert(r.underflow);assert.equal(r.final,0);
+near(D.timeUnits.y/86400,365.25);
+console.log('Calculs directs/inverses, unités mixtes, virgule, limites, domaine et sous-flux : OK');

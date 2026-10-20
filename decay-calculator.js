@@ -61,7 +61,7 @@
   const elapsed=nCursor*(result.half/timeUnits[unit]),activity=Math.exp(Math.log(result.initial)-Math.LN2*nCursor)/activityUnits[displayUnit];
   q('#rdExploreValue').textContent=`${fmt(nCursor)} période(s) · ${fmt(elapsed)} ${labels[unit]} · ${fmt(activity)} ${displayUnit} (${fmt(100*Math.pow(2,-nCursor))} %)`;
  }
- function update(){
+ function update(showErrors=true){
   const input=inputs(),isTime=input.mode==='time';
   q('#rdDurationGroup').hidden=isTime;q('#rdDuration').disabled=isTime;
   q('#rdTargetGroup').hidden=!isTime;q('#rdTarget').disabled=!isTime;
@@ -73,7 +73,7 @@
    const finalOut=r.final/activityUnits[outputUnit],durationOut=r.seconds/timeUnits[unit];
    if(!Number.isFinite(durationOut)||!Number.isFinite(finalOut))throw Error('Choisis une unité de résultat plus grande.');
    if(isTime&&r.seconds>0&&durationOut===0)throw Error('Choisis une unité de durée plus petite pour représenter le résultat.');
-   last={r,unit,outputUnit};
+   last={r,unit,outputUnit};q('#rdExplore').disabled=isTime;q('#rdExplore').value=String(Math.min(10,Math.max(0,r.n)));
    q('#rdError').textContent='';q('#rdResults').hidden=false;
    q('#rdAnswer').textContent=isTime?`${fmt(durationOut)} ${labels[unit]}`:r.underflow?'Activité inférieure à la précision numérique':finalOut===0&&r.final>0?'Activité trop faible dans cette unité':`${fmt(finalOut)} ${outputUnit}`;
    q('#rdAnswerLabel').textContent=isTime?'Durée pour atteindre l’activité visée':'Activité restante';
@@ -84,16 +84,34 @@
    q('#rdSteps').innerHTML=`<li><strong>Convertir dans les mêmes unités.</strong> ${esc(conversion)}</li><li><strong>Choisir la relation.</strong> ${esc(formula)}</li><li><strong>Remplacer les valeurs.</strong> ${esc(replacement)}</li><li><strong>Constante de décroissance.</strong> λ = ln(2) / T½ = ${esc(fmt(r.lambda))} s⁻¹.</li>`;
    q('#rdMilestones').innerHTML=[0,1,2,3,4,5,10].map(n=>`<tr><th scope="row">${n}</th><td>${esc(fmt(n*(r.half/timeUnits[unit])))} ${labels[unit]}</td><td>${esc(fmt(Math.exp(Math.log(r.initial)-n*Math.LN2)/activityUnits[outputUnit]))} ${outputUnit}</td><td>${esc(fmt(100*Math.pow(2,-n)))} %</td></tr>`).join('');
    chart(r,unit,outputUnit,Number(q('#rdExplore').value));
-  }catch(err){last=null;q('#rdResults').hidden=true;q('#rdError').textContent=err.message;}
+  }catch(err){last=null;q('#rdResults').hidden=true;q('#rdError').textContent=showErrors?err.message:'';}
  }
  function init(){
   if(!q('#decayCalculator'))return;
   q('#rdForm').addEventListener('submit',e=>{e.preventDefault();update()});
-  q('#rdForm').addEventListener('input',e=>{if(e.target.id==='rdHalf'||e.target.id==='rdHalfUnit')origin=null;update()});
-  q('#rdForm').addEventListener('change',e=>{if(e.target.id==='rdHalf'||e.target.id==='rdHalfUnit')origin=null;update()});
-  q('#rdExplore').addEventListener('input',()=>{if(last)chart(last.r,last.unit,last.outputUnit,Number(q('#rdExplore').value))});
-  q('#rdExample').onclick=()=>{origin=null;q('#rdMode').value='activity';q('#rdHalf').value='8';q('#rdHalfUnit').value='d';q('#rdInitial').value='800';q('#rdInitialUnit').value='kBq';q('#rdDuration').value='24';q('#rdDurationUnit').value='d';q('#rdTarget').value='100';q('#rdTargetUnit').value='kBq';q('#rdExplore').value='3';update()};
-  api.prefill=info=>{origin=info;q('#rdHalf').value=info.half;q('#rdHalfUnit').value=info.unit;q('#rdMode').value='activity';update();q('#decayCalculator').scrollIntoView({block:'start',behavior:'instant'});q('#rdInitial').focus({preventScroll:true})};
+  const unitPairs={rdHalfUnit:['rdHalf',timeUnits],rdDurationUnit:['rdDuration',timeUnits],rdInitialUnit:['rdInitial',activityUnits],rdTargetUnit:['rdTarget',activityUnits]};
+  let unitState={};const rememberUnits=()=>{for(const id in unitPairs)unitState[id]=q('#'+id).value};rememberUnits();
+  q('#rdForm').addEventListener('input',e=>{if(e.target.tagName==='SELECT'||e.target.id==='rdIsotopeSearch')return;if(e.target.id==='rdHalf'){origin=null;q('#rdIsotopeSearch').value='';}update(false)});
+  q('#rdForm').addEventListener('change',e=>{
+   const id=e.target.id;if(unitPairs[id]){const [inputId,units]=unitPairs[id];try{const before=parse(q('#'+inputId).value);const converted=before*units[unitState[id]]/units[e.target.value];if(!Number.isFinite(converted)||(before!==0&&converted===0))throw Error('Conversion hors plage');q('#'+inputId).value=String(converted)}catch(err){e.target.value=unitState[id];q('#rdError').textContent='Conversion impossible : vérifier la valeur saisie.';return;}rememberUnits();}
+   if(id!=='rdIsotopeSearch')update();
+  });
+  q('#rdExplore').addEventListener('input',()=>{if(!last||q('#rdMode').value!=='activity')return;const n=Number(q('#rdExplore').value);q('#rdDuration').value=String(n*last.r.half/timeUnits[q('#rdDurationUnit').value]);update(false)});
+  const picker=document.createElement('div');picker.className='rd-field';picker.innerHTML='<label for="rdIsotopeSearch">Choisir un radionucléide (facultatif)</label><input id="rdIsotopeSearch" type="search" list="rdIsotopeOptions" placeholder="Exemple : Co-60, Tc-99m…" autocomplete="off"><datalist id="rdIsotopeOptions"></datalist><small id="rdIsotopeHint">Rechercher parmi les périodes exploitables de la base.</small>';
+  q('#rdForm').prepend(picker);
+  const sourceUnit={as:'as',ps:'ps',ns:'ns',us:'us',ms:'ms',s:'s',m:'min',h:'h',d:'d',Y:'y'};
+  const catalogue=[];function rebuildCatalogue(){catalogue.length=0;for(const [z,variants] of Object.entries(isotopes)){
+   const el=elements.find(x=>x.z===+z);if(!el)continue;
+   for(const v of variants)if(!v.stable&&sourceUnit[v.unit]&&Number(v.half)>0&&(!v.operator||v.operator==='AP'))catalogue.push({id:`${el.s}-${v.label||v.a}`,el,v});
+  }
+}
+  const fillOptions=()=>{const term=q('#rdIsotopeSearch').value.toLowerCase().replace(/[-\s]/g,'');q('#rdIsotopeOptions').replaceChildren();catalogue.filter(x=>x.id.toLowerCase().replace(/-/g,'').includes(term)||x.el.name.toLowerCase().includes(term)).slice(0,50).forEach(item=>{const option=document.createElement('option');option.value=item.id;option.label=item.el.name;q('#rdIsotopeOptions').append(option)})};
+  window.addEventListener('elementsready',()=>{rebuildCatalogue();fillOptions()});rebuildCatalogue();
+  q('#rdIsotopeSearch').addEventListener('input',fillOptions);
+  q('#rdIsotopeSearch').addEventListener('change',()=>{const term=q('#rdIsotopeSearch').value.replace(/[-\s]/g,'').toLowerCase();const item=catalogue.find(x=>x.id.replace(/-/g,'').toLowerCase()===term);if(!item){q('#rdIsotopeHint').textContent='Sélectionner un isotope proposé avec une période exploitable.';return;}const {el,v}=item;api.prefill({name:item.id,half:v.half,unit:sourceUnit[v.unit],unc:v.unc,approx:v.operator==='AP',extracted:v.extracted,url:`https://nds.iaea.org/relnsd/v1/data?fields=${v.source}&nuclides=${v.a}${el.s.toLowerCase()}`});q('#rdIsotopeHint').textContent='Période et provenance actualisées ; activités conservées.';});fillOptions();
+  q('#rdExample').onclick=()=>{origin=null;q('#rdMode').value='activity';q('#rdHalf').value='8';q('#rdHalfUnit').value='d';q('#rdInitial').value='800';q('#rdInitialUnit').value='kBq';q('#rdDuration').value='24';q('#rdDurationUnit').value='d';q('#rdTarget').value='100';q('#rdTargetUnit').value='kBq';q('#rdExplore').value='3';rememberUnits();update()};
+  api.prefill=info=>{origin=info;q('#rdHalf').value=info.half;q('#rdHalfUnit').value=info.unit;rememberUnits();q('#rdIsotopeSearch').value=info.name;update();q('#decayCalculator').scrollIntoView({block:'start',behavior:'instant'});q('#rdInitial').focus({preventScroll:true})};
+  for(const id of ['rdHalf','rdInitial','rdDuration','rdTarget']){const button=document.createElement('button');button.type='button';button.className='exponent-btn';button.textContent='×10ⁿ';button.setAttribute('aria-label','Ajouter un exposant à '+q('#'+id).labels[0].textContent);button.onclick=()=>{const input=q('#'+id);if(!/e/i.test(input.value))input.value+='e';input.focus()};q('#'+id).parentElement.after(button);}
   update();
  }
  document.addEventListener('DOMContentLoaded',init);

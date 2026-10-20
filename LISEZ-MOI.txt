@@ -1,69 +1,11 @@
-Nucléa TIIN v0.8 — calculateur de décroissance radioactive
+Nucléa TIIN v0.9 — version issue de votre archive v0.8
 
-Nucléa TIIN v0.7 — parcours de désintégration
+Déposer le CONTENU de ce dossier (celui qui contient index.html) dans la racine publiée par GitHub Pages. Aucun outil de compilation n’est nécessaire. Ne pas oublier les nouveaux scripts et les polices de assets/fonts/.
 
-Nucléa TIIN v0.6
+Nouveautés : quatre onglets, recherche isotopique, gestes de carte, accordéons du formulaire, calculateur enrichi, énergie de liaison, Aston, trois modes DATE, préparations locales et exercices guidés.
 
-PUBLICATION SUR GITHUB PAGES
-1. Extraire l’archive.
-2. Copier tous les fichiers du dossier nuclea-tiin à la racine du dépôt, en remplaçant ceux de la v0.2. index.html doit se trouver directement à la racine publiée.
-3. Activer GitHub Pages pour la branche et le dossier contenant index.html (par exemple main / root).
-4. Ouvrir l’adresse HTTPS du site. Aucun outil de compilation ni serveur applicatif n’est nécessaire.
+Conservés : 118 éléments, dix familles, 3 385 états, fiches, filiation et branches, Retour/Avancer, six rubriques, thème et logos.
 
-MISE À JOUR DE LA PWA
-Le cache v0.5 remplace les anciens caches Nucléa TIIN. Après publication, recharger la page puis la rouvrir. Le premier chargement nécessite une connexion ; la consultation suivante fonctionne hors connexion.
+Documents : README.md (utilisation/tests), AUDIT.md (base protégée), SOURCES.md (science), TECHNIQUE.md (architecture), VALIDATION.md (résultats et limites), PUBLICATION.md (prévisualisation et mise à jour).
 
-NAVIGATION
-Téléphone jusqu’à 700 px : fiche en panneau bas, navigation principale en bas.
-Tablette : panneau latéral plus large et tableau déplaçable.
-Ordinateur à partir de 1024 px : tableau ajusté entièrement à la largeur disponible au démarrage et lors du redimensionnement. Recentrer rétablit cet ajustement après un zoom manuel.
-Le bouton Fermer reste en haut de la fiche pendant son défilement. Échap, Retour navigateur/Android et clic sur le fond ferment la fiche. Avancer rouvre la fiche. Le zoom et la position du tableau sont conservés.
-Le défilement tactile et le zoom du navigateur restent natifs ; les boutons − et + règlent la taille des cases.
-
-CONTENU
-118 éléments, données isotopiques sélectionnées et six rubriques du formulaire conservés à l’identique depuis la v0.2.
-
-VALIDATION
-Voir TESTS.txt. Le geste Retour physique sur un appareil Android reste à confirmer sur appareil réel.
-
-Version 0.3.1 : sur ordinateur avec souris ou pavé tactile et fenêtre supérieure à 700 px, affichage direct du tableau ajusté, sans miniature ni barre de zoom.
-Retour Android confirmé fonctionnel par l’utilisateur.
-
-ISOTOPES v0.5
-3 385 fiches (3 383 états fondamentaux et Tc-99m / Ba-137m) pour les 118 éléments. Consulter SOURCES.md pour les références, dates et règles de transformation. Le dossier sources contient les données originales.
-
-FAMILLES v0.5
-Cliquer sur une famille affiche une définition et redessine une grille compacte ne contenant que ses éléments, triés par numéro atomique. Un second clic sur la famille active rétablit les 118 éléments et la vue précédente. Un clic sur une autre famille change le filtre. Le bouton Afficher les 118 éléments rétablit également le tableau complet. La recherche est conservée et agit dans la famille choisie. Les fiches isotopiques restent disponibles.
-
-DESIGN v0.6 — identité Lycée Alexis de Tocqueville
-- Couleurs du logo : bleu Tocqueville #1A3C89 et orange #F18A52 ; police Lexend (Google Fonts, mise en cache par le service worker au premier chargement, repli sur la police système).
-- En-tête avec le logo du lycée (toujours sur fond blanc), navigation à onglets avec icônes (barre du bas sur téléphone).
-- Thème clair / sombre : suit le réglage de l’appareil, bouton lune/soleil pour forcer un thème (mémorisé sur l’appareil).
-- Pastille « Hors ligne » affichée uniquement quand le réseau est coupé.
-- Tableau : noms des éléments visibles dès que les cases sont assez larges, repères 57–71 et 89–103, séries f séparées.
-- Fiche élément : protons / neutrons / nucléons / électrons avec les couleurs des particules, notation nucléaire A/Z, informations en liste.
-- Formulaire en cartes numérotées ; page À propos avec les logos Tocqueville et Bac Pro TIIN.
-- Nouvelles icônes d’application (PNG 192/512 et maskable) dans assets/.
-Fonctionnement, données et comportements (fiche, Retour, familles, zoom, hors connexion) inchangés.
-
-
-VERSION v0.7 — PARCOURS DE DÉSINTÉGRATION
-Base : archive v0.6 fournie, design clair/sombre et logos conservés.
-Dans une fiche d’élément : choisir un isotope, puis Tracer la désintégration.
-Lire les cartes de haut en bas jusqu’au premier noyau stable sur la branche suivie. Les menus de branche permettent d’explorer les autres voies. Changer l’isotope recalcule le tracé. Masquer le parcours revient à la lecture de la fiche.
-Parcours isotopique simplifié : voir SOURCES.md et les précisions affichées. Les états excités ne sont pas tous résolus. Donnée manquante ou fission : arrêt explicite.
-Fonction disponible hors connexion après le premier chargement.
-Publication : copier TOUS les fichiers du dossier nuclea-tiin dans le dossier publié par GitHub Pages, en remplaçant la version précédente. Inclure le nouveau fichier decay-chain.js et recharger la PWA après la mise à jour.
-
-
-NOUVEAUTÉ v0.8
-Formulaire > Décroissance radioactive :
-- Choisir activité restante ou durée pour atteindre une activité visée.
-- Saisir la période et l’activité initiale, puis la durée ou l’activité visée.
-- Les unités sont converties automatiquement ; virgule et notation scientifique sont acceptées.
-- Lire le résultat, le nombre de périodes, la fraction restante et les étapes du calcul.
-- Déplacer le curseur pour explorer la courbe sur dix périodes ; consulter le tableau des divisions par deux.
-- Charger un exemple : 800 kBq, période 8 jours, durée 24 jours → 100 kBq.
-Depuis une fiche isotopique, Étudier sa décroissance ouvre le formulaire avec la période nominale, la provenance et sa date. L’activité initiale reste à adapter au problème posé.
-Le modèle ne calcule pas l’activité totale des descendants. La convention d’année et l’absence de propagation des incertitudes sont affichées.
-Publication : remplacer l’ensemble du dossier publié, incluant decay-calculator.js, puis recharger la PWA.
+Aucune publication en ligne n’a été effectuée. Valider une copie avant remplacement. Les préparations locales ne sont pas chiffrées ; ne pas saisir de noms ni de données sensibles. Android réel reste à tester. DATE est pédagogique, sans valeur opérationnelle ou réglementaire.

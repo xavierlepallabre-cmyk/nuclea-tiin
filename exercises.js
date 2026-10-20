@@ -1,0 +1,56 @@
+(function(root){
+ const unitGroups={count:{'sans unité':1},charge:{C:1},activity:{Bq:1,kBq:1e3,MBq:1e6},time:{s:1,min:60,h:3600,jours:86400},energy:{MeV:1,J:1/1.602176634e-13},dose:{mSv:1,'µSv':.001,Sv:1000},collective:{'H.mSv':1,'H.µSv':.001},length:{m:1,cm:.01,mm:.001}};
+ function generate(theme,level,random=Math.random){
+  if(!Number.isInteger(theme)||theme<0||theme>5||![1,2,3].includes(level))throw Error('Thème ou niveau invalide.');
+  let dateParams=null;const pick=arr=>arr[Math.min(arr.length-1,Math.max(0,Math.floor(random()*arr.length)))],k=pick([1,2,3,4]),n=pick([1,2,3,4]);let question,answer,group,unit,hint,formula,numeric,correction,date=false;
+  if(theme===0){const [z,a]=pick([[6,12],[6,14],[8,16],[11,23],[26,56],[27,60],[53,131],[92,235]]),neutrons=a-z;
+   group='count';unit='sans unité';hint='Identifier protons, neutrons et nucléons.';
+   if(level===1){question=`Un noyau possède Z = ${z} protons et N = ${neutrons} neutrons. Calculer A.`;answer=a;formula='A = Z + N';numeric=`${z} + ${neutrons} = ${a}`;}
+   else if(level===2){question=`Une fiche indique A = ${a} et Z = ${z}. Combien de neutrons contient ce noyau ?`;answer=neutrons;formula='N = A − Z';numeric=`${a} − ${z} = ${neutrons}`;}
+   else{question=`Lors de l’étude d’une ionisation, un atome de Z = ${z} a perdu ${k} électron(s). Calculer sa charge en coulombs, avec e = 1,602176634 × 10⁻¹⁹ C.`;answer=k*1.602176634e-19;group='charge';unit='C';formula='q = (Z − nₑ)e';numeric=`nₑ = ${z} − ${k} ; q = ${k} × 1,602176634 × 10⁻¹⁹ C.`;}
+  }else if(theme===1){const a0=800*k,half=8,days=n*half;group=level===3?'time':'activity';unit=level===3?'jours':'kBq';hint='Compter les périodes ou utiliser le logarithme pour une activité cible.';
+   if(level===1){question=`Une source de ${a0} kBq a une période de ${half} jours. Quelle activité reste-t-il après ${days} jours ?`;answer=a0*1000/2**n;formula='A = A₀ / 2ⁿ ; n = t/T½';numeric=`n = ${days}/${half} = ${n} ; A = ${a0}/2^${n} = ${a0/2**n} kBq.`;}
+   else if(level===2){question=`Activité initiale : ${a0*1000} Bq. Période : 2 h. Durée : ${120*n} min. Calculer l’activité restante en kBq.`;answer=a0*1000/2**n;formula='A = A₀ × 2⁻⁽ᵗ/ᵀ½⁾';numeric=`${120*n} min = ${2*n} h ; n = ${n} ; A = ${a0/2**n} kBq.`;}
+   else{question=`Préparation d’une source pédagogique isolée : de ${a0} kBq à ${a0/8} kBq, période 8 jours. Quelle attente faut-il prévoir ? L’activité des descendants n’est pas incluse.`;answer=24*86400;formula='t = T½ ln(A₀/A)/ln(2)';numeric=`Le rapport est 8 = 2³ ; t = 3 × 8 = 24 jours.`;}
+  }else if(theme===2){const delta=.01*k,energy=delta*931.5;hint='Employer un défaut de masse, jamais la masse atomique moyenne.';group='energy';unit=level===2?'J':'MeV';
+   if(level===1){question=`Un défaut de masse vaut ${delta} u. Calculer l’énergie correspondante en MeV avec 1 u c² = 931,5 MeV.`;answer=energy;formula='E = Δm c²';numeric=`E = ${delta} × 931,5 = ${energy} MeV.`;}
+   else if(level===2){question=`Une réaction libère ${k} MeV. Convertir cette énergie en joules (1 eV = 1,602176634 × 10⁻¹⁹ J).`;answer=k;formula='1 MeV = 10⁶ eV';numeric=`E = ${k} × 10⁶ × 1,602176634 × 10⁻¹⁹ J.`;}
+   else{const a=10*k;question=`Étude pédagogique d’un noyau fictif de A = ${a} : Δm = ${delta} u. Calculer son énergie de liaison par nucléon en MeV/nucléon. Aucun isotope réel n’est attribué à ces données.`;answer=energy/a;group='perNucleon';unit='MeV/nucléon';formula='E/A = Δm c²/A';numeric=`E/A = ${delta} × 931,5 / ${a} = ${energy/a} MeV/nucléon.`;}
+  }else if(theme===3){hint='Convertir la durée en heures ; distinguer dose individuelle et somme collective.';group='dose';unit='mSv';
+   if(level===1){question=`Débit constant : ${.2*k} mSv/h pendant 2 h. Calculer la dose individuelle.`;answer=.4*k;formula='H = débit × t';numeric=`H = ${.2*k} × 2 = ${.4*k} mSv.`;}
+   else if(level===2){question=`Débit constant : ${120*k} µSv/h pendant 15 min. Calculer la dose en µSv.`;answer=.03*k;unit='µSv';formula='H = débit × t';numeric=`15 min = 0,25 h ; H = ${120*k} × 0,25 = ${30*k} µSv.`;}
+   else{question=`DATE : pendant 30 min, un intervenant travaille à ${.2*k} mSv/h ; le chargé de travaux reste au repli à ${.02*k} mSv/h. Calculer la dose collective en H.mSv.`;answer=.11*k;group='collective';unit='H.mSv';date=true;dateParams={kind:'prepare',rate:.2*k,retreat:.02*k,minutes:30};formula='Hcollective = Σ (débit au point occupé × durée)';numeric=`30 min = 0,5 h ; somme = (${.2*k} + ${.02*k}) × 0,5 = ${.11*k} H.mSv.`;}
+  }else if(theme===4){hint='Préciser le modèle : source ponctuelle ou transmission d’un écran. Compter aussi la pose et le retrait.';
+   if(level===1){question=`Source ponctuelle : ${100*k} µSv/h à 1 m. Quel débit à 2 m, sans écran ni diffusion ?`;answer=25*k;group='rate';unit='µSv/h';formula='débit₂ = débit₁(r₁/r₂)²';numeric=`${100*k} × (1/2)² = ${25*k} µSv/h.`;}
+   else if(level===2){question=`Une intensité initiale de ${800*k} unités traverse ${n} CDA. Donner la fraction restante en pourcentage.`;answer=100/2**n;group='percent';unit='%';formula='I/I₀ = 1/2ⁿ';numeric=`100/2^${n} = ${100/2**n} %.`;}
+   else{question=`DATE : deux personnes travaillent 30 min à ${.1*k} mSv/h. Un écran transmet 50 % ; sa pose et son retrait prennent ensemble 20 min par deux personnes au débit sans écran. Calculer le gain de dose collective (sans écran moins avec écran) en H.mSv.`;answer=(.1*k)-(.05*k+(.1*k)*2/3);group='collective';unit='H.mSv';date=true;dateParams={kind:'screen',rate:.1*k,minutes:30};formula='Gain = dose sans écran − (dose de travail avec écran + dose pose/retrait)';numeric=`Sans : ${.1*k} H.mSv ; avec : ${.05*k} + ${.1*k*2/3} H.mSv. Le gain est négatif : l’écran augmente ici la collective.`;}
+  }else{hint='Écrire le facteur de conversion avant le calcul.';
+   if(level===1){question=`Convertir ${k} MBq en Bq.`;answer=k*1e6;group='activity';unit='Bq';formula='1 MBq = 10⁶ Bq';numeric=`${k} × 10⁶ Bq.`;}
+   else if(level===2){question=`Convertir ${250*k} µSv en mSv.`;answer=.25*k;group='dose';unit='mSv';formula='1 mSv = 1 000 µSv';numeric=`${250*k}/1000 = ${.25*k} mSv.`;}
+   else{question=`Un mode opératoire comporte ${15*k} minutes de présence. Pour un calcul de dose, exprimer cette durée en heures.`;answer=15*k*60;group='time';unit='h';formula='1 h = 60 min';numeric=`${15*k}/60 = ${.25*k} h.`;}
+  }
+  correction=numeric+' Vérifier l’unité demandée et les hypothèses du modèle.';
+  return {theme,level,question,answer,group,unit,hints:[hint,formula,numeric,correction],date,dateParams};
+ }
+ unitGroups.perNucleon={'MeV/nucléon':1,'keV/nucléon':.001};unitGroups.rate={'µSv/h':1,'mSv/h':1000};unitGroups.percent={'%':1};
+ function check(ex,value,unit){const allowed=unitGroups[ex.group];if(!allowed||!Object.hasOwn(allowed,unit))return {kind:'unit',message:'L’unité ne correspond pas à la grandeur demandée.'};
+ const s=String(value).trim().replace(',','.');if(!/^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(s)||!Number.isFinite(Number(s)))return {kind:'input',message:'Saisir un nombre fini (virgule, point ou e).'};
+ const got=Number(s)*allowed[unit],tolerance=Math.max(Math.abs(ex.answer)*.015,1e-30);
+ return Math.abs(got-ex.answer)<=tolerance?{kind:'ok',message:'La valeur est cohérente avec le modèle et l’unité choisie.'}:{kind:'value',message:'L’unité convient. Revoir les valeurs, conversions et étapes du calcul avec les aides.'};
+ }
+ const api={generate,check,unitGroups};root.LearningExercises=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+ if(typeof document==='undefined')return;
+ document.addEventListener('DOMContentLoaded',()=>{
+  const $=s=>document.querySelector(s),host=$('#exerciseTools');let ex=null,help=0;
+  host.innerHTML='<article class="card"><div class="rd-fields"><div class="rd-field"><label for="exerciseTheme">Thème</label><select id="exerciseTheme">'+['Atome et noyau','Activité et décroissance','Masse et énergie','Dose et débit de dose','Distance et écrans','Conversions et repères'].map((x,i)=>`<option value="${i}">${x}</option>`).join('')+'</select></div><div class="rd-field"><label for="exerciseLevel">Niveau</label><select id="exerciseLevel"><option value="1">1 · Application directe</option><option value="2">2 · Calculs et conversions</option><option value="3">3 · Situation TIIN</option></select></div></div><button id="exerciseNew" class="btn btn-ghost">Nouvel énoncé</button><h2 id="exerciseQuestion"></h2><div class="rd-fields"><div class="rd-field"><label for="exerciseAnswer">Ma réponse</label><input data-scientific inputmode="decimal" id="exerciseAnswer"></div><div class="rd-field"><label for="exerciseUnit">Unité de ma réponse</label><select id="exerciseUnit"></select></div></div><button id="exerciseCheck" class="btn btn-primary">Vérifier mon raisonnement</button><p id="exerciseFeedback" role="status"></p><div class="tool-tabs"><button id="exerciseHelp" class="btn btn-ghost">Aide suivante</button><button id="exerciseFormula" class="btn btn-ghost">Consulter le formulaire</button><button id="exerciseDate" class="btn btn-ghost" hidden>Explorer DATE</button></div><ol id="exerciseHints"></ol><p>Aucun résultat ni historique de réussite n’est enregistré. La réponse en cours reste présente lors de la navigation entre onglets.</p></article>';
+  for(const unit of [...new Set(Object.values(unitGroups).flatMap(x=>Object.keys(x)))]){const option=document.createElement('option');option.textContent=unit;$('#exerciseUnit').append(option)}
+  function start(){ex=generate(+$(' #exerciseTheme'.trim()).value,+$('#exerciseLevel').value);help=0;$('#exerciseQuestion').textContent=ex.question;$('#exerciseAnswer').value='';$('#exerciseUnit').value=ex.unit;$('#exerciseFeedback').textContent='';$('#exerciseHints').replaceChildren();$('#exerciseHelp').disabled=false;$('#exerciseDate').hidden=!ex.date;}
+  $('#exerciseNew').onclick=start;$('#exerciseTheme').onchange=start;$('#exerciseLevel').onchange=start;
+  $('#exerciseCheck').onclick=()=>$('#exerciseFeedback').textContent=check(ex,$('#exerciseAnswer').value,$('#exerciseUnit').value).message;
+  $('#exerciseHelp').onclick=()=>{if(help>=4)return;const li=document.createElement('li');li.textContent=['Indice : ','Formule : ','Application : ','Correction : '][help]+ex.hints[help];$('#exerciseHints').append(li);help++;$('#exerciseHelp').disabled=help===4};
+  $('#exerciseFormula').onclick=()=>document.querySelector('[data-tab="formulas"]').click();
+  $('#exerciseDate').onclick=()=>{document.querySelector('[data-tab="explore"]').click();if(ex.dateParams&&DateLearning.applyExercise)DateLearning.applyExercise(ex.dateParams);$('#dateTool').scrollIntoView({block:'start'})};
+  // Equivalent unit changes preserve the quantity; incompatible choices remain selectable for diagnosis.
+  let previousUnit=null;$('#exerciseUnit').addEventListener('focus',()=>previousUnit=$('#exerciseUnit').value);$('#exerciseUnit').onchange=()=>{const allowed=unitGroups[ex.group],next=$('#exerciseUnit').value;if(previousUnit&&allowed[previousUnit]&&allowed[next]&&$('#exerciseAnswer').value.trim()){try{$('#exerciseAnswer').value=String(Number($('#exerciseAnswer').value.replace(',','.'))*allowed[previousUnit]/allowed[next])}catch(e){}}previousUnit=next};start();
+ });
+})(globalThis);

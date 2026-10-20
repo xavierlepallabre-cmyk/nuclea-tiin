@@ -1,3 +1,9 @@
+Nucléa TIIN v0.9 — validation du 20 octobre 2026
+
+Suites reproductibles dans tests/. Résultats et limites actuels : VALIDATION.md ; résultats scientifiques structurés : test-results/science.json.
+
+HISTORIQUE CONSERVÉ
+
 Nucléa TIIN v0.4 — validation du 19 octobre 2026
 
 Tests automatisés Microsoft Edge / Chromium aux formats 390 × 900, 820 × 900 et 1440 × 900 : réussis.

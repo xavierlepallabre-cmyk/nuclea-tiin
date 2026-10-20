@@ -1,4 +1,5 @@
-# Nucléa TIIN v0.4 — provenance des isotopes
+# Nucléa TIIN v0.9 — sources et méthodes scientifiques
+
 
 Téléchargement effectué le 19 octobre 2026. 3 383 états fondamentaux de Z = 1 à 118, plus deux états métastables : Tc-99m et Ba-137m. Le neutron libre et les deux systèmes de neutrons (Z = 0) ne figurent pas dans le tableau des éléments.
 
@@ -65,3 +66,22 @@ Conversions : seconde, attoseconde, picoseconde, nanoseconde, microseconde, mill
 Les périodes absentes ou données seulement comme limites ne sont pas préremplies. Les valeurs approximatives AP sont acceptées et signalées. Les isotopes stables n’activent pas le calcul de décroissance.
 
 Le calcul inverse est effectué par différence de logarithmes pour éviter de déborder lors du quotient A0/A. Une activité positive peut tomber sous la précision numérique lors d’un calcul direct ; elle est alors signalée, sans conclure à une extinction physique. La courbe porte sur dix périodes ; un résultat situé au-delà est annoncé hors de la courbe. Les points de repère sont également disponibles sous forme de tableau accessible.
+
+
+## v0.9 — unités, liaison, Aston et DATE (20 octobre 2026)
+
+La population des 3 385 états et les CSV d’origine ne changent pas. Les propriétés complémentaires proviennent exclusivement des colonnes atomic_mass, unc_am, binding et unc_ba du CSV ground_states déjà fourni. atomic_mass est en micro-u ; binding est une énergie de liaison PAR NUCLÉON en keV, non une énergie totale. Référence officielle de définition des champs : AIEA NDLab, https://iaea-nds.github.io/ndlab/_static/ndlab-tutorial.html . Vérifications d’échelle : C-12 a une masse de 12 u et He-4 une liaison totale proche de 28,296 MeV.
+
+La référence de liaison est E/A = binding/1000 en MeV par nucléon, E = A × E/A, avec équivalent de masse E/(931,49410372 MeV/u). Une valeur absente reste absente. Les deux isomères n’héritent pas silencieusement des masses de leur fondamental : ce calcul y est désactivé avec explication.
+
+Calcul pédagogique avec masses atomiques neutres : Δm ≈ Z m(¹H) + N m_n − m_atome ; m(¹H) = 1,007825031898 u et m_n = 1,0086649159 u proviennent des lignes H-1 et neutron du même CSV. Les électrons se compensent au premier ordre ; les différences d’énergie de liaison électronique ne sont pas corrigées. Ce résultat approximatif est distingué de la valeur de référence. Le nuage d’Aston utilise uniquement les valeurs tabulées, conserve les isobares distincts et ne fabrique aucun point : 3 356 états fondamentaux ont une liaison disponible. Maximum constaté dans ce jeu : Ni-62. Les incertitudes originales sont affichées ; aucune propagation complète n’est présentée.
+
+Constantes de conversion : 1 u c² = 931,49410372 MeV et 1 u = 1,66053906892 × 10⁻²⁷ kg, CODATA 2022 : https://physics.nist.gov/cuu/pdf/wall_2022.pdf . 1 eV = 1,602176634 × 10⁻¹⁹ J. Les constantes arrondies du formulaire historique restent identifiées dans les exemples pédagogiques ; elles ne remplacent pas les données isotopiques.
+
+DATE Explorer : débit = débit de référence à 1 m × fraction d’activité / distance², puis multiplication par la transmission de l’écran. La composition radioactive et la géométrie sont inchangées ; ce n’est pas un calcul de débit à partir de Bq seuls. Source ponctuelle, géométrie appropriée, pas de diffusion ni d’autres phénomènes non modélisés. Dose = débit constant × durée. Les doses de pose et retrait sont comptées au débit sans écran pour l’équipe de pose. Une transmission imposée ne garantit pas l’efficacité d’un écran réel.
+
+Préparation : doses individuelles par point et phase, puis sommes individuelles et collectives. H.mSv désigne ici personne-mSv, pour distinguer la somme collective du mSv individuel. Les changements de débit d’une phase sont hérités par les phases suivantes, jusqu’à un nouvel ajustement. Les relèves répartissent les doses ; à temps-personne et débits inchangés, elles ne réduisent pas la collective.
+
+Repères de radioprotection : AIEA, Basic Safety Standards, principes d’optimisation/ALARA et distinction des doses individuelles et collectives : https://nucleus.iaea.org/sites/nss-oui/Published%20Collections/m_3761d926-c16f-4477-a63b-741a9db1c16c/m_3761d926-c16f-4477-a63b-741a9db1c16c__50_0.Html . ASNR, principes de radioprotection : https://reglementation-controle.asnr.fr/information/publications/fiches-d-information-du-public/les-principes-de-radioprotection . Ces références fondent les explications ; les nombres de missions sont fictifs et ne constituent pas des prescriptions.
+
+Exercices : les questions d’identification des noyaux utilisent des isotopes réels prédéfinis. Les jeux variables de missions et les données explicitement fictives sont encadrés. Les réponses acceptent une tolérance relative de 1,5 % sur la valeur dans la dimension attendue ; une unité incompatible reçoit un message distinct. Ni notes, ni classement, ni statistiques de réussite ne sont produits.

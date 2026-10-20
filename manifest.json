@@ -1,0 +1,10 @@
+{
+  "downloaded": "2026-10-19",
+  "count": 3385,
+  "elements": 118,
+  "sha256": {
+    "iaea-ground-states.csv": "8aee5dc431af1e35fcb49746387b83e927b3c300e7787defbda621a08212c795",
+    "iaea-levels-137ba.csv": "cee23da2e62653d1b998d7c128af82c41ab4c564f7ad2590d70fac9626758029",
+    "iaea-levels-99tc.csv": "b8ee67c954425890951f8eb3395a79f8ce8baa60837438ad636c2a4b0a9721f3"
+  }
+}
