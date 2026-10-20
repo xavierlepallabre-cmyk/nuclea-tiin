@@ -41,16 +41,67 @@
  const api={generate,check,unitGroups};root.LearningExercises=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
  if(typeof document==='undefined')return;
  document.addEventListener('DOMContentLoaded',()=>{
-  const $=s=>document.querySelector(s),host=$('#exerciseTools');let ex=null,help=0;
-  host.innerHTML='<article class="card"><div class="rd-fields"><div class="rd-field"><label for="exerciseTheme">Thème</label><select id="exerciseTheme">'+['Atome et noyau','Activité et décroissance','Masse et énergie','Dose et débit de dose','Distance et écrans','Conversions et repères'].map((x,i)=>`<option value="${i}">${x}</option>`).join('')+'</select></div><div class="rd-field"><label for="exerciseLevel">Niveau</label><select id="exerciseLevel"><option value="1">1 · Application directe</option><option value="2">2 · Calculs et conversions</option><option value="3">3 · Situation TIIN</option></select></div></div><button id="exerciseNew" class="btn btn-ghost">Nouvel énoncé</button><h2 id="exerciseQuestion"></h2><div class="rd-fields"><div class="rd-field"><label for="exerciseAnswer">Ma réponse</label><input data-scientific inputmode="decimal" id="exerciseAnswer"></div><div class="rd-field"><label for="exerciseUnit">Unité de ma réponse</label><select id="exerciseUnit"></select></div></div><button id="exerciseCheck" class="btn btn-primary">Vérifier mon raisonnement</button><p id="exerciseFeedback" role="status"></p><div class="tool-tabs"><button id="exerciseHelp" class="btn btn-ghost">Aide suivante</button><button id="exerciseFormula" class="btn btn-ghost">Consulter le formulaire</button><button id="exerciseDate" class="btn btn-ghost" hidden>Explorer DATE</button></div><ol id="exerciseHints"></ol><p>Aucun résultat ni historique de réussite n’est enregistré. La réponse en cours reste présente lors de la navigation entre onglets.</p></article>';
-  for(const unit of [...new Set(Object.values(unitGroups).flatMap(x=>Object.keys(x)))]){const option=document.createElement('option');option.textContent=unit;$('#exerciseUnit').append(option)}
-  function start(){ex=generate(+$(' #exerciseTheme'.trim()).value,+$('#exerciseLevel').value);help=0;$('#exerciseQuestion').textContent=ex.question;$('#exerciseAnswer').value='';$('#exerciseUnit').value=ex.unit;$('#exerciseFeedback').textContent='';$('#exerciseHints').replaceChildren();$('#exerciseHelp').disabled=false;$('#exerciseDate').hidden=!ex.date;}
-  $('#exerciseNew').onclick=start;$('#exerciseTheme').onchange=start;$('#exerciseLevel').onchange=start;
-  $('#exerciseCheck').onclick=()=>$('#exerciseFeedback').textContent=check(ex,$('#exerciseAnswer').value,$('#exerciseUnit').value).message;
-  $('#exerciseHelp').onclick=()=>{if(help>=4)return;const li=document.createElement('li');li.textContent=['Indice : ','Formule : ','Application : ','Correction : '][help]+ex.hints[help];$('#exerciseHints').append(li);help++;$('#exerciseHelp').disabled=help===4};
+  const $=s=>document.querySelector(s),host=$('#exerciseTools');let ex=null,help=0,theme=0,level=1;
+  const THEMES=[
+   ['Atome et noyau','<circle cx="12" cy="12" r="2.2"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(-60 12 12)"/>'],
+   ['Activité et décroissance','<path d="M4 5c3 0 4 9 8 11s5 2 8 2"/><path d="M4 20h16M4 4v16"/>'],
+   ['Masse et énergie','<path d="M13 3 5 13h6l-1 8 8-10h-6z"/>'],
+   ['Dose et débit de dose','<rect x="7" y="3" width="10" height="18" rx="2"/><path d="M10 7h4M10 11h4"/><circle cx="12" cy="16" r="1.6"/>'],
+   ['Distance et écrans','<circle cx="5" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 0 1 0 7"/><rect x="13" y="4" width="4" height="16" rx="1"/><path d="M19 12h2"/>'],
+   ['Conversions et repères','<path d="M4 8h13l-3-3M20 16H7l3 3"/>']
+  ];
+  const LEVELS=[[1,'Direct','Application directe'],[2,'Calculs','Calculs et conversions'],[3,'Situation','Situation TIIN']];
+  const UNIT_LABELS={count:'Nombre',charge:'Charge',activity:'Activité',time:'Durée',energy:'Énergie',perNucleon:'Énergie par nucléon',dose:'Dose',rate:'Débit de dose',collective:'Dose collective',length:'Longueur',percent:'Pourcentage'};
+  host.innerHTML=`<div class="ex-pick card">
+   <div class="ex-step"><h2 class="ex-label" id="exThemeLabel">Thème</h2>
+    <div id="exerciseTheme" class="ex-themes" role="radiogroup" aria-labelledby="exThemeLabel">${THEMES.map(([name,icon],i)=>`<button type="button" role="radio" class="ex-theme" data-value="${i}" aria-checked="false"><svg aria-hidden="true" viewBox="0 0 24 24">${icon}</svg><span>${name}</span></button>`).join('')}</div></div>
+   <div class="ex-step"><h2 class="ex-label" id="exLevelLabel">Niveau</h2>
+    <div id="exerciseLevel" class="ex-levels" role="radiogroup" aria-labelledby="exLevelLabel">${LEVELS.map(([v,short,long])=>`<button type="button" role="radio" class="ex-level" data-value="${v}" aria-checked="false" title="${long}"><b>${v}</b><span>${short}</span></button>`).join('')}</div>
+    <p class="ex-level-hint" id="exLevelHint"></p></div>
+  </div>
+  <article class="card ex-card" aria-labelledby="exerciseQuestion">
+   <div class="ex-card-head"><span class="ex-meta" id="exMeta"></span><button id="exerciseNew" type="button" class="ex-link"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg>Autre énoncé</button></div>
+   <h2 id="exerciseQuestion"></h2>
+   <form id="exForm" class="ex-answer" novalidate>
+    <div class="ex-field"><label for="exerciseAnswer">Ma réponse</label><input data-scientific inputmode="decimal" id="exerciseAnswer" autocomplete="off" placeholder="ex. 2,5 ou 3e-6"></div>
+    <div class="ex-field ex-unit"><label for="exerciseUnit">Unité</label><select id="exerciseUnit"></select></div>
+    <button id="exerciseCheck" type="submit" class="btn btn-primary ex-check">Vérifier</button>
+   </form>
+   <div id="exerciseFeedback" class="ex-feedback" role="status" hidden></div>
+   <button id="exerciseNext" type="button" class="btn btn-primary ex-next" hidden>Exercice suivant →</button>
+   <ol id="exerciseHints" class="ex-hints"></ol>
+   <div class="ex-tools">
+    <button id="exerciseHelp" type="button" class="ex-link"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17.5v.01"/></svg><span id="exHelpText">Un coup de pouce</span></button>
+    <button id="exerciseFormula" type="button" class="ex-link"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8.5 8.5h7M8.5 12h3M14 12h1.5M8.5 15.5h3"/></svg>Formulaire</button>
+    <button id="exerciseDate" type="button" class="ex-link" hidden><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15 9-2 4-4 2 2-4z"/></svg>Explorer DATE</button>
+   </div>
+  </article>
+  <p class="ex-note">Aucun résultat n’est enregistré. Ta réponse en cours reste là si tu changes d’onglet.</p>`;
+  // Unités regroupées par grandeur : l'élève choisit encore l'unité, mais dans une liste lisible.
+  for(const [group,units] of Object.entries(unitGroups)){const og=document.createElement('optgroup');og.label=UNIT_LABELS[group]||group;for(const unit of Object.keys(units)){if($('#exerciseUnit').querySelector(`option[value="${CSS.escape(unit)}"]`))continue;const o=document.createElement('option');o.value=unit;o.textContent=unit;og.append(o)}if(og.children.length)$('#exerciseUnit').append(og)}
+  const mark=(sel,val)=>document.querySelectorAll(sel+' [role="radio"]').forEach(b=>{const on=+b.dataset.value===val;b.setAttribute('aria-checked',String(on));b.tabIndex=on?0:-1});
+  function start(){
+   ex=generate(theme,level);help=0;mark('#exerciseTheme',theme);mark('#exerciseLevel',level);
+   $('#exLevelHint').textContent=LEVELS[level-1][2];
+   $('#exMeta').textContent=`${THEMES[theme][0]} · niveau ${level}`;
+   $('#exerciseQuestion').textContent=ex.question;$('#exerciseAnswer').value='';$('#exerciseUnit').value=ex.unit;
+   const fb=$('#exerciseFeedback');fb.hidden=true;fb.textContent='';fb.className='ex-feedback';
+   $('#exerciseNext').hidden=true;$('#exerciseHints').replaceChildren();$('#exerciseHelp').disabled=false;$('#exHelpText').textContent='Un coup de pouce';$('#exerciseDate').hidden=!ex.date;
+  }
+  // Sélecteurs à choix unique : clic, et flèches du clavier comme un vrai groupe radio.
+  function radios(sel,set){const g=$(sel);g.addEventListener('click',e=>{const b=e.target.closest('[role="radio"]');if(b){set(+b.dataset.value);start()}});
+   g.addEventListener('keydown',e=>{const list=[...g.querySelectorAll('[role="radio"]')],i=list.indexOf(document.activeElement);if(i<0)return;const d={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];if(!d)return;e.preventDefault();const n=list[(i+d+list.length)%list.length];set(+n.dataset.value);start();n.focus()})}
+  radios('#exerciseTheme',v=>theme=v);radios('#exerciseLevel',v=>level=v);
+  $('#exerciseNew').onclick=start;$('#exerciseNext').onclick=()=>{start();$('#exerciseAnswer').focus({preventScroll:true});$('#exerciseQuestion').scrollIntoView({block:'center',behavior:'smooth'})};
+  $('#exForm').onsubmit=e=>{e.preventDefault();const r=check(ex,$('#exerciseAnswer').value,$('#exerciseUnit').value),fb=$('#exerciseFeedback');
+   fb.hidden=false;fb.className='ex-feedback is-'+r.kind;
+   fb.innerHTML='<strong>'+({ok:'Bravo !',unit:'Attention à l’unité',input:'Réponse illisible',value:'Pas encore'})[r.kind]+'</strong><span></span>';fb.querySelector('span').textContent=r.message;
+   $('#exerciseNext').hidden=r.kind!=='ok'};
+  $('#exerciseHelp').onclick=()=>{if(help>=4)return;const li=document.createElement('li');li.innerHTML='<b></b> ';li.firstChild.textContent=['Indice','Formule','Application','Correction'][help];li.append(ex.hints[help]);$('#exerciseHints').append(li);help++;
+   $('#exerciseHelp').disabled=help===4;$('#exHelpText').textContent=help===4?'Correction affichée':help===3?'Voir la correction':'Aide suivante ('+(help+1)+'/4)'};
   $('#exerciseFormula').onclick=()=>document.querySelector('[data-tab="formulas"]').click();
   $('#exerciseDate').onclick=()=>{document.querySelector('[data-tab="explore"]').click();if(ex.dateParams&&DateLearning.applyExercise)DateLearning.applyExercise(ex.dateParams);$('#dateTool').scrollIntoView({block:'start'})};
-  // Equivalent unit changes preserve the quantity; incompatible choices remain selectable for diagnosis.
+  // Un changement d'unité équivalente conserve la grandeur ; les unités incompatibles restent proposées pour le diagnostic.
   let previousUnit=null;$('#exerciseUnit').addEventListener('focus',()=>previousUnit=$('#exerciseUnit').value);$('#exerciseUnit').onchange=()=>{const allowed=unitGroups[ex.group],next=$('#exerciseUnit').value;if(previousUnit&&allowed[previousUnit]&&allowed[next]&&$('#exerciseAnswer').value.trim()){try{$('#exerciseAnswer').value=String(Number($('#exerciseAnswer').value.replace(',','.'))*allowed[previousUnit]/allowed[next])}catch(e){}}previousUnit=next};start();
  });
 })(globalThis);
