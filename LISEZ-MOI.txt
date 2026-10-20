@@ -1,3 +1,9 @@
+Nucléa TIIN v0.13 — Courbe d’Aston lisible sur téléphone
+
+Le graphique est dessiné à la taille réelle de l’écran : textes et points gardent leur taille, la courbe est plus haute en mode portrait. Bouton « Zoom 7–9 MeV » pour séparer les noyaux autour du maximum. Toucher ou glisser le doigt le long des points sélectionne l’isotope le plus proche, avec une étiquette sur la courbe. Le résultat (E/A et E) s’affiche en premier, le calcul détaillé est replié.
+
+---------------------------------------------------------------------
+
 Nucléa TIIN v0.12 — Correctif de mise à jour
 
 La mise en cache hors connexion téléchargeait les fichiers via le cache HTTP du navigateur (10 min sur GitHub Pages) : une mise à jour pouvait mélanger des fichiers de deux versions (exemple : nouveaux exercices mais pied de page « v0.10 »). Chaque fichier est désormais demandé directement au serveur.
