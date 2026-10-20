@@ -1,7 +1,9 @@
-const CACHE='nuclea-tiin-v011';
+const CACHE='nuclea-tiin-v012';
 const FONT_CACHE='nuclea-tiin-fonts';
 const ASSETS=['./','./index.html','./style.css','./app.js','./assets/fonts/lexend-0.ttf','./assets/fonts/lexend-1.ttf','./assets/fonts/lexend-2.ttf','./assets/fonts/lexend-3.ttf','./assets/fonts/lexend-4.ttf','./assets/fonts/lexend.css','./isotopes.js','./decay-chain.js','./decay-calculator.js','./navigation.js','./formulas.js','./units.js','./nuclear-properties.js','./energy.js','./date-model.js','./date-ui.js','./exercises.js','./updates.js','./visuals.js','./visuels/decroissance.html','./visuels/attenuation.html','./visuels/distance.html','./visuels/desintegrations.html','./visuels/filiation.html','./SOURCES.md','./elements.json','./icon.svg','./manifest.webmanifest','./assets/logo-tocqueville.png','./assets/logo-bac-pro-tiin.png','./assets/icon-192.png','./assets/icon-512.png','./assets/icon-maskable-512.png'];
-self.addEventListener('install',e=>e.waitUntil((async()=>{const keys=await caches.keys();const legacy=keys.some(k=>/^nuclea-tiin-v0[3-8]/.test(k))&&!keys.some(k=>/^nuclea-tiin-v09/.test(k));const cache=await caches.open(CACHE);await cache.addAll(ASSETS);if(legacy)await self.skipWaiting()})()));
+self.addEventListener('install',e=>e.waitUntil((async()=>{const keys=await caches.keys();const legacy=keys.some(k=>/^nuclea-tiin-v0[3-8]/.test(k))&&!keys.some(k=>/^nuclea-tiin-v09/.test(k));const cache=await caches.open(CACHE);// cache:'reload' : télécharger chaque fichier depuis le serveur, jamais depuis le cache HTTP du navigateur,
+ // sinon une mise à jour peut mélanger des fichiers de deux versions.
+ await cache.addAll(ASSETS.map(u=>new Request(u,{cache:'reload'})));if(legacy)await self.skipWaiting()})()));
 self.addEventListener('message',e=>{if(e.data?.type==='ACTIVATE_UPDATE')self.skipWaiting()});
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('nuclea-tiin-')&&k!==CACHE&&k!==FONT_CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{
