@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="stylesheet" href="../assets/fonts/lexend.css">
+<script>try{const t=localStorage.getItem("nuclea-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}
+if(window.self!==window.top)document.documentElement.classList.add("embedded");</script>
+<title>Désintégrations α, β, γ</title>
+</head>
+<body>
+<style>
+
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+.embedded header h1{display:none}
+.embedded body{padding-top:12px}
+/* Layout : équation-bilan en tête, puis noyau animé | diagramme N-Z côte à côte, puis repères */
+:root{
+  --bg:#F4F6FA; --panel:#FFFFFF; --ink:#0E1B36; --muted:#4A5A75; --line:#D5DDEA;
+  --p:#F18A52; --n:#8E9AAD; --e:#3D6BD6; --pos:#8A5CC2; --gam:#E0A400; --src:#F2B84B; --ok:#1E7A4F;
+  --f-disp:Lexend,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:Lexend,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0A1430; --panel:#12204A; --ink:#EEF2FA; --muted:#A9B6D3; --line:#2B3F72;
+  --p:#F6A06E; --n:#AEB8C8; --e:#8FB0F5; --pos:#C3A6F0; --gam:#F2C14E; --src:#F2C14E; --ok:#7FD6A8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A1430; --panel:#12204A; --ink:#EEF2FA; --muted:#A9B6D3; --line:#2B3F72;
+  --p:#F6A06E; --n:#AEB8C8; --e:#8FB0F5; --pos:#C3A6F0; --gam:#F2C14E; --src:#F2C14E; --ok:#7FD6A8; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px}
+.wrap{max-width:1080px;margin:0 auto;display:grid;gap:16px}
+header h1{font-family:var(--f-disp);font-weight:700;font-size:clamp(26px,4vw,36px);margin:0;letter-spacing:.01em;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted);max-width:65ch}
+.controls{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.field{display:grid;gap:4px;min-width:0}
+label,.lab{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500}
+select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px;max-width:100%}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button{font-family:var(--f-disp);font-weight:700;font-size:16px;letter-spacing:.03em;border-radius:4px;padding:8px 16px;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:var(--bg)}
+button.ghost{background:transparent;color:var(--ink)}
+button:disabled{opacity:.45;cursor:default}
+button:focus-visible,select:focus-visible{outline:2px solid var(--p);outline-offset:2px}
+.seg{display:flex;border:1px solid var(--ink);border-radius:4px;overflow:hidden;width:max-content}
+.seg button{border:0;border-radius:0;font-family:var(--f-mono);font-size:17px;padding:6px 16px;background:transparent;color:var(--ink)}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.eqband{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;display:grid;gap:10px}
+.eqline{font-family:var(--f-mono);font-size:clamp(20px,3.4vw,32px);display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;overflow-x:auto}
+.nuc{display:inline-flex;align-items:center;gap:2px}
+.nuc .az{display:inline-flex;flex-direction:column;align-items:flex-end;font-size:.48em;line-height:1.05}
+.nuc .sym{font-weight:600}
+.arrow{color:var(--muted)}
+.q{color:var(--muted)}
+.cons{display:flex;flex-wrap:wrap;gap:6px 24px;font-family:var(--f-mono);font-size:14px;color:var(--muted)}
+.cons b{color:var(--ok);font-weight:600}
+.main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:760px){.main{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px;display:grid;gap:10px;min-width:0;align-content:start}
+.card h2{font-family:var(--f-disp);font-size:18px;margin:0;font-weight:700}
+canvas{width:100%;display:block;max-width:100%}
+#nucleus{aspect-ratio:600/440}
+#nz{aspect-ratio:600/520}
+#valley{aspect-ratio:600/300}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:middle;margin-right:6px;background-image:radial-gradient(circle at 35% 30%,rgba(255,255,255,.75),rgba(255,255,255,0) 50%,rgba(0,0,0,.3) 100%)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.fact{background:var(--panel);padding:12px 14px;min-width:0}
+.fact span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.fact p{margin:2px 0 0}
+.note{font-size:13px;color:var(--muted)}
+footer{font-size:13px;color:var(--muted);max-width:75ch}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Désintégrations α, β, γ</h1>
+    <p>Un noyau instable se transforme en émettant un rayonnement. Le type de désintégration fixe le déplacement dans le diagramme N-Z, et le bilan conserve toujours A et Z.</p>
+  </header>
+
+  <div class="controls">
+    <div class="field"><span class="lab">Type</span>
+      <div class="seg" role="group" aria-label="Type de désintégration" id="types">
+        <button data-t="a" class="on" aria-pressed="true">α</button><button data-t="bm" aria-pressed="false">β⁻</button><button data-t="bp" aria-pressed="false">β⁺</button><button data-t="g" aria-pressed="false">γ</button>
+      </div></div>
+    <div class="field"><label for="ex">Radionucléide</label><select id="ex"></select></div>
+    <div class="btns"><button id="go">Désintégrer</button><button id="back" class="ghost">Revenir au noyau père</button></div>
+  </div>
+
+  <section class="eqband" aria-live="polite">
+    <div class="eqline" id="eq"></div>
+    <div class="cons" id="cons"></div>
+  </section>
+
+  <div class="main">
+    <section class="card">
+      <h2>Dans le noyau</h2>
+      <canvas id="nucleus" width="600" height="440"></canvas>
+      <div class="legend"><span><i class="dot" style="background:var(--p)"></i>Proton</span><span><i class="dot" style="background:var(--n)"></i>Neutron</span><span><i class="dot" style="background:var(--e)"></i>Électron e⁻</span><span><i class="dot" style="background:var(--pos)"></i>Positon e⁺</span><span><i class="dot" style="background:var(--gam)"></i>Photon γ</span></div>
+      <div class="note" id="nuNote"></div>
+    </section>
+    <section class="card">
+      <h2>Déplacement dans le diagramme N-Z</h2>
+      <canvas id="nz" width="600" height="520"></canvas>
+      <canvas id="valley" width="600" height="300" aria-label="Position du noyau par rapport à la vallée de stabilité"></canvas>
+    </section>
+  </div>
+
+  <div class="facts">
+    <div class="fact"><span>Ce qui se passe</span><p id="fWhat"></p></div>
+    <div class="fact"><span>Bilan</span><p id="fBil"></p></div>
+    <div class="fact"><span>Pourquoi ce noyau</span><p id="fWhy"></p></div>
+    <div class="fact"><span>Arrêté par</span><p id="fStop"></p></div>
+  </div>
+
+  <footer>Le noyau est représenté de façon symbolique avec quelques dizaines de nucléons ; la proportion protons/neutrons respecte celle du radionucléide. Les neutrinos interagissent si peu avec la matière qu'ils ne comptent pas dans la dose.</footer>
+</div>
+
+<script>
+const SYM="n H He Li Be B C N O F Ne Na Mg Al Si P S Cl Ar K Ca Sc Ti V Cr Mn Fe Co Ni Cu Zn Ga Ge As Se Br Kr Rb Sr Y Zr Nb Mo Tc Ru Rh Pd Ag Cd In Sn Sb Te I Xe Cs Ba La Ce Pr Nd Pm Sm Eu Gd Tb Dy Ho Er Tm Yb Lu Hf Ta W Re Os Ir Pt Au Hg Tl Pb Bi Po At Rn Fr Ra Ac Th Pa U Np Pu Am Cm Bk Cf Es Fm".split(" ");
+const EX={
+  a:[{Z:88,N:138,T:"1 600 ans"},{Z:95,N:146,T:"432 ans"},{Z:92,N:146,T:"4,47 milliards d'années"},{Z:84,N:126,T:"138 jours"}],
+  bm:[{Z:27,N:33,T:"5,27 ans"},{Z:55,N:82,T:"30,1 ans"},{Z:53,N:78,T:"8,02 jours"},{Z:6,N:8,T:"5 730 ans"}],
+  bp:[{Z:9,N:9,T:"110 min"},{Z:11,N:11,T:"2,6 ans"},{Z:6,N:5,T:"20,4 min"}],
+  g:[{Z:43,N:56,m:"m",E:"140 keV",T:"6,0 h"},{Z:56,N:81,m:"m",E:"662 keV",T:"2,55 min"},{Z:28,N:32,m:"*",E:"1,17 et 1,33 MeV",T:"état excité très bref"}]
+};
+const MOVE={a:[-2,-2],bm:[-1,1],bp:[1,-1],g:[0,0]};
+const INFO={
+  a:{what:"Le noyau éjecte un noyau d'hélium 4 (2 protons + 2 neutrons).",bil:"A diminue de 4, Z diminue de 2.",why:"Noyau lourd (A > 200 environ) : l'émission α le rapproche de la stabilité.",stop:"Une feuille de papier ou la couche superficielle de la peau. Danger surtout en contamination interne."},
+  bm:{what:"Un neutron se transforme en proton : n → p + e⁻ + ν̄ₑ.",bil:"A inchangé, Z augmente de 1.",why:"Excès de neutrons : le noyau est sous la vallée de stabilité.",stop:"Quelques millimètres d'aluminium ou de plexiglas."},
+  bp:{what:"Un proton se transforme en neutron : p → n + e⁺ + νₑ. Le positon s'annihile ensuite avec un électron.",bil:"A inchangé, Z diminue de 1. L'annihilation produit 2 γ de 511 keV.",why:"Excès de protons : le noyau est au-dessus de la vallée de stabilité.",stop:"Le positon s'arrête vite, mais les 2 γ de 511 keV demandent du plomb ou du béton."},
+  g:{what:"Le noyau, resté dans un état excité, se désexcite en émettant un photon.",bil:"A et Z inchangés : seul l'état d'énergie change.",why:"Suit souvent une désintégration α ou β qui laisse le noyau fils excité.",stop:"Atténué mais jamais arrêté totalement : plomb, acier, béton, eau."}
+};
+const $=id=>document.getElementById(id);
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function rgb(h){h=h.replace('#','');if(h.length===3)h=[...h].map(c=>c+c).join('');const n=parseInt(h,16);return[n>>16&255,n>>8&255,n&255]}
+const sup=s=>String(s).replace(/[0-9]/g,c=>"⁰¹²³⁴⁵⁶⁷⁸⁹"[c]);
+
+let type="a",ex=EX.a[0],state="parent",t0=0,anim=0;
+function daughter(){const [dn,dz]=MOVE[type];return{Z:ex.Z+dz,N:ex.N+dn}}
+function label(Z,N,m){return `${sup(Z+N)}${m==="m"?"ᵐ":""}${SYM[Z]}${m==="*"?"*":""}`}
+
+function nucHTML(A,Z,s){return `<span class="nuc"><span class="az"><span>${A}</span><span>${Z}</span></span><span class="sym">${s}</span></span>`}
+function renderEq(){
+  const A=ex.Z+ex.N,d=daughter(),Ad=d.Z+d.N,done=state==="daughter";
+  const P=nucHTML(A,ex.Z,SYM[ex.Z]+(ex.m==="m"?"<sup>m</sup>":ex.m==="*"?"*":""));
+  let D,rest,cA,cZ;
+  if(type==="a"){D=nucHTML(Ad,d.Z,SYM[d.Z]);rest=" + "+nucHTML(4,2,"He");cA=`${A} = ${Ad} + 4`;cZ=`${ex.Z} = ${d.Z} + 2`}
+  if(type==="bm"){D=nucHTML(Ad,d.Z,SYM[d.Z]);rest=" + "+nucHTML(0,"−1","e")+" + ν̄ₑ";cA=`${A} = ${Ad} + 0`;cZ=`${ex.Z} = ${d.Z} + (−1)`}
+  if(type==="bp"){D=nucHTML(Ad,d.Z,SYM[d.Z]);rest=" + "+nucHTML(0,"+1","e")+" + νₑ";cA=`${A} = ${Ad} + 0`;cZ=`${ex.Z} = ${d.Z} + 1`}
+  if(type==="g"){D=nucHTML(Ad,d.Z,SYM[d.Z]);rest=" + "+nucHTML(0,0,"γ");cA=`${A} = ${Ad} + 0`;cZ=`${ex.Z} = ${d.Z} + 0`}
+  $("eq").innerHTML=`${P}<span class="arrow">→</span>${done?`${D}<span>${rest}</span>`:`<span class="q">?</span>`}`;
+  $("cons").innerHTML=done?`<span>Nombre de masse A : ${cA} <b>✓</b></span><span>Numéro atomique Z : ${cZ} <b>✓</b></span>${type==="g"?`<span>Énergie du γ : ${ex.E}</span>`:""}`
+    :`<span>Période du noyau père : ${ex.T}</span><span>Appuie sur « Désintégrer » pour trouver le noyau fils.</span>`;
+  const I=INFO[type];$("fWhat").textContent=I.what;$("fBil").textContent=I.bil;$("fWhy").textContent=I.why;$("fStop").textContent=I.stop;
+}
+
+// ----- noyau symbolique 3D -----
+const CX=230,CY=200,R=100,FOC=700,TILT=-0.38;
+let nucleons=[],rot=0.6,lastNow=0,rn=20,convPos=null;
+function pack3(M,scale){const out=[],step=M%37?37:41;for(let i=0;i<M;i++){
+  const r=R*scale*Math.cbrt((i+.5)/M),j=(i*step)%M,y=1-2*(j+.5)/M,rr=Math.sqrt(1-y*y),th=j*2.39996;
+  out.push([r*rr*Math.cos(th),r*y,r*rr*Math.sin(th)])}return out}
+function rnd(s){return()=>(s=(s*16807)%2147483647)/2147483647}
+function proj(p){const c=Math.cos(rot),s=Math.sin(rot),x=p[0]*c+p[2]*s,z=-p[0]*s+p[2]*c,y=p[1];
+  const ct=Math.cos(TILT),st=Math.sin(TILT),y2=y*ct-z*st,z2=y*st+z*ct,k=FOC/(FOC-z2);return{x:CX+x*k,y:CY+y2*k,z:z2,k}}
+function buildNucleus(){
+  const A=ex.Z+ex.N,M=type==="a"?40:34,np=Math.round(M*ex.Z/A),r=rnd(ex.Z*131+ex.N);
+  const kinds=Array.from({length:M},(_,i)=>i<np?"p":"n");
+  for(let i=M-1;i>0;i--){const j=Math.floor(r()*(i+1));[kinds[i],kinds[j]]=[kinds[j],kinds[i]]}
+  rn=R*Math.cbrt(0.62/M)*1.08;
+  nucleons=pack3(M,.86).map((p,i)=>({p0:p,tp:p,k:kinds[i],k2:kinds[i],role:""}));
+}
+// choix des nucléons acteurs au moment du déclenchement (selon l'orientation visible)
+function trigger(){
+  const vis=nucleons.map(n=>({n,q:proj(n.p0)}));
+  if(type==="a"){
+    const byX=[...vis].sort((a,b)=>(b.q.x+b.q.z*.3)-(a.q.x+a.q.z*.3));
+    const ps=byX.filter(o=>o.n.k==="p").slice(0,2),ns=byX.filter(o=>o.n.k==="n").slice(0,2);
+    [...ps,...ns].forEach((o,i)=>{o.n.role="alpha";o.n.ai=i});
+    const rest=nucleons.filter(n=>n.role!=="alpha"),np2=pack3(rest.length,.82);rest.forEach((n,i)=>n.tp=np2[i]);
+  }
+  if(type==="bm"||type==="bp"){
+    const want=type==="bm"?"n":"p";let best=null,bs=-1e9;
+    vis.forEach(o=>{if(o.n.k!==want)return;const s=o.q.x*.6+o.q.z*1.2-Math.abs(o.q.y-CY)*.3;if(s>bs){bs=s;best=o.n}});
+    if(best){best.role="conv";best.k2=want==="n"?"p":"n"}
+  }
+}
+const shade=(c,f)=>c.map(v=>Math.round(f>0?v+(255-v)*f:v*(1+f)));
+const rgbs=(c,a=1)=>`rgba(${c[0]},${c[1]},${c[2]},${a})`;
+function wavy(g,x1,y1,x2,y2,col,len=70){
+  const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,nx=-uy,ny=ux;
+  g.strokeStyle=col;g.lineWidth=3;g.beginPath();
+  for(let s=0;s<=len;s+=2){const a=Math.sin(s*.45)*6,px=x2-ux*s+nx*a,py=y2-uy*s+ny*a;s?g.lineTo(px,py):g.moveTo(px,py)}
+  g.stroke();
+}
+const ease=x=>x<0?0:x>1?1:x*x*(3-2*x);
+function ball(g,x,y,r,col,depth){
+  const base=shade(col,-0.38*(1-depth));
+  const gr=g.createRadialGradient(x-r*.38,y-r*.42,r*.06,x,y,r);
+  gr.addColorStop(0,rgbs(shade(base,.65)));gr.addColorStop(.45,rgbs(base));gr.addColorStop(1,rgbs(shade(base,-.55)));
+  g.fillStyle=gr;g.beginPath();g.arc(x,y,r,0,7);g.fill();
+}
+
+function drawNucleus(t,now){
+  const c=$("nucleus"),g=c.getContext("2d"),W=c.width,H=c.height,ink=css("--ink"),mut=css("--muted");
+  const dt=lastNow?Math.min((now-lastNow)/1000,.05):0;lastNow=now;
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(!reduce)rot+=dt*(state==="anim"?0.1:0.35);
+  g.clearRect(0,0,W,H);
+  const T=state==="anim"?t:(state==="daughter"?9:0),CP=rgb(css("--p")),CN=rgb(css("--n")),INK=rgb(ink);
+  // ombre portée
+  g.save();g.translate(CX,CY+R+30);g.scale(1,.16);
+  const sh=g.createRadialGradient(0,0,0,0,0,R*1.05);sh.addColorStop(0,rgbs(INK,.22));sh.addColorStop(1,rgbs(INK,0));
+  g.fillStyle=sh;g.beginPath();g.arc(0,0,R*1.05,0,7);g.fill();g.restore();
+  // excitation γ
+  let jx=0,jy=0;
+  if(type==="g"&&T<0.9){const amp=state==="parent"?1.5:4*(1-T/0.9);jx=Math.sin(now/40)*amp;jy=Math.cos(now/53)*amp;
+    const gl=g.createRadialGradient(CX,CY,R*.6,CX,CY,R+34);gl.addColorStop(0,rgbs(rgb(css("--gam")),.35));gl.addColorStop(1,rgbs(rgb(css("--gam")),0));
+    g.fillStyle=gl;g.beginPath();g.arc(CX,CY,R+34,0,7);g.fill()}
+  const list=[];convPos=null;
+  for(const n of nucleons){
+    let p=n.p0;
+    if(type==="a"&&n.role!=="alpha"){const f=ease((T-0.5)/0.8);p=[0,1,2].map(i=>n.p0[i]+(n.tp[i]-n.p0[i])*f)}
+    const q=proj(p);let x=q.x,y=q.y,z=q.z,k=q.k;
+    if(n.role==="alpha"){
+      const cxA=CX+R+30,cyA=CY,off=[[-1,-.62],[1,-.62],[-1,.62],[1,.62]][n.ai].map(v=>v*rn*.92);
+      const f1=ease(T/0.45),f2=ease((T-0.45)/1.4);
+      x=x+(cxA+off[0]-x)*f1+(W-80-cxA)*f2;y=y+(cyA+off[1]-y)*f1-110*f2;z=z+(R+30+(n.ai<2?4:0)-z)*f1;k=k+(1-k)*f1;
+    }
+    let col=n.k==="p"?CP:CN;
+    if(n.role==="conv"){const f=ease((T-0.5)/0.35),c2=n.k2==="p"?CP:CN;col=col.map((v,i)=>v+(c2[i]-v)*f);convPos={x:x+jx,y:y+jy,r:rn*k}}
+    list.push({x:x+jx,y:y+jy,z,k,col,n});
+  }
+  list.sort((a,b)=>a.z-b.z);
+  for(const o of list){
+    const depth=Math.min(1,Math.max(0,(o.z+R)/(2*R)));
+    ball(g,o.x,o.y,rn*o.k,o.col,depth);
+    if(o.n.role==="conv"&&state!=="daughter"&&T<1){g.strokeStyle=css("--gam");g.lineWidth=3;g.beginPath();g.arc(o.x,o.y,rn*o.k+6+Math.sin(now/90)*2,0,7);g.stroke()}
+  }
+  g.font="18px ui-monospace, Menlo, Consolas, monospace";g.textAlign="center";
+  if(type==="a"&&T>0.6){const f=ease((T-0.45)/1.4);g.fillStyle=ink;g.fillText("α (⁴He)",CX+R+30+(W-80-CX-R-30)*f,CY-110*f-rn*2-10)}
+  if((type==="bm"||type==="bp")&&T>0.6){
+    const ox=convPos?convPos.x:CX+R*.5,oy=convPos?convPos.y:CY;
+    const f=Math.min((T-0.6)/1.1,1),f2=Math.min((T-0.6)/1.6,1);
+    const ex1=ox+(W-40-ox)*f,ey1=oy+(60-oy)*f,ex2=ox+(W-80-ox)*f2,ey2=oy+(H-50-oy)*f2;
+    const ann=type==="bp"&&T>1.5;
+    if(!ann){ball(g,ex1,ey1,9,rgb(type==="bm"?css("--e"):css("--pos")),1);g.fillStyle=ink;g.fillText(type==="bm"?"e⁻":"e⁺",ex1,ey1-18)}
+    g.strokeStyle=mut;g.lineWidth=2;g.setLineDash([3,6]);g.beginPath();g.moveTo(ox,oy);g.lineTo(ex2,ey2);g.stroke();g.setLineDash([]);
+    g.fillStyle=css("--panel");g.strokeStyle=mut;g.lineWidth=2;g.beginPath();g.arc(ex2,ey2,5,0,7);g.fill();g.stroke();
+    g.fillStyle=mut;g.fillText(type==="bm"?"ν̄ₑ":"νₑ",ex2+22,ey2+4);
+    if(ann){
+      const ax=ox+(W-40-ox)*(0.9/1.1),ay=oy+(60-oy)*(0.9/1.1),k=Math.min((T-1.5)/0.9,1);
+      if(k<.4){g.fillStyle=css("--gam");g.globalAlpha=1-k/.4;g.beginPath();g.arc(ax,ay,10+k*60,0,7);g.fill();g.globalAlpha=1}
+      const L=150*k;wavy(g,ax,ay,ax-L*.35,Math.max(8,ay-L*.6),css("--gam"),Math.min(70,L));
+      wavy(g,ax,ay,ax+L*.35,ay+L*.6,css("--gam"),Math.min(70,L));
+      if(k>.3){g.fillStyle=ink;g.fillText("2 γ de 511 keV",ax-110,ay+70)}
+    }
+  }
+  if(type==="g"&&T>0.9){const k=Math.min((T-0.9)/1.2,1),x2=CX+R+20+(W-30-CX-R-20)*k;
+    wavy(g,CX+R+10,CY,x2,CY-30*k,css("--gam"),Math.min(90,x2-CX-R-10));g.fillStyle=ink;g.fillText(`γ ${ex.E}`,Math.max(x2-60,CX+R+80),CY-30*k-24)}
+  const d=daughter(),done=state==="daughter",Z=done?d.Z:ex.Z,N=done?d.N:ex.N;
+  g.fillStyle=ink;g.font="600 22px ui-monospace, Menlo, Consolas, monospace";g.textAlign="center";
+  g.fillText(done?label(d.Z,d.N):label(ex.Z,ex.N,ex.m),CX,CY+R+72);
+  g.font="17px ui-monospace, Menlo, Consolas, monospace";g.fillStyle=mut;g.fillText(`Z = ${Z}  N = ${N}`,CX,CY+R+98);
+}
+
+// ----- diagramme N-Z local -----
+function drawNZ(t){
+  const c=$("nz"),g=c.getContext("2d"),W=c.width,H=c.height,ink=css("--ink"),mut=css("--muted"),line=css("--line");
+  const L=96,B=64,T=16,Rr=12,S=Math.min((W-L-Rr)/7,(H-B-T)/7);
+  const N0=ex.N,Z0=ex.Z,cx=n=>L+(n-(N0-3))*S,cy=z=>T+(Z0+3-z)*S;
+  g.clearRect(0,0,W,H);g.font="15px ui-monospace, Menlo, Consolas, monospace";
+  for(let i=-3;i<=3;i++)for(let j=-3;j<=3;j++){
+    const n=N0+i,z=Z0+j;g.strokeStyle=line;g.lineWidth=1;g.strokeRect(cx(n)+2,cy(z)+2,S-4,S-4);
+    g.fillStyle=mut;g.textAlign="center";g.fillText(`${sup(n+z)}${SYM[z]||""}`,cx(n)+S/2,cy(z)+S/2+5);
+  }
+  for(let j=-3;j<=3;j++){g.fillStyle=mut;g.textAlign="right";g.fillText(`${Z0+j} ${SYM[Z0+j]}`,L-8,cy(Z0+j)+S/2+5)}
+  for(let i=-3;i<=3;i++){g.textAlign="center";g.fillText(N0+i,cx(N0+i)+S/2,H-B+22)}
+  g.textAlign="center";g.fillText("N (neutrons) →",L+3.5*S,H-10);
+  g.save();g.translate(14,T+3.5*S);g.rotate(-Math.PI/2);g.fillText("Z (protons) →",0,0);g.restore();
+  // cases père et fils
+  const d=daughter(),done=state==="daughter",T2=state==="anim"?t:(done?9:0),f=ease(T2/1.6);
+  const fillCell=(n,z,col,a)=>{g.globalAlpha=a;g.fillStyle=col;g.fillRect(cx(n)+2,cy(z)+2,S-4,S-4);g.globalAlpha=1;g.strokeStyle=ink;g.lineWidth=2;g.strokeRect(cx(n)+2,cy(z)+2,S-4,S-4)};
+  fillCell(N0,Z0,css("--src"),.85);
+  g.fillStyle=ink;g.font="600 16px ui-monospace, Menlo, Consolas, monospace";g.fillText(label(Z0,N0,ex.m),cx(N0)+S/2,cy(Z0)+S/2+6);
+  // rose des déplacements
+  const ox=cx(N0)+S/2,oy=cy(Z0)+S/2;
+  const arrowTo=(dn,dz,col,w,frac,lab)=>{
+    const tx=ox+dn*S*frac,ty=oy-dz*S*frac,a=Math.atan2(ty-oy,tx-ox);
+    const sx=ox+Math.cos(a)*S*.36,sy=oy+Math.sin(a)*S*.36,ex2=tx-Math.cos(a)*S*.3*Math.min(frac,1),ey2=ty-Math.sin(a)*S*.3*Math.min(frac,1);
+    if(Math.hypot(ex2-sx,ey2-sy)<4)return;
+    g.strokeStyle=col;g.fillStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(sx,sy);g.lineTo(ex2,ey2);g.stroke();
+    g.beginPath();g.moveTo(ex2,ey2);g.lineTo(ex2-Math.cos(a-.45)*12,ey2-Math.sin(a-.45)*12);g.lineTo(ex2-Math.cos(a+.45)*12,ey2-Math.sin(a+.45)*12);g.fill();
+    if(lab){g.font="600 17px ui-monospace, Menlo, Consolas, monospace";g.fillText(lab,ox+dn*S*.62+(dn===0?0:Math.sign(dn)*4)+(dz===dn?-18:10),oy-dz*S*.62+(dz===dn?0:-8))}
+  };
+  [["a","α"],["bm","β⁻"],["bp","β⁺"]].forEach(([k,lab])=>{if(k!==type){const[dn,dz]=MOVE[k];g.globalAlpha=.35;arrowTo(dn,dz,mut,2,1,lab);g.globalAlpha=1}});
+  if(type!=="g"){
+    const[dn,dz]=MOVE[type];
+    if(done)fillCell(d.N,d.Z,css("--ok"),.55);
+    arrowTo(dn,dz,css("--p"),4,state==="parent"?1:Math.max(f,.0001),{a:"α",bm:"β⁻",bp:"β⁺"}[type]);
+    if(done){g.fillStyle=ink;g.font="600 16px ui-monospace, Menlo, Consolas, monospace";g.fillText(label(d.Z,d.N),cx(d.N)+S/2,cy(d.Z)+S/2+6)}
+  }else{
+    g.strokeStyle=css("--gam");g.lineWidth=4;g.beginPath();g.arc(ox+S*.42,oy-S*.42,S*.22,Math.PI*.6,Math.PI*.6+Math.PI*1.6*Math.max(f,state==="parent"?1:f));g.stroke();
+    g.fillStyle=ink;g.font="600 15px ui-monospace, Menlo, Consolas, monospace";g.textAlign="left";g.fillText("γ : même case",cx(N0)+S+6,cy(Z0)-8);
+  }
+}
+
+// ----- vallée de stabilité -----
+function drawValley(){
+  const c=$("valley"),g=c.getContext("2d"),W=c.width,H=c.height,ink=css("--ink"),mut=css("--muted"),line=css("--line");
+  const L=56,B=40,T=14,R2=14,NM=160,ZM=100,X=n=>L+n/NM*(W-L-R2),Y=z=>T+(H-T-B)*(1-z/ZM);
+  g.clearRect(0,0,W,H);g.font="14px ui-monospace, Menlo, Consolas, monospace";
+  g.strokeStyle=line;g.lineWidth=1;g.strokeRect(L,T,W-L-R2,H-T-B);
+  g.setLineDash([5,6]);g.strokeStyle=mut;g.beginPath();g.moveTo(X(0),Y(0));g.lineTo(X(ZM),Y(ZM));g.stroke();g.setLineDash([]);
+  g.fillStyle=mut;g.textAlign="left";g.fillText("N = Z",X(70)+6,Y(78));
+  g.strokeStyle=ink;g.lineWidth=3;g.beginPath();
+  for(let A=1;A<=262;A++){const z=A/(1.98+0.0155*Math.pow(A,2/3)),n=A-z;A>1?g.lineTo(X(n),Y(z)):g.moveTo(X(n),Y(z))}g.stroke();
+  g.fillStyle=mut;g.textAlign="left";
+  g.fillText("excès de p → β⁺",X(10),Y(52));g.fillText("excès de n → β⁻",X(78),Y(14));g.fillText("lourds → α",X(118),Y(96)+4);
+  g.fillStyle=ink;g.fillText("vallée de stabilité",X(92),Y(44));
+  g.textAlign="center";g.fillStyle=mut;g.fillText("N",L+(W-L-R2)/2,H-12);g.textAlign="right";g.fillText("Z",L-10,T+14);
+  [0,40,80,120,160].forEach(n=>{g.textAlign="center";g.fillText(n,X(n),H-B+18)});
+  [0,50,100].forEach(z=>{g.textAlign="right";g.fillText(z,L-6,Y(z)+5)});
+  const d=daughter(),done=state==="daughter";
+  g.fillStyle=css("--src");g.strokeStyle=ink;g.lineWidth=2;g.beginPath();g.arc(X(ex.N),Y(ex.Z),7,0,7);g.fill();g.stroke();
+  if(done&&type!=="g"){g.fillStyle=css("--ok");g.beginPath();g.arc(X(d.N),Y(d.Z),7,0,7);g.fill();g.stroke()}
+}
+
+// ----- pilotage -----
+function fillEx(){const s=$("ex");s.innerHTML="";EX[type].forEach((e,i)=>{const o=document.createElement("option");o.value=i;
+  o.textContent=`${label(e.Z,e.N,e.m)} (T½ = ${e.T})`;s.appendChild(o)});}
+function resetState(){state="parent";ex=EX[type][+$("ex").value||0];buildNucleus();renderEq();$("go").disabled=false;
+  $("nuNote").textContent=`Représentation symbolique : ${nucleons.length} nucléons au lieu de ${ex.Z+ex.N}.`}
+document.querySelectorAll("#types button").forEach(b=>b.onclick=()=>{type=b.dataset.t;
+  document.querySelectorAll("#types button").forEach(x=>{x.classList.toggle("on",x===b);x.setAttribute("aria-pressed",x===b)});fillEx();resetState()});
+$("ex").onchange=resetState;
+$("go").onclick=()=>{if(state!=="parent")resetState();trigger();state="anim";t0=performance.now();$("go").disabled=true};
+$("back").onclick=resetState;
+function loop(now){
+  let t=0;if(state==="anim"){t=(now-t0)/1000;if(t>2.6){state="daughter";renderEq();$("go").disabled=false}}
+  drawNucleus(t,now);drawNZ(t);drawValley();requestAnimationFrame(loop);
+}
+fillEx();resetState();requestAnimationFrame(loop);
+</script>
+
+<script>window.addEventListener("storage",e=>{if(e.key==="nuclea-theme"){if(e.newValue==="light"||e.newValue==="dark")document.documentElement.dataset.theme=e.newValue;else delete document.documentElement.dataset.theme}})</script>
+</body>
+</html>

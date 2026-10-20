@@ -127,7 +127,13 @@
     <div id="formulaList" class="formula-grid"></div>
   </section>
 
-  <section id="explore" class="panel hidden"><div class="page-head"><div><p class="tag">03 · Explorer</p><h1>Explorer les phénomènes</h1><p class="lead">Énergie de liaison et leviers DATE.</p></div></div><div id="exploreTools"></div></section>
+  <section id="explore" class="panel hidden"><div class="page-head"><div><p class="tag">03 · Explorer</p><h1>Explorer les phénomènes</h1><p class="lead">Des phénomènes à manipuler, puis les outils de calcul.</p></div></div>
+    <section class="visuals" aria-labelledby="visualsHead">
+      <div class="section-head"><h2 id="visualsHead">Phénomènes animés</h2><p>Touche un phénomène pour l’ouvrir en plein écran.</p></div>
+      <div id="visualGrid" class="visual-grid"></div>
+    </section>
+    <div class="section-head tools-head"><h2>Outils de calcul</h2><p>Énergie de liaison et leviers DATE.</p></div>
+    <div id="exploreTools"></div></section>
   <section id="exercises" class="panel hidden"><div class="page-head"><div><p class="tag">04 · S’entraîner</p><h1>Exercices guidés</h1><p class="lead">Des aides à ton rythme, sans note ni suivi des résultats.</p></div></div><div id="exerciseTools"></div></section>
   <section id="about" class="panel hidden">
     <div class="page-head">
@@ -169,8 +175,13 @@
   </section>
 </main>
 
+<div id="visualViewer" class="visual-viewer" role="dialog" aria-modal="true" aria-labelledby="visualTitle" hidden>
+  <div class="visual-bar"><strong id="visualTitle">Phénomène animé</strong><button id="closeVisual" class="close-detail" type="button" aria-label="Fermer et revenir à Explorer"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg><span>Fermer</span></button></div>
+  <iframe id="visualFrame" title="Phénomène animé"></iframe>
+</div>
+
 <footer class="footer">
-  <span>Nucléa TIIN · v0.9</span>
+  <span>Nucléa TIIN · v0.10</span>
   <span>Lycée Alexis de Tocqueville · Cherbourg-en-Cotentin</span>
   <span>Ne remplace pas les documents de radioprotection réglementaires.</span>
 </footer>
@@ -179,7 +190,7 @@
 <script src="decay-chain.js" defer></script>
 <script src="decay-calculator.js" defer></script>
 <script src="app.js" defer></script>
-<script src="navigation.js" defer></script><script src="formulas.js" defer></script><script src="units.js" defer></script><script src="energy.js" defer></script><script src="date-model.js" defer></script><script src="date-ui.js" defer></script><script src="exercises.js" defer></script><script src="updates.js" defer></script>
+<script src="navigation.js" defer></script><script src="formulas.js" defer></script><script src="units.js" defer></script><script src="energy.js" defer></script><script src="date-model.js" defer></script><script src="date-ui.js" defer></script><script src="exercises.js" defer></script><script src="updates.js" defer></script><script src="visuals.js" defer></script>
 </body>
 </html>
 

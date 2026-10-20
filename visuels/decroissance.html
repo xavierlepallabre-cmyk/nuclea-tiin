@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="stylesheet" href="../assets/fonts/lexend.css">
+<script>try{const t=localStorage.getItem("nuclea-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}
+if(window.self!==window.top)document.documentElement.classList.add("embedded");</script>
+<title>Décroissance radioactive</title>
+</head>
+<body>
+<style>
+
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+.embedded header h1{display:none}
+.embedded body{padding-top:12px}
+/* Layout : banc de mesure — grille de noyaux à gauche, courbe N(t) à droite, instruments en bandeau */
+:root{
+  --bg:#F4F6FA; --panel:#FFFFFF; --ink:#0E1B36; --muted:#4A5A75; --line:#D5DDEA;
+  --alive:#F18A52; --dead:#C9D3E2; --theo:#1A3C89; --sim:#C2410C;
+  --f-disp:Lexend,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:Lexend,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0A1430; --panel:#12204A; --ink:#EEF2FA; --muted:#A9B6D3; --line:#2B3F72;
+  --alive:#F6A06E; --dead:#2B3F72; --theo:#9DB8F5; --sim:#FFB98C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A1430; --panel:#12204A; --ink:#EEF2FA; --muted:#A9B6D3; --line:#2B3F72;
+  --alive:#F6A06E; --dead:#2B3F72; --theo:#9DB8F5; --sim:#FFB98C; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px}
+.wrap{max-width:1080px;margin:0 auto;display:grid;gap:16px}
+header h1{font-family:var(--f-disp);font-weight:700;font-size:clamp(26px,4vw,36px);margin:0;letter-spacing:.01em;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted);max-width:65ch}
+.controls{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.field{display:grid;gap:4px;min-width:0}
+label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500}
+select,input[type=range]{font:inherit;color:var(--ink)}
+select{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px}
+.btns{display:flex;gap:8px;margin-left:auto}
+button{font-family:var(--f-disp);font-weight:700;font-size:16px;letter-spacing:.03em;border-radius:4px;padding:8px 16px;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:var(--bg)}
+button.ghost{background:transparent;color:var(--ink)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--sim);outline-offset:2px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:16px}
+@media (max-width:760px){.main{grid-template-columns:minmax(0,1fr)}.btns{margin-left:0}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px;display:grid;gap:10px;min-width:0}
+.card h2{font-family:var(--f-disp);font-size:18px;margin:0;font-weight:700}
+canvas{width:100%;display:block}
+#grid{aspect-ratio:1;max-width:100%}
+#plot{aspect-ratio:16/11;max-width:100%}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.sw{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:6px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:6px}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.ro{background:var(--panel);padding:10px 14px}
+.ro span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.ro b{font-family:var(--f-mono);font-weight:600;font-size:20px;font-variant-numeric:tabular-nums}
+.eq{font-family:var(--f-mono);font-size:14px;color:var(--muted)}
+.eq strong{color:var(--ink);font-weight:600}
+.head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.seg{display:flex;border:1px solid var(--ink);border-radius:4px;overflow:hidden}
+.seg button{border:0;border-radius:0;font-size:14px;padding:5px 12px;background:transparent;color:var(--ink)}
+.seg button.on{background:var(--ink);color:var(--bg)}
+#hint{display:block;margin-top:4px}
+footer{font-size:13px;color:var(--muted);max-width:75ch}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Décroissance radioactive</h1>
+    <p>Chaque carré est un noyau. À chaque instant, il a une probabilité fixe de se désintégrer. On ne peut pas prédire lequel, mais la population suit la loi de décroissance.</p>
+  </header>
+
+  <div class="controls">
+    <div class="field"><label for="iso">Radionucléide</label>
+      <select id="iso"></select></div>
+    <div class="field"><label for="n0">Noyaux au départ</label>
+      <select id="n0"><option value="100">100</option><option value="400" selected>400</option><option value="1600">1 600</option><option value="6400">6 400</option></select></div>
+    <div class="field"><label for="speed">Vitesse</label>
+      <input id="speed" type="range" min="0.1" max="1.5" step="0.05" value="0.5"></div>
+    <div class="btns">
+      <button id="play">Lancer</button>
+      <button id="reset" class="ghost">Réinitialiser</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="ro"><span>Temps écoulé</span><b id="rT">0</b></div>
+    <div class="ro"><span>Périodes écoulées</span><b id="rP">0,00</b></div>
+    <div class="ro"><span>Noyaux restants N</span><b id="rN">400</b></div>
+    <div class="ro"><span>N / N₀ mesuré</span><b id="rR">100 %</b></div>
+    <div class="ro"><span>N / N₀ théorique</span><b id="rTh">100 %</b></div>
+  </div>
+
+  <div class="main">
+    <section class="card">
+      <h2>Échantillon</h2>
+      <canvas id="grid" width="600" height="600"></canvas>
+      <div class="legend"><span><i class="dot" style="background:var(--alive)"></i><span id="lgP">Père</span></span><span><i class="dot" style="background:var(--dead)"></i><span id="lgF">Fils</span></span></div>
+    </section>
+    <section class="card">
+      <div class="head"><h2>Courbe N(t)</h2>
+        <div class="seg" role="group" aria-label="Échelle de l'axe N">
+          <button id="lin" class="on" aria-pressed="true">Linéaire</button><button id="log" aria-pressed="false">Semi-log</button>
+        </div></div>
+      <canvas id="plot" width="800" height="550"></canvas>
+      <div class="legend"><span><i class="sw" style="background:var(--theo)"></i>Loi théorique</span><span><i class="sw" style="background:var(--sim)"></i>Comptage simulé</span></div>
+      <div class="eq"><strong>N(t) = N₀ · e<sup>−λt</sup></strong> &nbsp;avec&nbsp; <strong>λ = ln 2 / T½</strong> &nbsp;·&nbsp; <span id="lam"></span><span id="hint" hidden>En semi-log : ln N = ln N₀ − λt, la loi devient une droite de pente −λ.</span></div>
+    </section>
+  </div>
+
+  <footer>Repères : à chaque période T½ la population est divisée par 2. Avec 100 noyaux les fluctuations sont fortes ; avec 6 400 la courbe simulée colle à la loi. C'est le caractère aléatoire et statistique de la désintégration.</footer>
+</div>
+
+<script>
+const ISOS=[
+  {id:"co60",name:"Cobalt 60",p:"⁶⁰Co",f:"⁶⁰Ni",mode:"β⁻ puis γ",T:5.27,u:"ans"},
+  {id:"cs137",name:"Césium 137",p:"¹³⁷Cs",f:"¹³⁷Ba",mode:"β⁻",T:30.1,u:"ans"},
+  {id:"i131",name:"Iode 131",p:"¹³¹I",f:"¹³¹Xe",mode:"β⁻",T:8.02,u:"jours"},
+  {id:"tc99m",name:"Technétium 99m",p:"⁹⁹ᵐTc",f:"⁹⁹Tc",mode:"γ (transition isomérique)",T:6.01,u:"h"},
+  {id:"f18",name:"Fluor 18",p:"¹⁸F",f:"¹⁸O",mode:"β⁺",T:109.8,u:"min"},
+  {id:"am241",name:"Américium 241",p:"²⁴¹Am",f:"²³⁷Np",mode:"α",T:432.2,u:"ans"}
+];
+const $=id=>document.getElementById(id);
+const isoSel=$("iso");
+ISOS.forEach(i=>{const o=document.createElement("option");o.value=i.id;o.textContent=`${i.name} (T½ = ${i.T.toString().replace(".",",")} ${i.u})`;isoSel.appendChild(o)});
+
+let logMode=false;
+let iso=ISOS[0],N0=400,alive,decayT,tP=0,running=false,hist=[],last=0;
+const MAXP=6;
+const fmt=(x,d)=>x.toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d});
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+
+function reset(){
+  N0=+$("n0").value; iso=ISOS.find(i=>i.id===isoSel.value);
+  alive=new Uint8Array(N0).fill(1); decayT=new Float32Array(N0).fill(-1);
+  tP=0; hist=[[0,N0]]; running=false; $("play").textContent="Lancer";
+  $("lgP").textContent=`Noyau père ${iso.p}`; $("lgF").textContent=`Noyau fils ${iso.f} (${iso.mode})`;
+  const lam=Math.LN2/iso.T;
+  $("lam").textContent=`λ = ${lam<0.01?lam.toExponential(2).replace(".",","):fmt(lam,4)} ${iso.u}⁻¹`;
+  draw();
+}
+function count(){let n=0;for(let i=0;i<N0;i++)n+=alive[i];return n}
+
+function step(dtP){
+  const p=1-Math.pow(2,-dtP);
+  for(let i=0;i<N0;i++) if(alive[i]&&Math.random()<p){alive[i]=0;decayT[i]=tP+dtP}
+  tP+=dtP; hist.push([tP,count()]);
+  if(tP>=MAXP||count()===0){running=false;$("play").textContent="Lancer"}
+}
+
+function drawGrid(){
+  const c=$("grid"),x=c.getContext("2d"),W=c.width,side=Math.ceil(Math.sqrt(N0)),cell=W/side,g=cell>6?cell*.14:0;
+  x.clearRect(0,0,W,W);
+  const A=css("--alive"),D=css("--dead"),S=css("--sim");
+  for(let i=0;i<N0;i++){
+    const cx=(i%side)*cell,cy=Math.floor(i/side)*cell;
+    const fresh=!alive[i]&&tP-decayT[i]<0.08;
+    x.fillStyle=alive[i]?A:(fresh?S:D);
+    x.fillRect(cx+g/2,cy+g/2,cell-g,cell-g);
+  }
+}
+function drawPlot(){
+  const c=$("plot"),x=c.getContext("2d"),W=c.width,H=c.height,L=70,R=20,T=20,B=56;
+  const pw=W-L-R,ph=H-T-B,ink=css("--ink"),mut=css("--muted"),line=css("--line");
+  const KMAX=MAXP+1;
+  const X=t=>L+t/MAXP*pw,Y=logMode?n=>T+Math.min(-Math.log2(Math.max(n,1e-9)/N0),KMAX)/KMAX*ph:n=>T+ph-n/N0*ph;
+  x.clearRect(0,0,W,H);x.font="22px ui-monospace, Menlo, Consolas, monospace";x.lineWidth=1;
+  for(let k=0;k<=MAXP;k++){
+    x.strokeStyle=line;x.beginPath();x.moveTo(X(k),T);x.lineTo(X(k),T+ph);x.stroke();
+    x.fillStyle=mut;x.textAlign="center";x.fillText(k===0?"0":`${k}T½`,X(k),H-B+30);
+  }
+  const fr=logMode?Array.from({length:KMAX+1},(_,k)=>Math.pow(2,-k)):[1,.5,.25,.125];
+  fr.forEach(f=>{
+    x.strokeStyle=line;x.setLineDash(f<1?[6,6]:[]);x.beginPath();x.moveTo(L,Y(f*N0));x.lineTo(L+pw,Y(f*N0));x.stroke();x.setLineDash([]);
+    x.fillStyle=mut;x.textAlign="right";x.fillText(f===1?"N₀":`N₀/${1/f}`,L-8,Y(f*N0)+7);
+  });
+  x.fillStyle=mut;x.textAlign="right";x.fillText(`t (${iso.u})`,L+pw,H-6);
+  x.textAlign="left";x.fillText(`T½ = ${fmt(iso.T,iso.T<10?2:1)} ${iso.u}`,L,H-6);
+  // théorique
+  x.strokeStyle=css("--theo");x.lineWidth=2.5;x.beginPath();
+  for(let i=0;i<=300;i++){const t=i/300*MAXP;i?x.lineTo(X(t),Y(N0*Math.pow(2,-t))):x.moveTo(X(t),Y(N0))}
+  x.stroke();
+  x.save();x.beginPath();x.rect(L,T,pw,ph);x.clip();
+  // simulé
+  x.strokeStyle=css("--sim");x.lineWidth=3;x.beginPath();
+  hist.forEach(([t,n],i)=>i?x.lineTo(X(t),Y(n)):x.moveTo(X(t),Y(n)));x.stroke();
+  const [lt,ln]=hist[hist.length-1];x.fillStyle=css("--sim");x.beginPath();x.arc(X(lt),Y(ln),6,0,7);x.fill();x.restore();
+}
+function draw(){
+  drawGrid();drawPlot();const n=count();
+  $("rT").textContent=`${fmt(tP*iso.T,iso.T*tP<10?2:1)} ${iso.u}`;
+  $("rP").textContent=fmt(tP,2);
+  $("rN").textContent=n.toLocaleString("fr-FR");
+  $("rR").textContent=`${fmt(n/N0*100,1)} %`;
+  $("rTh").textContent=`${fmt(Math.pow(2,-tP)*100,1)} %`;
+}
+function loop(ts){
+  if(running){const dt=Math.min((ts-last)/1000,.1);step(dt*+$("speed").value);draw()}
+  last=ts;requestAnimationFrame(loop);
+}
+$("play").onclick=()=>{
+  if(tP>=MAXP||count()===0)reset();
+  running=!running;$("play").textContent=running?"Pause":"Reprendre";
+};
+function setScale(l){logMode=l;$("lin").classList.toggle("on",!l);$("log").classList.toggle("on",l);
+  $("lin").setAttribute("aria-pressed",!l);$("log").setAttribute("aria-pressed",l);$("hint").hidden=!l;draw()}
+$("lin").onclick=()=>setScale(false);$("log").onclick=()=>setScale(true);
+$("reset").onclick=reset;isoSel.onchange=reset;$("n0").onchange=reset;
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",draw);
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+reset();
+// état de départ parlant : une période déjà simulée
+for(let i=0;i<20;i++)step(0.05);draw();
+requestAnimationFrame(loop);
+</script>
+
+<script>window.addEventListener("storage",e=>{if(e.key==="nuclea-theme"){if(e.newValue==="light"||e.newValue==="dark")document.documentElement.dataset.theme=e.newValue;else delete document.documentElement.dataset.theme}})</script>
+</body>
+</html>

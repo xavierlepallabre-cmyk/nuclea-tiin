@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="stylesheet" href="../assets/fonts/lexend.css">
+<script>try{const t=localStorage.getItem("nuclea-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}
+if(window.self!==window.top)document.documentElement.classList.add("embedded");</script>
+<title>Atténuation des gamma</title>
+</head>
+<body>
+<style>
+
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+.embedded header h1{display:none}
+.embedded body{padding-top:12px}
+/* Layout : banc de mesure source → écran → détecteur en pleine largeur, instruments, puis courbe I/I₀(x) */
+:root{
+  --bg:#F4F6FA; --panel:#FFFFFF; --ink:#0E1B36; --muted:#4A5A75; --line:#D5DDEA;
+  --photon:#E0661F; --screen:#8E9AAD; --screen2:#6F7C92; --src:#F18A52; --ok:#1E7A4F;
+  --f-disp:Lexend,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:Lexend,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0A1430; --panel:#12204A; --ink:#EEF2FA; --muted:#A9B6D3; --line:#2B3F72;
+  --photon:#F6A06E; --screen:#3A4F7E; --screen2:#2B3F72; --src:#F6A06E; --ok:#7FD6A8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A1430; --panel:#12204A; --ink:#EEF2FA; --muted:#A9B6D3; --line:#2B3F72;
+  --photon:#F6A06E; --screen:#3A4F7E; --screen2:#2B3F72; --src:#F6A06E; --ok:#7FD6A8; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px}
+.wrap{max-width:1080px;margin:0 auto;display:grid;gap:16px}
+header h1{font-family:var(--f-disp);font-weight:700;font-size:clamp(26px,4vw,36px);margin:0;letter-spacing:.01em;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted);max-width:65ch}
+.controls{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.field{display:grid;gap:4px;min-width:0}
+.field.grow{flex:1 1 220px}
+label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500}
+select,input[type=range]{font:inherit;color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--photon)}
+select{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px}
+.val{font-family:var(--f-mono);font-size:14px;font-weight:600}
+.btns{display:flex;gap:8px}
+button{font-family:var(--f-disp);font-weight:700;font-size:16px;letter-spacing:.03em;border-radius:4px;padding:8px 16px;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:var(--bg)}
+button.ghost{background:transparent;color:var(--ink)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--photon);outline-offset:2px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px;display:grid;gap:10px;min-width:0}
+.card h2{font-family:var(--f-disp);font-size:18px;margin:0;font-weight:700}
+canvas{width:100%;display:block;max-width:100%}
+#bench{aspect-ratio:1000/320}
+#plot{aspect-ratio:16/8}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.ro{background:var(--panel);padding:10px 14px}
+.ro span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.ro b{font-family:var(--f-mono);font-weight:600;font-size:20px;font-variant-numeric:tabular-nums}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.sw{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:6px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:6px}
+.head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.seg{display:flex;border:1px solid var(--ink);border-radius:4px;overflow:hidden}
+.seg button{border:0;border-radius:0;font-size:14px;padding:5px 12px;background:transparent;color:var(--ink)}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.eq{font-family:var(--f-mono);font-size:14px;color:var(--muted)}
+.eq strong{color:var(--ink);font-weight:600}
+#hint{display:block;margin-top:4px}
+footer{font-size:13px;color:var(--muted);max-width:75ch}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Atténuation des gamma</h1>
+    <p>Un faisceau de photons traverse un écran. Chaque photon est absorbé ou passe, au hasard. Plus l'écran est épais et dense, moins il en arrive au détecteur.</p>
+  </header>
+
+  <div class="controls">
+    <div class="field"><label for="iso">Source</label>
+      <select id="iso"><option value="cs">Césium 137 (γ 662 keV)</option><option value="co">Cobalt 60 (γ 1,17 et 1,33 MeV)</option></select></div>
+    <div class="field"><label for="mat">Écran</label>
+      <select id="mat"><option value="pb">Plomb</option><option value="fe" selected>Acier</option><option value="beton">Béton</option><option value="eau">Eau</option></select></div>
+    <div class="field grow"><label for="ep">Épaisseur : <span class="val" id="epV">0</span></label>
+      <input id="ep" type="range" min="0" max="800" step="1" value="200"></div>
+    <div class="btns">
+      <button id="play">Pause</button>
+      <button id="cdaBtn" class="ghost">+1 CDA</button>
+    </div>
+  </div>
+
+  <section class="card">
+    <h2>Banc de mesure</h2>
+    <canvas id="bench" width="1000" height="320"></canvas>
+    <div class="legend"><span><i class="dot" style="background:var(--photon)"></i>Photon γ</span><span><i class="dot" style="background:var(--screen)"></i>Écran</span><span>Les éclats dans l'écran marquent les photons absorbés.</span></div>
+  </section>
+
+  <div class="readout">
+    <div class="ro"><span>Épaisseur x</span><b id="rX">0</b></div>
+    <div class="ro"><span>Nombre de CDA</span><b id="rN">0</b></div>
+    <div class="ro"><span>I / I₀ théorique</span><b id="rT">100 %</b></div>
+    <div class="ro"><span>I / I₀ compté</span><b id="rM">—</b></div>
+    <div class="ro"><span>Photons comptés</span><b id="rC">0 / 0</b></div>
+  </div>
+
+  <section class="card">
+    <div class="head"><h2>Transmission I/I₀ selon l'épaisseur</h2>
+      <div class="seg" role="group" aria-label="Échelle de l'axe I/I₀">
+        <button id="lin" class="on" aria-pressed="true">Linéaire</button><button id="log" aria-pressed="false">Semi-log</button>
+      </div></div>
+    <canvas id="plot" width="1000" height="500"></canvas>
+    <div class="legend"><span><i class="sw" style="background:var(--ink)"></i>Loi théorique</span><span><i class="dot" style="background:var(--photon)"></i>Position de l'écran</span><span><i class="dot" style="background:var(--ok)"></i>Mesure du compteur</span></div>
+    <div class="eq"><strong>I = I₀ · e<sup>−μx</sup></strong> &nbsp;·&nbsp; <strong>CDA = ln 2 / μ</strong> &nbsp;·&nbsp; <strong>CDT = ln 10 / μ</strong> &nbsp;·&nbsp; <span id="mu"></span>
+      <span id="hint" hidden>En semi-log : ln I = ln I₀ − μx, une droite de pente −μ. Chaque CDA divise I par 2.</span></div>
+  </section>
+
+  <footer>Valeurs de CDA indicatives, en faisceau étroit, sans facteur d'accumulation (build-up). En situation réelle, le rayonnement diffusé augmente la dose derrière l'écran : on applique un facteur de sécurité.</footer>
+</div>
+
+<script>
+// CDA indicatives (cm), faisceau étroit
+const CDA={cs:{pb:0.65,fe:1.6,beton:4.8,eau:9.0},co:{pb:1.2,fe:2.1,beton:6.2,eau:11.0}};
+const MAT={pb:"plomb",fe:"acier",beton:"béton",eau:"eau"};
+const SRC={cs:"¹³⁷Cs",co:"⁶⁰Co"};
+const NCDA=8; // épaisseur max = 8 CDA
+const $=id=>document.getElementById(id);
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const fmt=(x,d)=>x.toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+let src="cs",mat="fe",cda,mu,xMax,x=0,running=true,logMode=false;
+let photons=[],flashes=[],arrived=0,passed=0,acc=0,last=0;
+// géométrie du banc
+const SX=90,CY=160,BEAM=110,SCR0=400,SCRMAX=280,DET=905;
+
+function params(){
+  src=$("iso").value;mat=$("mat").value;cda=CDA[src][mat];mu=Math.LN2/cda;xMax=NCDA*cda;
+  x=+$("ep").value/800*xMax;
+  arrived=0;passed=0;photons=photons.filter(p=>p.x<SCR0);
+  $("mu").textContent=`${MAT[mat]}, ${SRC[src]} : μ = ${fmt(mu,mu<0.1?3:2)} cm⁻¹, CDA = ${fmt(cda,2)} cm, CDT = ${fmt(Math.LN10/mu,1)} cm`;
+  update();
+}
+function scrW(){return x/xMax*SCRMAX}
+function update(){
+  const n=x/cda;
+  $("epV").textContent=`${fmt(x,x<10?2:1)} cm`;
+  $("rX").textContent=`${fmt(x,x<10?2:1)} cm`;
+  $("rN").textContent=fmt(n,2);
+  $("rT").textContent=`${fmt(Math.exp(-mu*x)*100,Math.exp(-mu*x)<0.01?2:1)} %`;
+  $("rM").textContent=arrived>=30?`${fmt(passed/arrived*100,1)} %`:"—";
+  $("rC").textContent=`${passed.toLocaleString("fr-FR")} / ${arrived.toLocaleString("fr-FR")}`;
+}
+
+function tick(dt){
+  acc+=dt*160;
+  while(acc>=1){acc--;photons.push({x:SX+22,y:CY+(Math.random()-.5)*BEAM,s:0})}
+  const v=520,w=scrW(),pxcm=SCRMAX/xMax;
+  for(const p of photons){
+    const nx=p.x+v*dt;
+    if(p.s===0&&nx>=SCR0){
+      arrived++;
+      if(Math.random()<Math.exp(-mu*x)){p.s=1}
+      else{
+        const u=Math.random(),d=-Math.log(1-u*(1-Math.exp(-mu*x)))/mu;
+        flashes.push({x:SCR0+d*pxcm,y:p.y,t:0});p.s=2;
+      }
+    }
+    p.x=nx;
+    if(p.s===1&&p.x>=DET&&!p.c){passed++;p.c=1}
+  }
+  photons=photons.filter(p=>p.s!==2&&p.x<DET+10);
+  flashes.forEach(f=>f.t+=dt);flashes=flashes.filter(f=>f.t<.35);
+}
+
+function drawBench(){
+  const c=$("bench"),g=c.getContext("2d"),W=c.width,H=c.height;
+  const ink=css("--ink"),mut=css("--muted"),line=css("--line"),ph=css("--photon");
+  g.clearRect(0,0,W,H);
+  g.font="20px ui-monospace, Menlo, Consolas, monospace";g.textAlign="center";
+  // axe du faisceau
+  g.strokeStyle=line;g.setLineDash([6,8]);g.beginPath();g.moveTo(SX,CY);g.lineTo(DET,CY);g.stroke();g.setLineDash([]);
+  // source
+  g.fillStyle=css("--src");g.beginPath();g.arc(SX,CY,22,0,7);g.fill();
+  g.strokeStyle=ink;g.lineWidth=2;g.stroke();
+  g.fillStyle=ink;g.fillText(SRC[src],SX,CY+56);g.fillStyle=mut;g.fillText("source",SX,CY-40);
+  // écran
+  const w=scrW();
+  if(w>0.5){
+    g.fillStyle=css("--screen");g.fillRect(SCR0,CY-BEAM/2-30,w,BEAM+60);
+    g.save();g.beginPath();g.rect(SCR0,CY-BEAM/2-30,w,BEAM+60);g.clip();
+    g.strokeStyle=css("--screen2");g.lineWidth=2;
+    for(let k=-H;k<w+H;k+=14){g.beginPath();g.moveTo(SCR0+k,CY-BEAM/2-30);g.lineTo(SCR0+k+BEAM+60,CY+BEAM/2+30);g.stroke()}
+    g.restore();
+    // repères de CDA
+    g.strokeStyle=css("--bg");g.lineWidth=1.5;
+    for(let k=1;k*cda<x;k++){const px=SCR0+k*cda/xMax*SCRMAX;g.beginPath();g.moveTo(px,CY-BEAM/2-30);g.lineTo(px,CY+BEAM/2+30);g.stroke()}
+  }
+  g.fillStyle=mut;g.fillText(w>0.5?`écran ${MAT[mat]}`:"pas d'écran",SCR0+Math.max(w,0)/2+ (w<120?60:0),CY-BEAM/2-44);
+  if(w>0.5){g.fillStyle=ink;g.fillText(`${fmt(x/cda,1)} CDA`,SCR0+w/2+(w<120?60:0),CY+BEAM/2+60)}
+  // détecteur
+  g.fillStyle=css("--panel");g.strokeStyle=ink;g.lineWidth=2;
+  g.fillRect(DET,CY-BEAM/2-10,60,BEAM+20);g.strokeRect(DET,CY-BEAM/2-10,60,BEAM+20);
+  g.fillStyle=mut;g.fillText("détecteur",DET+30,CY-BEAM/2-24);
+  g.fillStyle=ink;g.font="600 22px ui-monospace, Menlo, Consolas, monospace";g.fillText(passed>9999?"9999+":passed,DET+30,CY+8);
+  // photons
+  g.fillStyle=ph;
+  for(const p of photons){g.beginPath();g.arc(p.x,p.y,3.6,0,7);g.fill()}
+  for(const f of flashes){const a=1-f.t/.35;g.globalAlpha=a;g.beginPath();g.arc(f.x,f.y,4+f.t*30,0,7);g.fill();g.globalAlpha=1}
+}
+
+function drawPlot(){
+  const c=$("plot"),g=c.getContext("2d"),W=c.width,H=c.height,L=90,R=24,T=20,B=60;
+  const pw=W-L-R,ph=H-T-B,ink=css("--ink"),mut=css("--muted"),line=css("--line");
+  const KMAX=NCDA;
+  const X=v=>L+v/xMax*pw;
+  const Y=logMode?f=>T+Math.min(-Math.log2(Math.max(f,1e-9)),KMAX)/KMAX*ph:f=>T+ph-f*ph;
+  g.clearRect(0,0,W,H);g.font="20px ui-monospace, Menlo, Consolas, monospace";g.lineWidth=1;
+  for(let k=0;k<=NCDA;k++){
+    g.strokeStyle=line;g.beginPath();g.moveTo(X(k*cda),T);g.lineTo(X(k*cda),T+ph);g.stroke();
+    g.fillStyle=mut;g.textAlign="center";
+    g.fillText(fmt(k*cda,cda<1?2:1),X(k*cda),H-B+28);
+  }
+  g.textAlign="right";g.fillText("x (cm)",L+pw,H-6);
+  g.textAlign="left";g.fillText("graduations = 1 CDA",L,H-6);
+  const fr=logMode?Array.from({length:KMAX+1},(_,k)=>Math.pow(2,-k)):[1,.5,.25,.125];
+  fr.forEach(f=>{
+    g.strokeStyle=line;g.setLineDash(f<1?[6,6]:[]);g.beginPath();g.moveTo(L,Y(f));g.lineTo(L+pw,Y(f));g.stroke();g.setLineDash([]);
+    g.fillStyle=mut;g.textAlign="right";g.fillText(f===1?"1":`1/${1/f}`,L-10,Y(f)+7);
+  });
+  g.strokeStyle=ink;g.lineWidth=2.5;g.beginPath();
+  for(let i=0;i<=300;i++){const v=i/300*xMax;i?g.lineTo(X(v),Y(Math.exp(-mu*v))):g.moveTo(X(v),Y(1))}
+  g.stroke();
+  // repère position
+  const t=Math.exp(-mu*x);
+  g.strokeStyle=css("--photon");g.setLineDash([4,5]);g.lineWidth=1.5;
+  g.beginPath();g.moveTo(X(x),T+ph);g.lineTo(X(x),Y(t));g.lineTo(L,Y(t));g.stroke();g.setLineDash([]);
+  g.fillStyle=css("--photon");g.beginPath();g.arc(X(x),Y(t),7,0,7);g.fill();
+  if(arrived>=30&&passed>0){
+    g.fillStyle=css("--ok");g.beginPath();g.arc(X(x),Y(passed/arrived),6,0,7);g.fill();
+  }
+}
+
+function loop(ts){
+  const dt=Math.min((ts-last)/1000,.05);last=ts;
+  if(running){tick(dt);update()}
+  drawBench();drawPlot();
+  requestAnimationFrame(loop);
+}
+function setScale(l){logMode=l;$("lin").classList.toggle("on",!l);$("log").classList.toggle("on",l);
+  $("lin").setAttribute("aria-pressed",!l);$("log").setAttribute("aria-pressed",l);$("hint").hidden=!l}
+$("lin").onclick=()=>setScale(false);$("log").onclick=()=>setScale(true);
+$("play").onclick=()=>{running=!running;$("play").textContent=running?"Pause":"Reprendre"};
+$("cdaBtn").onclick=()=>{const k=Math.min(NCDA,Math.floor(x/cda+1e-6)+1);$("ep").value=k*100;params()};
+$("ep").oninput=params;$("iso").onchange=params;$("mat").onchange=params;
+params();
+// état de départ : quelques secondes déjà simulées
+for(let i=0;i<120;i++)tick(1/60);update();
+requestAnimationFrame(t=>{last=t;loop(t)});
+</script>
+
+<script>window.addEventListener("storage",e=>{if(e.key==="nuclea-theme"){if(e.newValue==="light"||e.newValue==="dark")document.documentElement.dataset.theme=e.newValue;else delete document.documentElement.dataset.theme}})</script>
+</body>
+</html>
