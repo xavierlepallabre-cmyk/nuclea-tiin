@@ -1,3 +1,9 @@
+Nucléa TIIN v0.12 — Correctif de mise à jour
+
+La mise en cache hors connexion téléchargeait les fichiers via le cache HTTP du navigateur (10 min sur GitHub Pages) : une mise à jour pouvait mélanger des fichiers de deux versions (exemple : nouveaux exercices mais pied de page « v0.10 »). Chaque fichier est désormais demandé directement au serveur.
+
+---------------------------------------------------------------------
+
 Nucléa TIIN v0.11 — Exercices simplifiés
 
 Onglet Exercices repensé : thème et niveau se choisissent d’une touche (plus de listes déroulantes), l’énoncé apparaît aussitôt. Un seul bouton « Vérifier » (ou la touche Entrée), un message clair (Bravo / Pas encore / Attention à l’unité), puis « Exercice suivant ». Les aides arrivent une par une sous l’énoncé. Les unités sont classées par grandeur. Le générateur d’énoncés et la vérification sont inchangés.
