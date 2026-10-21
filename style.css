@@ -490,3 +490,15 @@ body.visual-open{overflow:hidden}
 
 .qcm-dialog{max-width:600px;width:calc(100% - 24px);padding:22px;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink)}.qcm-dialog::backdrop{background:var(--scrim)}.qcm-dialog input{width:100%;max-width:100%;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:9px;color:var(--ink)}.qcm-dialog li{margin:12px 0}
 .card:has(#joinCollective){margin-bottom:16px}
+
+/* ---------- Masses de l’isotope et du noyau (v0.15) ---------- */
+.iso-facts li>span:first-child small{display:block;margin-top:1px;font-size:11.5px;color:var(--muted);opacity:.85}
+.iso-facts .mass{display:grid;gap:2px;min-width:0}
+.iso-facts .mass strong{font-weight:600;font-size:15px;font-variant-numeric:tabular-nums;letter-spacing:.01em;color:var(--brand-text);overflow-wrap:anywhere}
+.iso-facts .mass small{font-size:12px;font-weight:400;color:var(--muted)}
+.mass-none{color:var(--muted);font-style:italic;font-weight:400}
+.mass-help{margin:-8px 0 18px;border:1px solid var(--line);border-radius:var(--r-md);font-size:13px}
+.mass-help summary{cursor:pointer;font-weight:600;padding:10px 14px;color:var(--brand-text);list-style-position:inside}
+.mass-help[open] summary{border-bottom:1px solid var(--line)}
+.mass-help p{margin:10px 14px;line-height:1.55}
+.mass-eq{display:inline-block;margin:4px 0;padding:3px 8px;border-radius:6px;background:var(--surface-2);font-weight:600}

@@ -1,3 +1,9 @@
+Nucléa TIIN v0.15 — Masse de l’isotope et masse du noyau
+
+Chaque fiche isotopique affiche la masse atomique de l’isotope (AME2020, atome neutre) et la masse de son noyau (électrons retirés, calculée), avec leur incertitude et une aide repliable « Masse de l’atome ou masse du noyau ? ». Les élèves y relèvent Z, N, A et m_noyau pour calculer eux-mêmes Δm, E_l et E_l/A. Méthode et sources : SOURCES.md, section v0.15.
+
+---------------------------------------------------------------------
+
 Nucléa TIIN v0.14 — Entrée « QCM de classe »
 
 Ajout d’une carte « QCM de classe » en tête de l’onglet Exercices : elle explique comment rejoindre une séance organisée par l’enseignant et ouvre l’adresse locale du PC enseignant (réseau de la classe, adresse privée terminée par /eleve/). Aucun appel automatique à un serveur ; les outils scientifiques et les exercices individuels sont inchangés. Le programme Enseignant (Windows) n’est jamais publié ici.
