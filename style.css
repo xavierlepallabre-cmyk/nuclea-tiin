@@ -502,3 +502,10 @@ body.visual-open{overflow:hidden}
 .mass-help[open] summary{border-bottom:1px solid var(--line)}
 .mass-help p{margin:10px 14px;line-height:1.55}
 .mass-eq{display:inline-block;margin:4px 0;padding:3px 8px;border-radius:6px;background:var(--surface-2);font-weight:600}
+
+/* ---------- Logos côte à côte, même hauteur, sans déformation (v0.16) ---------- */
+.logo-row{display:flex;gap:10px;align-items:stretch}
+/* Largeur de chaque plaque proportionnelle au rapport largeur/hauteur de son logo : les deux ont alors la même hauteur. */
+.logo-row .logo-plate{flex:1.163 1 0;min-width:0;padding:10px}
+.logo-row .logo-plate:last-child{flex-grow:2.338}
+.logo-row .logo-plate img{width:100%;height:auto;max-height:none;object-fit:contain}
