@@ -1,3 +1,9 @@
+Nucléa TIIN v0.16 — Logos de la page À propos
+
+Les logos du lycée et du Bac Pro TIIN sont côte à côte, à la même hauteur, sans déformation (le logo Tocqueville était étiré en largeur sur téléphone).
+
+---------------------------------------------------------------------
+
 Nucléa TIIN v0.15 — Masse de l’isotope et masse du noyau
 
 Chaque fiche isotopique affiche la masse atomique de l’isotope (AME2020, atome neutre) et la masse de son noyau (électrons retirés, calculée), avec leur incertitude et une aide repliable « Masse de l’atome ou masse du noyau ? ». Les élèves y relèvent Z, N, A et m_noyau pour calculer eux-mêmes Δm, E_l et E_l/A. Méthode et sources : SOURCES.md, section v0.15.
