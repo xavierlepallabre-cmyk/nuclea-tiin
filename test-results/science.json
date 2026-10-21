@@ -1,5 +1,5 @@
 {
-  "executedAt": "2026-10-20T16:45:46.497Z",
+  "executedAt": "2026-10-21T06:19:39.089Z",
   "results": [
     {
       "suite": "data.test.cjs",
@@ -41,6 +41,12 @@
       "suite": "exercises.test.cjs",
       "status": "passed",
       "output": "18 types, 216 énoncés, unités équivalentes, aides et erreurs OK\n",
+      "error": ""
+    },
+    {
+      "suite": "masses.test.cjs",
+      "status": "passed",
+      "output": "Masses : 3356 isotopes couverts, 27 sans donnée ; p, d, t, α conformes CODATA ; C-12/13/14, He-4, Fe-56, U-235/238 cohérents avec AME2020 : OK\n",
       "error": ""
     }
   ]

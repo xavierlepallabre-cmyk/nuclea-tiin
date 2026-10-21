@@ -15,6 +15,25 @@ function daughterLabel(e,v,mode){
  return target?`${target.s}-${v.a+d[1]} (état nucléaire non précisé)`:"Non déterminé dans cette fiche";
 }
 let pendingDecayCalculation=null,pendingEnergy=null;
+// v0.15 : masse atomique de l'isotope et masse de son noyau (calcul dans nuclear-mass.js).
+function isoMasses(e,v){const row=nuclearProperties[`${e.z}:${v.a}`];return row&&window.NuclearMass?NuclearMass.masses(row,v.label?v.energy:0):null}
+function massRows(e,v){
+ const m=isoMasses(e,v),none='<span class="mass-none">Donnée indisponible</span>';
+ if(!m)return `<li><span>Masse atomique de l’isotope</span><span>${none}</span></li><li><span>Masse du noyau</span><span>${none}</span></li>`;
+ const tag=m.exact?"exacte par définition de l’unité u":m.estimated?"estimée (systématique AME2020, non mesurée)":m.excited?"fondamental AME2020 + énergie d’excitation":"AME2020";
+ const atom=`<span class="mass"><strong>${NuclearMass.formatU(m.atom,m.atomDecimals)} u</strong><small>${m.exact?"":esc(NuclearMass.formatUncMicro(m.atomUnc))+" · "}${tag}</small></span>`;
+ const nuc=`<span class="mass"><strong>${NuclearMass.formatU(m.nucleus,m.nucleusDecimals)} u</strong><small>${esc(NuclearMass.formatUncMicro(m.nucleusUnc))} · ${m.estimated?"calculée à partir d’une masse estimée":"calculée, électrons retirés"}</small></span>`;
+ return `<li class="mass-row"><span>Masse atomique de l’isotope<small>atome neutre, ${e.z} électron${e.z>1?"s":""} compris</small></span>${atom}</li><li class="mass-row"><span>Masse du noyau<small>noyau seul, sans électrons</small></span>${nuc}</li>`;
+}
+function massHelp(e,v){
+ const m=isoMasses(e,v),k=m&&m.electronBindingKeV;
+ const be=m?(k<1?`${Math.round(k*1000).toLocaleString("fr-FR")} eV`:`${k.toLocaleString("fr-FR",{maximumSignificantDigits:3})} keV`):"";
+ return `<details class="mass-help"><summary>Masse de l’atome ou masse du noyau ?</summary>
+ <p><strong>Masse atomique de l’isotope :</strong> l’atome neutre entier, électrons compris. À ne pas confondre avec la masse atomique moyenne de l’élément (mélange des isotopes naturels) ni avec le nombre de masse A, qui est un entier.</p>
+ <p><strong>Masse du noyau :</strong> on retire la masse des ${e.z} électron${e.z>1?"s":""}, puis on rajoute leur énergie de liaison${m?` (environ ${be} pour cet atome)`:""} :<br><span class="mass-eq">m<sub>noyau</sub> = m<sub>atome</sub> − Z·m<sub>e</sub> + B<sub>e</sub>/c²</span><br>B<sub>e</sub> est estimée par une formule empirique : la masse du noyau est donc « calculée » et donnée avec son incertitude.</p>
+ <p><strong>Pour l’énergie de liaison :</strong> Δm = Z·m<sub>p</sub> + N·m<sub>n</sub> − m<sub>noyau</sub>, puis E<sub>l</sub> = Δm × 931,494 MeV (Δm en u), puis E<sub>l</sub>/A.<br>m<sub>p</sub> = 1,007 276 467 u · m<sub>n</sub> = 1,008 664 916 u · m<sub>e</sub> = 0,000 548 580 u (CODATA 2022).</p>
+ </details>`;
+}
 function renderIso(e,variants){
  const v=variants[Number($("#iso").value)]||{a:e.a,decays:[]};
  const timeMap={as:"as",ps:"ps",ns:"ns",us:"us",ms:"ms",s:"s",m:"min",h:"h",d:"d",Y:"y"};
@@ -40,9 +59,11 @@ function renderIso(e,variants){
  <ul class="iso-facts">
  <li><span>Notation nucléaire</span><span class="nuclide" aria-label="${e.s} ${esc(v.label||v.a)}, Z = ${e.z}"><span class="nuclide-idx" aria-hidden="true"><span>${esc(v.label||v.a)}</span><span>${e.z}</span></span><span aria-hidden="true">${e.s}</span></span></li>
  <li><span>État</span><span>${v.label?`Métastable, énergie d’excitation ${esc(v.energy)} keV`:"Fondamental"}</span></li>
+ ${massRows(e,v)}
  <li><span>${v.stable?"Stabilité":"Période radioactive"}</span><span>${esc(period)}</span></li>
  <li><span>Abondance naturelle</span><span>${v.abundance?`${esc(v.abundance)} %${v.abundanceUnc?` (incertitude ENSDF : ${esc(v.abundanceUnc)})`:""}`:"Non renseignée dans la source"}</span></li>
  </ul>
+ ${massHelp(e,v)}
  ${v.decays.length?`<h3>Modes de désintégration renseignés</h3><ul class="decay-list">${v.decays.map(d=>`<li><strong>${esc(modeNames[d.mode]||d.mode)}</strong>${d.percent?` : ${esc(d.percent)} %${d.unc?` (incertitude ENSDF : ${esc(d.unc)})`:""}`:" : proportion non renseignée"}<br><small>Noyau(x) fils : ${esc(daughterLabel(e,v,d.mode))}</small></li>`).join("")}</ul><p><small>Jusqu’à trois modes fournis par la source. Les noyaux fils sont déduits des bilans A et Z ; leurs états excités et les émissions γ ne sont pas détaillés.</small></p>`:!v.stable?"<p>Modes non renseignés ; cela ne signifie pas que cet isotope est stable.</p>":""}
  <details class="isotope-source"><summary>Source et précision des données</summary><p><a href="${esc(url)}" target="_blank" rel="noopener noreferrer">AIEA — LiveChart, données de ${e.s}-${esc(v.label||v.a)}</a></p><p>Extraction indiquée par la source : ${esc(v.extracted||"non renseignée")}. Téléchargement : 19 octobre 2026.<br>Limite bibliographique ENSDF : ${esc(v.cutoff||"non renseignée")}.<br>Évaluation : ${esc(v.authors||"non renseignée")}.</p><p>Les incertitudes sont reproduites en notation ENSDF : 12,32 (2) signifie 12,32 ± 0,02. Les valeurs vides restent non renseignées ; les signes &lt;, &gt;, ≥ et ≈ sont conservés.</p><p><a href="https://nds.iaea.org/relnsd/vcharthtml/api_v0_guide.html" target="_blank" rel="noopener noreferrer">Documentation et références de LiveChart</a></p></details>`;
 }
