@@ -38,6 +38,8 @@
   if(id){const v=VISUALS.find(x=>x.id===id);if(v&&open!==id)show(v,false)}else hide();
  });
  document.addEventListener('keydown',e=>{if(open&&e.key==='Escape'){e.preventDefault();close()}});
+ // Ouverture depuis un autre module (parcours élève).
+ window.NucleaVisuals={open:id=>{const v=VISUALS.find(x=>x.id===id);if(v)show(v,true)}};
  // Une page rechargée repart sur l'application : ne pas laisser un état de visionneuse orphelin.
  if(history.state?.nucleaVisual){const s={...history.state};delete s.nucleaVisual;history.replaceState(s,'')}
  // Le thème choisi dans l'application suit dans le visuel ouvert.

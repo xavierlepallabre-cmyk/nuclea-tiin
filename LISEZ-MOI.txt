@@ -1,3 +1,11 @@
+Nucléa TIIN v0.17 — Parcours élève
+
+Nouvel onglet « Parcours », ouvert au premier lancement : un parcours de découverte en six étapes (structure de l’atome, isotopes et stabilité, radioactivité, activité et décroissance, défaut de masse et énergie de liaison, introduction à la radioprotection). Chaque étape suit Découvrir → Observer → Manipuler → Comprendre → Vérifier et fait manipuler les outils existants : fiches isotopiques, filiation, calculateur de décroissance prérempli, énergie de liaison et Aston, visuels animés, DATE, formulaire et exercices. Un bandeau « Retour au parcours » ramène à l’étape après chaque outil.
+
+Rien n’est verrouillé : toutes les étapes restent consultables et « Explorer librement » est mémorisé (l’application rouvre alors sur le tableau). Progression enregistrée sur l’appareil uniquement, sans compte ; conservée lors des mises à jour ; réinitialisable après confirmation. Contenu des parcours : parcours-data.js (modifiable sans toucher au moteur).
+
+---------------------------------------------------------------------
+
 Nucléa TIIN v0.16 — Logos de la page À propos
 
 Les logos du lycée et du Bac Pro TIIN sont côte à côte, à la même hauteur, sans déformation (le logo Tocqueville était étiré en largeur sur téléphone).
