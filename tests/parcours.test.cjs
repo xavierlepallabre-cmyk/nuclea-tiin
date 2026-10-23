@@ -6,13 +6,15 @@ const ctx={};vm.createContext(ctx);vm.runInContext(read('isotopes.js')+';this.is
 const {isotopes,props,DecayChain}=ctx,elements=JSON.parse(read('elements.json'));
 const visualIds=[...read('visuals.js').matchAll(/\{id:'([a-z]+)'/g)].map(m=>m[1]);
 const iso=(z,a)=>(isotopes[z]||[]).find(v=>String(v.label||v.a)===String(a));
-// 1. Structure : identifiants uniques, cinq phases remplies, actions valides.
-const p=D.get('decouverte');assert(p&&p.available&&p.steps.length===6);
-const stepIds=new Set(),taskIds=new Set(),tasks={};
+// 1. Structure : parcours, identifiants uniques, phases remplies, actions valides.
+const avail=D.parcours.filter(x=>x.available);assert.deepEqual(avail.map(x=>x.id),['decouverte','bases'],'la découverte de l’application vient en premier');
+assert(new Set(D.parcours.map(x=>x.id)).size===D.parcours.length);
+const stepIds=new Set(),taskIds=new Set(),tasks={},spots=new Set();
+for(const p of avail){const PH=D.phasesOf(p);assert(PH.length>=2&&PH.length<=5&&p.steps.length&&p.intro);
 for(const s of p.steps){
  assert(!stepIds.has(s.id),s.id);stepIds.add(s.id);assert(s.title&&s.summary&&s.minutes>0);
- for(const [k] of D.PHASES)assert(Array.isArray(s.phases[k])&&s.phases[k].length,`${s.id}/${k} vide`);
- assert.deepEqual(Object.keys(s.phases),D.PHASES.map(x=>x[0]));
+ for(const [k] of PH)assert(Array.isArray(s.phases[k])&&s.phases[k].length,`${s.id}/${k} vide`);
+ assert.deepEqual(Object.keys(s.phases),PH.map(x=>x[0]));
  for(const b of Object.values(s.phases).flat()){
   assert(['text','tool','read','choice','keys'].includes(b.type),b.type);
   if(b.id){assert(!taskIds.has(b.id),b.id);taskIds.add(b.id);tasks[b.id]=b}
@@ -28,10 +30,15 @@ for(const s of p.steps){
    case 'exercise':assert(a.theme>=0&&a.theme<=5&&[1,2,3].includes(a.level));break;
    case 'date':assert(['free','mission','prepare'].includes(a.mode));break;
    case 'formulas':assert(a.topic>=0&&a.topic<=5);break;
+   case 'spot':assert(typeof a.target==='string'&&a.target);spots.add(a.target);if(a.tab)assert(['table','formulas','explore','exercises'].includes(a.tab));break;
    default:assert.fail('outil inconnu '+a.tool);
   }
  }
-}
+}}
+assert.equal(D.get('decouverte').phases.length,3);assert.equal(D.get('bases').steps.length,6);
+// Les zones mises en évidence existent dans l'application.
+const html=read('index.html')+read('exercises.js')+read('energy.js')+read('date-ui.js')+read('qcm-entry.js');
+for(const t of spots){const id=t.replace(/^#/,'');assert(new RegExp(`id=["']${id}["']|id=\\\\?["']${id}|\\.id=['"]${id}['"]|id=\\\\"${id}`).test(html)||html.includes(`id="${id}"`)||html.includes(`id='${id}'`)||html.includes(`.id='${id}'`),'zone absente : '+t)}
 // 2. Les réponses attendues sont celles des données embarquées.
 const ok=(id,x)=>{const a=tasks[id].answer,tol=a.rel?Math.abs(a.value)*a.tol:a.tol;assert(Math.abs(x-a.value)<=tol+1e-12,`${id} : attendu ${a.value}, données ${x}`)};
 ok('a-fe-p',26);ok('a-fe-n',56-26);ok('a-fe-e',26);ok('a-u-n',238-92);ok('a-oxygene',elements.find(e=>e.s==='O').z);
@@ -43,17 +50,22 @@ const he=M.masses(props['2:4']);ok('l-he-m',he.nucleus);
 const dm=2*1.007276+2*1.008665-4.001506;ok('l-dm',dm);ok('l-e',dm*931.494);ok('l-ea',dm*931.494/4);
 const fe=Number(props['26:56'].bindingKeVPerNucleon),u=Number(props['92:238'].bindingKeVPerNucleon),h=Number(props['2:4'].bindingKeVPerNucleon);assert(fe>u&&fe>h);
 ok('p-dose',100*0.5);ok('p-q1',0.5/2*60);ok('p-cda',Math.log2(8));
+// Découverte de l'application : les réponses correspondent à l'interface réelle.
+const formulaGroups=(read('app.js').match(/\["\d · [^"]+", \[/g)||[]).length;
+ok('t-nobles',elements.filter(e=>e.family==='noble').length);ok('t-carbone',isotopes[6].length);ok('t-rubriques',formulaGroups);ok('t-visuels',visualIds.length);
+ok('t-aides',require('../exercises.js').generate(0,1).hints.length);
+const co=DecayChain.trace(isotopes,27,iso(27,60),{});assert.equal(co.nodes.at(-1).id,'28:60');assert.equal(tasks['t-chaine'].options[tasks['t-chaine'].correct],'Ni-60');
 // 3. Suivi : enregistrement, reprise, fin d'étape, réinitialisation, données corrompues, stockage refusé.
 const mem=()=>{const m={};return {getItem:k=>k in m?m[k]:null,setItem:(k,v)=>{m[k]=String(v)},raw:m}};
-const st=mem(),a1=Prog.create(st),ids=p.steps.map(s=>s.id);
+const p=D.get('bases'),st=mem(),a1=Prog.create(st),ids=p.steps.map(s=>s.id);
 assert.equal(a1.mode,null);assert.equal(a1.resumeStep('decouverte',ids),'atome');
-a1.setMode('parcours');a1.open('decouverte','atome');a1.setPhase('decouverte','atome',3);a1.recordTask('decouverte','atome','a-oxygene',false,'7');a1.recordTask('decouverte','atome','a-oxygene',true,'8');
-const a2=Prog.create(st);assert.equal(a2.mode,'parcours');assert.equal(a2.step('decouverte','atome').phase,3);assert.deepEqual(a2.task('decouverte','atome','a-oxygene'),{ok:true,tries:2,value:'8'});
-a2.complete('decouverte','atome');assert.equal(a2.resumeStep('decouverte',ids),'isotopes');assert.equal(a2.doneCount('decouverte',ids),1);
-a2.restartStep('decouverte','atome');assert.equal(a2.status('decouverte','atome'),'started');assert.equal(a2.task('decouverte','atome','a-oxygene'),null);
-a2.reset('decouverte');assert.equal(Prog.create(st).status('decouverte','atome'),'todo');assert.equal(Prog.create(st).mode,'parcours');
+a1.setMode('parcours');a1.open('bases','atome');a1.setPhase('bases','atome',3);a1.recordTask('bases','atome','a-oxygene',false,'7');a1.recordTask('bases','atome','a-oxygene',true,'8');assert.equal(a1.active,'bases');
+const a2=Prog.create(st);assert.equal(a2.mode,'parcours');assert.equal(a2.active,'bases');assert.equal(a2.step('bases','atome').phase,3);assert.deepEqual(a2.task('bases','atome','a-oxygene'),{ok:true,tries:2,value:'8'});
+a2.complete('bases','atome');assert.equal(a2.resumeStep('bases',ids),'isotopes');assert.equal(a2.doneCount('bases',ids),1);
+a2.restartStep('bases','atome');assert.equal(a2.status('bases','atome'),'started');assert.equal(a2.task('bases','atome','a-oxygene'),null);
+a2.reset('bases');assert.equal(Prog.create(st).status('bases','atome'),'todo');assert.equal(Prog.create(st).mode,'parcours');
 st.setItem(Prog.KEY,'{pas du json');assert.equal(Prog.create(st).mode,null);
 st.setItem(Prog.KEY,JSON.stringify({v:1,mode:'pirate',parcours:{decouverte:{steps:{atome:{status:'hack',phase:99,tasks:{x:{ok:1,tries:-5,value:'<script>'.repeat(20)}}}}}}}));
 const s3=Prog.create(st);assert.equal(s3.mode,null);assert.equal(s3.status('decouverte','atome'),'started');assert.equal(s3.step('decouverte','atome').phase,4);assert(s3.task('decouverte','atome','x').value.length<=40);
 const refused=Prog.create({getItem:()=>null,setItem:()=>{throw Error('refusé')}});refused.setMode('libre');assert.equal(refused.mode,'libre');assert(!refused.persistent&&refused.message);
-console.log(`Parcours : ${p.steps.length} étapes, ${taskIds.size} activités notées, outils et réponses cohérents avec les données ; suivi local, reprise, réinitialisation et stockage refusé : OK`);
+console.log(`Parcours : ${avail.map(x=>x.steps.length).join(' + ')} étapes, ${taskIds.size} activités, ${spots.size} zones d’interface, outils et réponses cohérents avec les données ; suivi local, reprise, réinitialisation et stockage refusé : OK`);
