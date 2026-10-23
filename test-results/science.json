@@ -1,5 +1,5 @@
 {
-  "executedAt": "2026-10-21T06:47:31.680Z",
+  "executedAt": "2026-10-23T17:02:27.418Z",
   "results": [
     {
       "suite": "data.test.cjs",
@@ -47,6 +47,12 @@
       "suite": "masses.test.cjs",
       "status": "passed",
       "output": "Masses : 3356 isotopes couverts, 27 sans donnée ; p, d, t, α conformes CODATA ; C-12/13/14, He-4, Fe-56, U-235/238 cohérents avec AME2020 : OK\n",
+      "error": ""
+    },
+    {
+      "suite": "parcours.test.cjs",
+      "status": "passed",
+      "output": "Parcours : 6 étapes, 41 activités notées, outils et réponses cohérents avec les données ; suivi local, reprise, réinitialisation et stockage refusé : OK\n",
       "error": ""
     }
   ]

@@ -39,3 +39,14 @@ La pose/retrait d’un écran est calculée dans le mode Explorer au débit non 
 Cache applicatif : `nuclea-tiin-v09`. Les scripts, données, icônes, logos et police locale nécessaires sont préchargés. Les références web ne sont consultées que si l’utilisateur ouvre leurs liens. Une mise à jour depuis une version moderne reste en attente ; elle s’active après acceptation. Les caches d’application obsolètes sont supprimés à l’activation, jamais localStorage. La première migration depuis les caches v0.3–v0.8 est activée automatiquement pour éviter que l’ancien code dépourvu de bannière bloque l’adoption ; recharger ensuite la page. Pour une prochaine livraison, changer le nom de cache et le numéro d’interface.
 
 Une actualisation conserve les préparations enregistrées, mais réinitialise les saisies en mémoire et l’exercice courant ; le message d’actualisation le signale. La police locale dispose d’un repli système. HTTPS est requis hors localhost.
+
+## Parcours élève — v0.17
+
+Quatre couches séparées :
+
+- `parcours-data.js` : contenu pédagogique seul (parcours, étapes, phases, blocs, réponses attendues). Ajouter, déplacer ou retirer une étape ou une question se fait dans ce fichier, sans toucher au moteur. Un parcours prévu (`available:false`) s'affiche « À venir ». Les identifiants d'étapes et de questions servent au suivi : ne pas les renommer après diffusion.
+- `parcours-progress.js` : suivi local (`localStorage`, clé `nuclea-parcours-v1`, schéma versionné et nettoyé à la lecture). Étapes commencées ou terminées, phase atteinte, réponses trouvées, mode choisi (parcours ou libre). Si le stockage est refusé, la progression reste en mémoire et l'élève en est prévenu. Le service worker ne touche pas au `localStorage` : les mises à jour conservent la progression. « Effacer toutes les données locales » (À propos) l'efface, comme les autres données `nuclea-*`.
+- `parcours.js` : moteur d'affichage (accueil, étapes, phases, vérification des réponses) et pont vers les outils existants (`Tools`) : fiche isotopique et filiation (`showElement`), calculateur de décroissance (`RadioactiveDecay.prefill` puis calcul), énergie de liaison (`NuclearEnergy.open`), visuels (`NucleaVisuals.open`, ajouté à `visuals.js`), exercices (sélection du thème et du niveau), DATE (mode), formulaire (rubrique ouverte). Le bandeau « Retour au parcours » referme la fiche si besoin et revient au bloc d'origine.
+- Outils scientifiques : inchangés. Aucun nouveau simulateur, aucune dépendance.
+
+Démarrage : un élève qui n'a pas choisi « Explorer librement » arrive sur l'onglet Parcours ; après ce choix, l'application rouvre sur le tableau. Le parcours est indépendant du QCM de classe. Tests : `tests/parcours.test.cjs` (données, réponses recalculées depuis les données embarquées, suivi) et `tests/parcours-ui.cjs` (parcours complet dans un navigateur). Les tests d'interface historiques démarrent en mode « Explorer librement ».
