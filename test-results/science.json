@@ -1,5 +1,5 @@
 {
-  "executedAt": "2026-10-23T17:02:27.418Z",
+  "executedAt": "2026-10-23T17:28:57.429Z",
   "results": [
     {
       "suite": "data.test.cjs",
@@ -52,7 +52,7 @@
     {
       "suite": "parcours.test.cjs",
       "status": "passed",
-      "output": "Parcours : 6 étapes, 41 activités notées, outils et réponses cohérents avec les données ; suivi local, reprise, réinitialisation et stockage refusé : OK\n",
+      "output": "Parcours : 6 + 6 étapes, 56 activités, 10 zones d’interface, outils et réponses cohérents avec les données ; suivi local, reprise, réinitialisation et stockage refusé : OK\n",
       "error": ""
     }
   ]

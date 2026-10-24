@@ -1,8 +1,11 @@
 Nucléa TIIN v0.17 — Parcours élève
 
-Nouvel onglet « Parcours », ouvert au premier lancement : un parcours de découverte en six étapes (structure de l’atome, isotopes et stabilité, radioactivité, activité et décroissance, défaut de masse et énergie de liaison, introduction à la radioprotection). Chaque étape suit Découvrir → Observer → Manipuler → Comprendre → Vérifier et fait manipuler les outils existants : fiches isotopiques, filiation, calculateur de décroissance prérempli, énergie de liaison et Aston, visuels animés, DATE, formulaire et exercices. Un bandeau « Retour au parcours » ramène à l’étape après chaque outil.
+Nouvel onglet « Parcours », ouvert au premier lancement, avec deux parcours :
+- « Découverte de l’application » (proposé en premier) : six étapes courtes pour apprendre à se servir de l’interface — tableau et recherche, fiche d’un élément, formulaire et calculateur, Explorer, exercices et QCM de classe, réglages et hors connexion. Les boutons « Me montrer » ouvrent le bon onglet et mettent en évidence la zone concernée.
+- « Physique nucléaire : les bases » : six étapes (atome, isotopes, radioactivité, décroissance, énergie de liaison, radioprotection) en Découvrir → Observer → Manipuler → Comprendre → Vérifier, qui font manipuler les outils existants.
+Un bandeau « Retour au parcours » ramène à l’étape après chaque outil.
 
-Rien n’est verrouillé : toutes les étapes restent consultables et « Explorer librement » est mémorisé (l’application rouvre alors sur le tableau). Progression enregistrée sur l’appareil uniquement, sans compte ; conservée lors des mises à jour ; réinitialisable après confirmation. Contenu des parcours : parcours-data.js (modifiable sans toucher au moteur).
+Rien n’est verrouillé : toutes les étapes restent consultables et « Explorer librement » est mémorisé (l’application rouvre alors sur le tableau). Progression enregistrée sur l’appareil uniquement, sans compte ; conservée lors des mises à jour ; réinitialisable par parcours, après confirmation. Contenu des parcours : parcours-data.js (modifiable sans toucher au moteur).
 
 ---------------------------------------------------------------------
 

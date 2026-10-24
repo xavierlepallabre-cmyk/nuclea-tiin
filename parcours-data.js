@@ -3,7 +3,8 @@
    le suivi (parcours-progress.js) mémorise la progression, les outils scientifiques restent inchangés.
    Pour réorganiser un parcours : déplacer, ajouter ou retirer des objets dans "steps" ou "blocks".
 
-   Phases d'une étape (ordre fixe) : decouvrir, observer, manipuler, comprendre, verifier.
+   Phases d'une étape : par défaut decouvrir, observer, manipuler, comprendre, verifier ;
+   un parcours peut définir les siennes (champ phases, 5 au maximum), comme la découverte de l'application.
    Blocs possibles :
      {type:'text', html}                       court paragraphe
      {type:'tool', label, action}              bouton qui ouvre un outil existant
@@ -16,10 +17,98 @@
      {tool:'decay', z, iso, initial, initialUnit, duration, durationUnit}
      {tool:'energy', z, a} · {tool:'exercise', theme, level} · {tool:'date', mode}
      {tool:'formulas', topic}                  topic = index de rubrique (0 à 5)
+     {tool:'spot', tab?, target}              ouvre l'onglet et met en évidence une zone de l'interface
    Les identifiants (id) d'étapes et de questions servent au suivi : ne pas les renommer après diffusion. */
 (function(root){
 const parcours=[
-{id:'decouverte',title:'Parcours de découverte',available:true,
+/* ================= Découverte de l'application (interface) ================= */
+{id:'decouverte',title:'Découverte de l’application',available:true,
+ intro:'Six étapes courtes pour apprendre à te servir de Nucléa TIIN : où trouver chaque outil et comment l’utiliser.',
+ phases:[['decouvrir','Découvrir'],['essayer','Essayer'],['retenir','À retenir']],
+ steps:[
+ {id:'ui-tableau',title:'Le tableau périodique',minutes:4,
+  summary:'Onglet Éléments : se déplacer, rechercher, filtrer, ouvrir une fiche.',
+  phases:{
+  decouvrir:[
+   {type:'text',html:'L’onglet <b>Éléments</b> affiche les 118 éléments. Sur téléphone, fais glisser le tableau avec le doigt, pince pour zoomer ou touche la <b>miniature</b> pour te déplacer.'},
+   {type:'tool',label:'Montrer la recherche',action:{tool:'spot',tab:'table',target:'#search'}},
+   {type:'text',html:'La <b>recherche</b> accepte un nom (uranium), un symbole (U), un numéro (92) ou un isotope (U235, U-235).'},
+   {type:'tool',label:'Montrer les familles',action:{tool:'spot',tab:'table',target:'#legend'}},
+   {type:'text',html:'Les <b>familles</b> colorent le tableau. Touche une famille pour n’afficher qu’elle et lire sa définition ; touche-la à nouveau pour revenir aux 118 éléments.'}],
+  essayer:[
+   {type:'read',id:'t-nobles',q:'Touche la famille « Gaz nobles ». Combien d’éléments restent affichés ?',action:{tool:'spot',tab:'table',target:'#legend'},answer:{value:7,tol:0},hint:'Compte les cases restées colorées.',explain:'7 gaz nobles : He, Ne, Ar, Kr, Xe, Rn et Og.'},
+   {type:'choice',id:'t-search',q:'Tape « U235 » dans la recherche et choisis la proposition. Que se passe-t-il ?',action:{tool:'spot',tab:'table',target:'#search'},options:['La fiche de l’uranium s’ouvre, sur l’isotope 235','Un calcul de décroissance démarre','Rien : il faut taper « uranium »'],correct:0,explain:'La recherche ouvre directement la fiche, déjà réglée sur l’isotope demandé.'}],
+  retenir:[
+   {type:'keys',items:['Éléments : le tableau des 118 éléments.','Recherche : nom, symbole, Z ou isotope (U235).','Familles : filtrer le tableau et lire leur définition.','Toucher une case ouvre la fiche de l’élément.']}]}},
+ {id:'ui-fiche',title:'La fiche d’un élément',minutes:5,
+  summary:'Choisir un isotope, lire ses données, accéder aux calculs.',
+  phases:{
+  decouvrir:[
+   {type:'text',html:'La fiche s’ouvre par-dessus le tableau. En haut, la liste <b>Isotope étudié</b> permet de changer d’isotope. Dessous : composition du noyau, notation, période, masses, modes de désintégration.'},
+   {type:'text',html:'Trois boutons mènent aux calculs : <b>Tracer la désintégration</b> (filiation), <b>Étudier sa décroissance</b> (calculateur prérempli) et <b>Énergie de liaison et Aston</b>. Ferme la fiche avec la croix ou le bouton Retour du téléphone.'},
+   {type:'tool',label:'Ouvrir la fiche du carbone',action:{tool:'element',z:6,iso:'12'}}],
+  essayer:[
+   {type:'read',id:'t-carbone',q:'Dans la fiche du carbone, combien d’isotopes ou états sont disponibles ?',action:{tool:'element',z:6,iso:'12'},answer:{value:14,tol:0},hint:'La phrase « … isotope(s) / état(s) disponibles » est juste au-dessus des données.',explain:'14 isotopes du carbone sont décrits, du plus léger au plus lourd connu.'},
+   {type:'choice',id:'t-chaine',q:'Ouvre la fiche du cobalt 60 et touche « Tracer la désintégration ». Sur quel noyau stable le parcours s’arrête-t-il ?',action:{tool:'element',z:27,iso:'60'},options:['Fe-60','Ni-60','Co-59'],correct:1,explain:'Le cobalt 60 se désintègre en nickel 60, stable.'},
+   {type:'choice',id:'t-source',q:'Où vérifier d’où viennent les données d’un isotope ?',options:['Dans « Source et précision des données », en bas de la fiche','Dans l’onglet Exercices','Nulle part'],correct:0,explain:'Chaque fiche donne sa source (AIEA), sa date d’extraction et la précision des valeurs.'}],
+  retenir:[
+   {type:'keys',items:['« Isotope étudié » change l’isotope affiché.','Les boutons de la fiche ouvrent la filiation, la décroissance et l’énergie de liaison.','La source des données est en bas de chaque fiche.','Croix ou bouton Retour : revenir au tableau.']}]}},
+ {id:'ui-formulaire',title:'Le formulaire et le calculateur',minutes:4,
+  summary:'Onglet Formulaire : les formules par rubrique et le calcul de décroissance.',
+  phases:{
+  decouvrir:[
+   {type:'text',html:'L’onglet <b>Formulaire</b> commence par le <b>calculateur de décroissance</b> : activité restante après une durée, ou durée pour atteindre une activité.'},
+   {type:'tool',label:'Montrer le calculateur',action:{tool:'spot',tab:'formulas',target:'#decayCalculator'}},
+   {type:'text',html:'Dessous, les formules sont rangées par <b>rubriques</b>. Touche une rubrique pour la déplier, puis une formule pour voir ses conditions d’emploi et un exemple.'},
+   {type:'tool',label:'Montrer les rubriques',action:{tool:'spot',tab:'formulas',target:'#formulaList'}}],
+  essayer:[
+   {type:'read',id:'t-rubriques',q:'Combien de rubriques compte le formulaire ?',action:{tool:'spot',tab:'formulas',target:'#formulaList'},answer:{value:6,tol:0},hint:'Compte les titres numérotés 1 à …',explain:'6 rubriques : atome et noyau, activité et décroissance, masse et énergie, dose, distance et écrans, conversions.'},
+   {type:'choice',id:'t-exemple',q:'Dans le calculateur, touche « Charger un exemple » puis « Calculer ». Qu’apparaît-il sous le résultat ?',action:{tool:'spot',tab:'formulas',target:'#decayCalculator'},options:['Les étapes du calcul et une courbe de décroissance','Le tableau périodique','Un QCM noté'],correct:0,explain:'Le calculateur montre le résultat, le détail du calcul et la courbe que l’on peut explorer.'}],
+  retenir:[
+   {type:'keys',items:['Formulaire : calculateur de décroissance puis 6 rubriques de formules.','Chaque formule indique ses conditions d’emploi.','Depuis une fiche, « Étudier sa décroissance » remplit le calculateur pour toi.']}]}},
+ {id:'ui-explorer',title:'Explorer : phénomènes et outils',minutes:4,
+  summary:'Visuels animés en plein écran, énergie de liaison, outil DATE.',
+  phases:{
+  decouvrir:[
+   {type:'text',html:'L’onglet <b>Explorer</b> réunit les <b>phénomènes animés</b> : chacun s’ouvre en plein écran et se manipule avec des curseurs. <b>Fermer</b> ou le bouton Retour ramène à Explorer.'},
+   {type:'tool',label:'Montrer les phénomènes animés',action:{tool:'spot',tab:'explore',target:'#visualGrid'}},
+   {type:'text',html:'Plus bas, les <b>outils de calcul</b> : énergie de liaison et courbe d’Aston, puis <b>DATE</b> pour comparer des façons d’organiser une intervention.'},
+   {type:'tool',label:'Montrer l’outil DATE',action:{tool:'spot',tab:'explore',target:'#dateTool'}}],
+  essayer:[
+   {type:'read',id:'t-visuels',q:'Combien de phénomènes animés propose Explorer ?',action:{tool:'spot',tab:'explore',target:'#visualGrid'},answer:{value:5,tol:0},hint:'Compte les cartes sous « Phénomènes animés ».',explain:'5 visuels : décroissance, atténuation, distance, désintégrations, filiation.'},
+   {type:'choice',id:'t-fermer',q:'Ouvre « Décroissance radioactive ». Comment revenir à Explorer ?',action:{tool:'visual',id:'decroissance'},options:['Avec « Fermer » ou le bouton Retour du téléphone','En fermant l’application','En rechargeant la page'],correct:0,explain:'« Fermer » ou Retour : tu retrouves Explorer là où tu l’avais laissé.'},
+   {type:'choice',id:'t-zoom',q:'Sur la courbe d’Aston, à quoi sert le bouton « Zoom 7–9 MeV » ?',action:{tool:'spot',tab:'explore',target:'#energyTool'},options:['À séparer les noyaux autour du maximum de la courbe','À changer d’unité','À lancer une animation'],correct:0,explain:'En vue complète, les noyaux lourds se tassent en haut : le zoom les sépare.'}],
+  retenir:[
+   {type:'keys',items:['Explorer : phénomènes animés en plein écran, puis outils de calcul.','« Fermer » ou Retour : revenir à Explorer.','Énergie de liaison et Aston, DATE : sous les phénomènes animés.']}]}},
+ {id:'ui-exercices',title:'S’entraîner',minutes:4,
+  summary:'Onglet Exercices : thème, niveau, aides ; le QCM de classe.',
+  phases:{
+  decouvrir:[
+   {type:'text',html:'Dans <b>Exercices</b>, choisis un <b>thème</b> et un <b>niveau</b> (1 à 3) : l’énoncé apparaît. Saisis ta réponse et son unité, puis <b>Vérifier</b>. Les aides arrivent une par une, jusqu’à la correction. Aucun résultat n’est enregistré.'},
+   {type:'tool',label:'Montrer les thèmes',action:{tool:'spot',tab:'exercises',target:'#exerciseTheme'}},
+   {type:'text',html:'La carte <b>QCM de classe</b> sert uniquement pendant une séance organisée par l’enseignant, sur le Wi-Fi de la classe.'},
+   {type:'tool',label:'Montrer le QCM de classe',action:{tool:'spot',tab:'exercises',target:'#joinCollective'}}],
+  essayer:[
+   {type:'read',id:'t-aides',q:'Ouvre un exercice et touche « Un coup de pouce » jusqu’au bout. Combien d’aides au maximum ?',action:{tool:'exercise',theme:0,level:1},answer:{value:4,tol:0},hint:'Le compteur affiche 2/4, 3/4…',explain:'4 aides : indice, formule, application, correction.'},
+   {type:'choice',id:'t-qcm',q:'Le QCM de classe fonctionne :',options:['seulement pendant une séance, sur le Wi-Fi de la classe et le PC de l’enseignant','partout, avec Internet','sans l’enseignant, à la maison'],correct:0,explain:'Le QCM passe par le PC de l’enseignant ; les exercices individuels, eux, marchent partout.'}],
+  retenir:[
+   {type:'keys',items:['Exercices : thème + niveau, puis Vérifier.','Aides une par une, jusqu’à la correction ; rien n’est noté.','QCM de classe : seulement en séance, avec l’enseignant.']}]}},
+ {id:'ui-reglages',title:'Réglages et hors connexion',minutes:3,
+  summary:'Thème, À propos, installation, utilisation sans réseau, mises à jour.',
+  phases:{
+  decouvrir:[
+   {type:'text',html:'En haut à droite : <b>ⓘ</b> ouvre « À propos » (sources, mises à jour) et la <b>lune / soleil</b> passe en thème sombre ou clair.'},
+   {type:'tool',label:'Montrer le bouton de thème',action:{tool:'spot',target:'#themeToggle'}},
+   {type:'text',html:'Installe l’application : menu du navigateur → <b>Ajouter à l’écran d’accueil</b>. Après un premier chargement, elle fonctionne <b>sans réseau</b>. Quand une nouvelle version est prête, un bandeau propose <b>Actualiser maintenant</b> ; ta progression est conservée.'}],
+  essayer:[
+   {type:'choice',id:'t-theme',q:'Touche la lune (ou le soleil). Que se passe-t-il ?',action:{tool:'spot',target:'#themeToggle'},options:['L’application passe en thème sombre (ou clair)','Le parcours recommence','Les données sont effacées'],correct:0,explain:'Le thème est mémorisé sur ton appareil ; touche à nouveau pour revenir.'},
+   {type:'choice',id:'t-horsligne',q:'L’application est installée et tu n’as plus de réseau :',options:['tout fonctionne : tableau, fiches, calculs, visuels et parcours','plus rien ne s’affiche','seul le tableau s’affiche'],correct:0,explain:'Tout est enregistré sur le téléphone au premier chargement. Seul le QCM de classe demande le Wi-Fi de la classe.'},
+   {type:'choice',id:'t-retrouver',q:'Où retrouver les parcours plus tard ?',options:['Dans l’onglet Parcours','Dans À propos','Il faut réinstaller l’application'],correct:0,explain:'L’onglet Parcours garde ta progression ; tu peux aussi explorer librement à tout moment.'}],
+  retenir:[
+   {type:'keys',items:['ⓘ : À propos ; lune / soleil : thème.','Ajouter à l’écran d’accueil, puis utilisation sans réseau.','Mise à jour : « Actualiser maintenant », progression conservée.','Onglet Parcours : reprendre là où tu t’étais arrêté.']}]}}
+ ]},
+/* ================= Physique nucléaire : les bases ================= */
+{id:'bases',title:'Physique nucléaire : les bases',available:true,
  intro:'Six étapes, du noyau de l’atome à la radioprotection. Chaque étape te fait manipuler les outils de Nucléa TIIN.',
  steps:[
  /* ------------------------------------------------------------------ 1 */
@@ -150,13 +239,13 @@ const parcours=[
    {type:'tool',label:'S’entraîner : Distance et écrans, niveau 1',action:{tool:'exercise',theme:4,level:1}}]}}
  ]},
 /* Parcours prévus : ils apparaissent comme « À venir » tant que available vaut false. */
-{id:'physique',title:'Physique nucléaire',available:false},
+{id:'radioactivite',title:'Radioactivité et décroissance',available:false},
 {id:'radioprotection',title:'Radioprotection',available:false},
 {id:'interventions',title:'Interventions nucléaires',available:false},
 {id:'premiere',title:'Parcours Première TIIN',available:false},
 {id:'terminale',title:'Parcours Terminale TIIN',available:false}
 ];
 const PHASES=[['decouvrir','Découvrir'],['observer','Observer'],['manipuler','Manipuler'],['comprendre','Comprendre'],['verifier','Vérifier']];
-const api={parcours,PHASES,get:id=>parcours.find(p=>p.id===id)};
+const api={parcours,PHASES,get:id=>parcours.find(p=>p.id===id),phasesOf:p=>p.phases||PHASES};
 root.NucleaParcoursData=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

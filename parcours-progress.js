@@ -31,6 +31,7 @@
   const api={
    KEY,
    get mode(){return state.mode},
+   get active(){return state.active},
    get persistent(){return persistent},
    get message(){return message},
    setMode(m){state.mode=m;save()},
