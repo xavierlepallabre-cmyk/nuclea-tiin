@@ -1,5 +1,5 @@
 {
-  "executedAt": "2026-10-23T17:28:57.429Z",
+  "executedAt": "2026-10-24T05:55:59.569Z",
   "results": [
     {
       "suite": "data.test.cjs",
@@ -53,6 +53,12 @@
       "suite": "parcours.test.cjs",
       "status": "passed",
       "output": "Parcours : 6 + 6 étapes, 56 activités, 10 zones d’interface, outils et réponses cohérents avec les données ; suivi local, reprise, réinitialisation et stockage refusé : OK\n",
+      "error": ""
+    },
+    {
+      "suite": "version.test.cjs",
+      "status": "passed",
+      "output": "Version v0.18 cohérente avec le cache nuclea-tiin-v018 : OK\n",
       "error": ""
     }
   ]
