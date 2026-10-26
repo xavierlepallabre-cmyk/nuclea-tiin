@@ -71,9 +71,9 @@ $("#search").addEventListener("input",e=>renderTable(e.target.value));
 const formulas=[["1 · Atome et noyau", [["A = Z + N", "Z : protons ; N : neutrons ; A : nucléons."], ["N = A − Z", "Pour un isotope donné."], ["nₑ = Z", "Atome électriquement neutre."], ["q = (Z − nₑ) e", "Ion monoatomique ; e = 1,602 × 10⁻¹⁹ C."], ["1 u = 1,66054 × 10⁻²⁷ kg", "1 u c² = 931,5 MeV."]]], ["2 · Activité et décroissance", [["𝒜(t) = λ N(t)", "1 Bq = 1 désintégration par seconde."], ["N(t) = N₀ e⁻λᵗ", "Un seul radionucléide, sans filiation."], ["𝒜(t) = 𝒜₀ e⁻λᵗ", "Même hypothèse ; t et T½ dans la même unité."], ["λ = ln(2) / T½", "Constante de décroissance."], ["t = ln(𝒜₀ / 𝒜) / λ", "Activité initiale et finale connues."], ["𝒜 = 𝒜₀ / 2ⁿ", "Après n périodes radioactives."]]], ["3 · Masse et énergie", [["Δm = Zmₚ + Nmₙ − mₙₒᵧₐᵤ", "Employer la masse du noyau, pas la masse atomique moyenne."], ["E_liaison = Δm c²", "Si Δm en u : E_liaison [MeV] = 931,5 × Δm [u]."], ["E_liaison / A", "Énergie de liaison par nucléon."], ["E = mc²", "1 eV = 1,602 × 10⁻¹⁹ J ; 1 MeV = 10⁶ eV."]]], ["4 · Dose et débit de dose", [["D = E_déposée / m", "Dose absorbée ; 1 Gy = 1 J·kg⁻¹."], ["Hₜ = wᵣ Dₜ", "Dose équivalente (Sv), un rayonnement."], ["Hₜ = Σᵣ wᵣ Dₜ,ᵣ", "Plusieurs rayonnements."], ["Ḣ = ΔH / Δt", "Débit moyen de dose équivalente."], ["H = Ḣ × t", "Débit constant ; 1 mSv = 10³ µSv = 10⁻³ Sv."]]], ["5 · Distance et écrans", [["Ḣ₂ = Ḣ₁ × (r₁ / r₂)²", "Source ponctuelle, sans écran ni diffusion."], ["I = I₀ e⁻μˣ", "Faisceau étroit ; atténuation exponentielle."], ["CDA = ln(2) / μ", "Couche de demi-atténuation."], ["I = I₀ / 2ⁿ", "Après n CDA."], ["DATE", "Distance — Activité — Temps — Écran."]]], ["6 · Conversions et repères", [["k = 10³ ; M = 10⁶ ; G = 10⁹", "Préfixes multiplicateurs."], ["m = 10⁻³ ; µ = 10⁻⁶ ; n = 10⁻⁹", "Préfixes sous-multiples."], ["1 h = 3 600 s ; 1 j = 86 400 s", "Conversions de temps."], ["1 nm = 10⁻⁹ m ; 1 fm = 10⁻¹⁵ m", "Conversions de longueur."], ["c = 3,00 × 10⁸ m·s⁻¹", "Vitesse de la lumière dans le vide."], ["ln(2) ≈ 0,693", "Vérifier les unités avant tout calcul."]]]];$("#formulaList").innerHTML=formulas.map(([title,items])=>{const[num,...rest]=title.split(" · ");return `<article class="formula"><div class="formula-head"><span class="formula-num">${num}</span><h2>${rest.join(" · ")}</h2></div>${items.map(([eq,desc])=>`<div class="formula-item"><div class="eq">${eq}</div><p>${desc}</p></div>`).join("")}</article>`}).join("");fetch("elements.json").then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.json()}).then(a=>{elements=a;window.dispatchEvent(new Event("elementsready"));buildFamilyLegend();renderTable();buildOverview();requestAnimationFrame(()=>{fitTable()})}).catch(err=>{$("#detail").textContent="Impossible de charger les éléments : "+err.message});if("serviceWorker"in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("./sw.js").catch(console.warn);
 
 // Navigation tactile du tableau — v0.2
-let lastPanEnd=0, zoom=1, drag=null, pinch=null;
+let lastPanEnd=0, zoom=1, drag=null, pinch=null, cellStretch=1; // cellStretch : cases élargies quand la hauteur limite le zoom
 const viewport=$("#tableViewport"), periodic=$("#periodic"), overview=$("#overview"), overviewWindow=$("#overviewWindow");
-function setZoom(value){const oldW=periodic.scrollWidth, oldH=periodic.scrollHeight, cx=(viewport.scrollLeft+viewport.clientWidth/2)/(oldW||1),cy=(viewport.scrollTop+viewport.clientHeight/2)/(oldH||1);zoom=Math.min(2.8,Math.max(.3,value));periodic.dataset.density=zoom<.65?"far":zoom<1.1?"medium":"near";periodic.style.setProperty("--cell",(56*zoom)+"px");periodic.style.setProperty("--row",(66*zoom)+"px");requestAnimationFrame(()=>centerAt(cx,cy));}
+function setZoom(value){const oldW=periodic.scrollWidth, oldH=periodic.scrollHeight, cx=(viewport.scrollLeft+viewport.clientWidth/2)/(oldW||1),cy=(viewport.scrollTop+viewport.clientHeight/2)/(oldH||1);zoom=Math.min(2.8,Math.max(.3,value));periodic.dataset.density=zoom<(cellStretch>1?.5:.65)?"far":zoom<1.1?"medium":"near";periodic.style.setProperty("--cell",(56*zoom*cellStretch)+"px");periodic.style.setProperty("--row",(66*zoom)+"px");requestAnimationFrame(()=>centerAt(cx,cy));}
 function centerAt(x,y){viewport.scrollLeft=Math.max(0,periodic.scrollWidth*x-viewport.clientWidth/2);viewport.scrollTop=Math.max(0,periodic.scrollHeight*y-viewport.clientHeight/2);updateWindow()}
 function updateWindow(){const w=periodic.scrollWidth||1,h=periodic.scrollHeight||1;overviewWindow.style.left=(viewport.scrollLeft/w*100)+"%";overviewWindow.style.top=(viewport.scrollTop/h*100)+"%";overviewWindow.style.width=(Math.min(1,viewport.clientWidth/w)*100)+"%";overviewWindow.style.height=(Math.min(1,viewport.clientHeight/h)*100)+"%";}
 function buildOverview(){const og=$("#overviewGrid");og.innerHTML="";for(const e of elements){if(activeFamily&&e.family!==activeFamily)continue;const tile=document.createElement("span");tile.className="overview-tile";tile.style.cssText=`grid-column:${e.c};grid-row:${e.r};background:${colors[e.family]}`;tile.title=e.name;og.append(tile)}updateWindow()}
@@ -145,10 +145,16 @@ document.addEventListener("keydown",e=>{
 });
 function fitTable(){
   if(activeFamily){updateWindow();return;}
-  const available=viewport.clientWidth-16;
-  if(window.matchMedia("(min-width: 701px) and (hover: hover) and (pointer: fine)").matches){
-    setZoom(Math.max(.5,Math.min(1.8,(available-68)/(18*56))));
-  }else setZoom(1);
+  if(!viewport.clientWidth)return; // tableau masqué : il sera ajusté à l'affichage de l'onglet
+  if(window.matchMedia("(min-width: 701px)").matches){
+    // v0.19 — tablette et ordinateur : tout le tableau tient dans l'écran d'accueil, en largeur et en hauteur.
+    const byWidth=(viewport.clientWidth-16-68)/(18*56);
+    const top=viewport.getBoundingClientRect().top+window.scrollY;
+    const byHeight=(window.innerHeight-top-16-36-30)/(9.32*66);
+    const z=Math.max(.55,Math.min(1.8,byWidth,byHeight));
+    // Si la hauteur limite, les cases s'élargissent (jusqu'à 1,4 fois) pour occuper la largeur disponible.
+    cellStretch=Math.max(1,Math.min(1.4,byWidth/z));setZoom(z);
+  }else{cellStretch=1;setZoom(1)}
   requestAnimationFrame(()=>centerAt(0,0));
 }
 // A reloaded page starts on the table; stale overlay state must not trap Back.
@@ -159,12 +165,15 @@ new ResizeObserver(()=>{
   const width=viewport.clientWidth;
   if(width&&width!==lastViewportWidth){
     lastViewportWidth=width;
-    if(window.matchMedia("(min-width: 701px) and (hover: hover) and (pointer: fine)").matches&&!detailOpen)fitTable();
+    if(window.matchMedia("(min-width: 701px)").matches&&!detailOpen)fitTable();
     else updateWindow();
   }
 }).observe(viewport);
 
 window.matchMedia("(hover: hover) and (pointer: fine)").addEventListener("change",()=>{if(!detailOpen)fitTable()});
+// Le tableau peut être masqué au démarrage (onglet Parcours) : l'ajuster quand on l'affiche.
+document.querySelector('nav [data-tab="table"]')?.addEventListener("click",()=>requestAnimationFrame(()=>{if(!detailOpen&&!activeFamily)fitTable()}));
+window.matchMedia("(orientation: portrait)").addEventListener("change",()=>setTimeout(()=>{if(!detailOpen)fitTable()},250));
 
 const familyDefinitions={
  alcalin:"Métaux du groupe 1, à l’exception de l’hydrogène. Leur électron externe se perd facilement : ils forment généralement des ions +1 et sont très réactifs.",
