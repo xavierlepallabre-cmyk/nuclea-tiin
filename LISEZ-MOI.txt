@@ -1,3 +1,9 @@
+Nucléa TIIN v0.19 — Tableau entier sur tablette
+
+Sur tablette (paysage ou portrait) et sur ordinateur, le tableau périodique est ajusté pour que les 118 éléments tiennent dans l’écran d’accueil, sans défilement : zoom calculé sur la largeur et la hauteur disponibles, cases élargies quand la hauteur limite, numéros atomiques conservés, en-tête plus compact sur les écrans peu hauts. Le téléphone garde son fonctionnement (défilement, pincement, miniature).
+
+---------------------------------------------------------------------
+
 Nucléa TIIN v0.17 — Parcours élève
 
 Nouvel onglet « Parcours », ouvert au premier lancement, avec deux parcours :

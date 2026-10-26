@@ -617,3 +617,24 @@ body.visual-open{overflow:hidden}
 /* Zone mise en évidence par la découverte de l'application */
 .pc-spot{outline:3px solid var(--accent)!important;outline-offset:4px;border-radius:var(--r-md);animation:pc-spot 1.2s ease-in-out 3}
 @keyframes pc-spot{50%{outline-offset:9px;outline-color:var(--accent-soft)}}
+
+/* ---------- Tableau entier sur tablette et ordinateur (v0.19) ----------
+   Le zoom est calculé pour que les 118 éléments tiennent dans l'écran d'accueil ;
+   la miniature et les boutons de zoom ne servent plus au-delà du téléphone. */
+@media (min-width:701px){
+  .overview,.table-tools,.table-hint{display:none}
+  .scroll{height:auto;max-height:none;min-height:0}
+  #table:not(.family-filtered) .periodic{margin:0 auto}
+}
+/* Écran peu haut (tablette à l'horizontale) : en-tête compact pour laisser la place au tableau. */
+@media (min-width:701px) and (max-height:950px){
+  main{padding-top:14px}
+  #table .page-head{margin-bottom:10px;align-items:center}
+  #table .page-head h1{font-size:26px}
+  #table .page-head .lead{font-size:13.5px;margin-top:2px}
+  #table .tag{margin-bottom:2px}
+  #table .filter-row{margin-bottom:10px;align-items:center}
+  #table .filter-label{padding-top:0}
+  #table .legend button{min-height:32px;padding:4px 11px 4px 6px;font-size:12.5px}
+  #table .legend button::before{width:15px;height:15px}
+}
