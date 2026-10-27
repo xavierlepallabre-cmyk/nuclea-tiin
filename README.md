@@ -60,7 +60,9 @@ Tu peux le réutiliser, le copier et l'adapter, à trois conditions :
 - **Pas d'utilisation commerciale** : pas de vente ni d'usage dans un service payant ;
 - **Partage dans les mêmes conditions** : diffuser les adaptations sous la même licence.
 
+Le logo du Bac Pro TIIN est une création de Xavier Le Pallabre : il est couvert par cette licence, comme le reste de ses contenus.
+
 Ne sont pas couverts par cette licence :
 - la police Lexend (`assets/fonts/`), sous licence SIL Open Font License 1.1 (voir `assets/fonts/OFL.txt`) ;
-- les logos du lycée Alexis de Tocqueville et du Bac Pro TIIN, propriété de l'établissement ;
+- le logo du lycée Alexis de Tocqueville, propriété de l'établissement ;
 - les données nucléaires issues de l'AIEA (LiveChart) et des autres sources listées dans `SOURCES.md`, qui restent soumises aux conditions de leurs producteurs.
