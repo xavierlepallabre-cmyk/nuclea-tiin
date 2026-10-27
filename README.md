@@ -44,3 +44,9 @@ Les résultats scientifiques structurés sont écrits dans `test-results/science
 - `PUBLICATION.md` : mise à jour GitHub Pages et proposition de validation avant publication.
 
 Le module DATE est un outil d’apprentissage, pas une étude dosimétrique réglementaire ou opérationnelle.
+
+## Auteur et droits
+
+Conception originale : Xavier Le Pallabre  
+Ressource pédagogique développée à titre personnel, avec l’assistance d’outils d’intelligence artificielle.  
+© 2026 Xavier Le Pallabre — Attribution de l’auteur original à conserver lors des réutilisations et adaptations, conformément à la licence applicable.
