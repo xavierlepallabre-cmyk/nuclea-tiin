@@ -29,9 +29,12 @@ document.addEventListener('DOMContentLoaded',()=>{
   article.querySelectorAll('.formula-item').forEach((item,index)=>{
    const inner=document.createElement('details');inner.className='formula-item';const sum=document.createElement('summary');sum.append(item.querySelector('.eq'));inner.append(sum);
    for(const [title,text] of [['Grandeurs et unités',quantities[group]],['Hypothèses',item.querySelector('p').textContent+' '+groupHyp[group]],['Exemple résolu',examples[group][index]||'Vérifier les unités avant de remplacer les valeurs.']]){const p=document.createElement('p'),strong=document.createElement('strong');strong.textContent=title+' : ';p.append(strong,document.createTextNode(text));inner.append(p);}
-   if(group===1){const button=document.createElement('button');button.className='btn btn-ghost';button.textContent='Ouvrir le calculateur de décroissance';button.onclick=()=>{document.querySelector('#decayCalculator').scrollIntoView({block:'start'});document.querySelector('#rdInitial').focus({preventScroll:true})};inner.append(button)}
+   if(group===1){const button=document.createElement('button');button.className='btn btn-ghost';button.textContent='Aller à l’exemple : calcul de décroissance';button.onclick=()=>{document.querySelector('#decayCalculator').scrollIntoView({block:'start'});document.querySelector('#rdInitial').focus({preventScroll:true})};inner.append(button)}
    if(group===2||group===3||group===4){const button=document.createElement('button');button.className='btn btn-ghost';button.textContent=group===2?'Ouvrir énergie de liaison et Aston':'Ouvrir le module DATE';button.onclick=()=>{document.querySelector('[data-tab="explore"]').click();document.querySelector(group===2?'#energyTool':'#dateTool').scrollIntoView({block:'start'})};inner.append(button);}
    outer.append(inner);
-  });outer.addEventListener('toggle',()=>{if(outer.open)document.querySelectorAll('#formulaList > details').forEach(other=>{if(other!==outer)other.open=false})});article.replaceWith(outer);
+  });
+  // Rubrique 2 : le calcul guidé de décroissance est rangé ici, comme exemple d'application.
+  const calc=group===1&&document.querySelector('#decayCalculator');if(calc)outer.append(calc);
+  outer.addEventListener('toggle',()=>{if(outer.open)document.querySelectorAll('#formulaList > details').forEach(other=>{if(other!==outer)other.open=false})});article.replaceWith(outer);
  });
 });
