@@ -54,18 +54,18 @@ const parcours=[
   retenir:[
    {type:'keys',items:['« Isotope étudié » change l’isotope affiché.','Les boutons de la fiche ouvrent la filiation, la décroissance et l’énergie de liaison.','La source des données est en bas de chaque fiche.','Croix ou bouton Retour : revenir au tableau.']}]}},
  {id:'ui-formulaire',title:'Le formulaire et le calculateur',minutes:4,
-  summary:'Onglet Formulaire : les formules par rubrique et le calcul de décroissance.',
+  summary:'Onglet Formulaire : les formules par rubrique, et le calcul de décroissance en exemple.',
   phases:{
   decouvrir:[
-   {type:'text',html:'L’onglet <b>Formulaire</b> commence par le <b>calculateur de décroissance</b> : activité restante après une durée, ou durée pour atteindre une activité.'},
-   {type:'tool',label:'Montrer le calculateur',action:{tool:'spot',tab:'formulas',target:'#decayCalculator'}},
-   {type:'text',html:'Dessous, les formules sont rangées par <b>rubriques</b>. Touche une rubrique pour la déplier, puis une formule pour voir ses conditions d’emploi et un exemple.'},
-   {type:'tool',label:'Montrer les rubriques',action:{tool:'spot',tab:'formulas',target:'#formulaList'}}],
+   {type:'text',html:'Dans l’onglet <b>Formulaire</b>, les formules sont rangées par <b>rubriques</b>. Touche une rubrique pour la déplier, puis une formule pour voir ses conditions d’emploi et un exemple.'},
+   {type:'tool',label:'Montrer les rubriques',action:{tool:'spot',tab:'formulas',target:'#formulaList'}},
+   {type:'text',html:'La rubrique <b>2 · Activité et décroissance</b> se termine par un exemple d’application : le <b>calculateur de décroissance</b> (activité restante après une durée, ou durée pour atteindre une activité).'},
+   {type:'tool',label:'Montrer le calculateur',action:{tool:'spot',tab:'formulas',target:'#decayCalculator'}}],
   essayer:[
    {type:'read',id:'t-rubriques',q:'Combien de rubriques compte le formulaire ?',action:{tool:'spot',tab:'formulas',target:'#formulaList'},answer:{value:6,tol:0},hint:'Compte les titres numérotés 1 à …',explain:'6 rubriques : atome et noyau, activité et décroissance, masse et énergie, dose, distance et écrans, conversions.'},
    {type:'choice',id:'t-exemple',q:'Dans le calculateur, touche « Charger un exemple » puis « Calculer ». Qu’apparaît-il sous le résultat ?',action:{tool:'spot',tab:'formulas',target:'#decayCalculator'},options:['Les étapes du calcul et une courbe de décroissance','Le tableau périodique','Un QCM noté'],correct:0,explain:'Le calculateur montre le résultat, le détail du calcul et la courbe que l’on peut explorer.'}],
   retenir:[
-   {type:'keys',items:['Formulaire : calculateur de décroissance puis 6 rubriques de formules.','Chaque formule indique ses conditions d’emploi.','Depuis une fiche, « Étudier sa décroissance » remplit le calculateur pour toi.']}]}},
+   {type:'keys',items:['Formulaire : 6 rubriques de formules ; le calculateur de décroissance est dans la rubrique 2.','Chaque formule indique ses conditions d’emploi.','Depuis une fiche, « Étudier sa décroissance » remplit le calculateur pour toi.']}]}},
  {id:'ui-explorer',title:'Explorer : phénomènes et outils',minutes:4,
   summary:'Visuels animés en plein écran, énergie de liaison, outil DATE.',
   phases:{

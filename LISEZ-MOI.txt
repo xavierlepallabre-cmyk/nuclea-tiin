@@ -1,3 +1,9 @@
+Nucléa TIIN v0.23 — Le calcul de décroissance rangé dans sa rubrique
+
+Dans l’onglet Formulaire, le calculateur de décroissance n’est plus en tête de page : il est devenu l’exemple d’application de la rubrique « 2 · Activité et décroissance », à la suite de ses formules. Depuis une fiche d’isotope (« Étudier sa décroissance ») ou depuis le parcours, la rubrique s’ouvre directement sur le calculateur prérempli.
+
+---------------------------------------------------------------------
+
 Nucléa TIIN v0.22 — Nouveau logo Bac Pro TIIN
 
 Le nouveau logo du Bac Pro TIIN (un atome dans un sas, cycle logistique · maintenance · démantèlement · déchets) remplace l’ancien sur la page « À propos », en version vectorielle nette à toutes les tailles. L’icône de l’application (écran d’accueil Android et iPhone, onglet du navigateur) reprend le symbole du logo ; au prochain lancement, la mise à jour est proposée comme d’habitude. Sur certains téléphones, l’icône déjà installée ne change qu’après avoir retiré puis réinstallé l’application.

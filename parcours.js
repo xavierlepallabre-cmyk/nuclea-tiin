@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   table(){go('table')},
   // Mettre en évidence une zone de l'interface (découverte de l'application).
   spot(a){if(a.tab)go(a.tab);const el=document.querySelector(a.target);if(!el)return;
+   const box=el.closest('details');if(box&&!box.open)box.open=true;
    el.scrollIntoView({block:'center',behavior:reduced()?'auto':'smooth'});el.classList.remove('pc-spot');void el.offsetWidth;el.classList.add('pc-spot');
    clearTimeout(el._pcSpot);el._pcSpot=setTimeout(()=>el.classList.remove('pc-spot'),4000)},
   element(a){go('table');isotopeSelection[a.z]=String(a.iso);showElement(a.z,true);
@@ -31,7 +32,7 @@ document.addEventListener('DOMContentLoaded',()=>{
    const mode=$('#rdMode');mode.value='activity';mode.dispatchEvent(new Event('change',{bubbles:true}));
    $('#rdInitial').value=a.initial;$('#rdInitialUnit').value=a.initialUnit;$('#rdDuration').value=a.duration;$('#rdDurationUnit').value=a.durationUnit;
    RadioactiveDecay.prefill({name:`${el.s}-${a.iso}`,half:v.half,unit:timeMap[v.unit],unc:v.unc,approx:v.operator==='AP',extracted:v.extracted,url:`https://nds.iaea.org/relnsd/v1/data?fields=${v.source}&nuclides=${v.a}${el.s.toLowerCase()}`});
-   $('#rdForm').requestSubmit();$('#decayCalculator').scrollIntoView({block:'start'})},
+   $('#rdForm').requestSubmit();RadioactiveDecay.reveal();$('#decayCalculator').scrollIntoView({block:'start'})},
   energy(a){NuclearEnergy.open(a.z,{a:a.a})},
   exercise(a){go('exercises');$(`#exerciseTheme [data-value="${a.theme}"]`)?.click();$(`#exerciseLevel [data-value="${a.level}"]`)?.click();$('#exerciseTools')?.scrollIntoView({block:'start'})},
   date(a){go('explore');const s=$('#dateTool');s?.querySelector(`[data-date="${a.mode}"]`)?.click();s?.scrollIntoView({block:'start'})},
