@@ -508,7 +508,7 @@ body.visual-open{overflow:hidden}
 .logo-row{display:flex;gap:10px;align-items:stretch}
 /* Largeur de chaque plaque proportionnelle au rapport largeur/hauteur de son logo : les deux ont alors la même hauteur. */
 .logo-row .logo-plate{flex:1.163 1 0;min-width:0;padding:10px}
-.logo-row .logo-plate:last-child{flex-grow:2.338}
+.logo-row .logo-plate:last-child{flex-grow:3.088}
 .logo-row .logo-plate img{width:100%;height:auto;max-height:none;object-fit:contain}
 
 /* ---------- Parcours élève (v0.17) ---------- */

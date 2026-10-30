@@ -1,3 +1,9 @@
+Nucléa TIIN v0.22 — Nouveau logo Bac Pro TIIN
+
+Le nouveau logo du Bac Pro TIIN (un atome dans un sas, cycle logistique · maintenance · démantèlement · déchets) remplace l’ancien sur la page « À propos », en version vectorielle nette à toutes les tailles. L’icône de l’application (écran d’accueil Android et iPhone, onglet du navigateur) reprend le symbole du logo ; au prochain lancement, la mise à jour est proposée comme d’habitude. Sur certains téléphones, l’icône déjà installée ne change qu’après avoir retiré puis réinstallé l’application.
+
+---------------------------------------------------------------------
+
 Nucléa TIIN v0.19 — Tableau entier sur tablette
 
 Sur tablette (paysage ou portrait) et sur ordinateur, le tableau périodique est ajusté pour que les 118 éléments tiennent dans l’écran d’accueil, sans défilement : zoom calculé sur la largeur et la hauteur disponibles, cases élargies quand la hauteur limite, numéros atomiques conservés, en-tête plus compact sur les écrans peu hauts. Le téléphone garde son fonctionnement (défilement, pincement, miniature).
