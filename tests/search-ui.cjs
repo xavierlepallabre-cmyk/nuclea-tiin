@@ -29,8 +29,20 @@ const server=http.createServer((req,res)=>{let rel=decodeURIComponent(req.url.sp
   // Ouverture au clavier (/) et fermeture par Échap.
   await page.keyboard.press('/');await page.waitForTimeout(150);assert.equal(await page.evaluate(()=>document.querySelector('#searchDialog').hidden),false);
   await page.keyboard.press('Escape');await page.waitForTimeout(150);assert.ok(await page.evaluate(()=>document.querySelector('#searchDialog').hidden));
+  // Mini-jeu caché : « 235 » dans la loupe, puis trois appuis sur la case U de la fiche de l'uranium.
+  assert.deepEqual(await first('235'),['se:Un neutron, et tout bascule…']);
+  await page.click('#searchOpen');await page.fill('#searchAll','235');await page.keyboard.press('Enter');await page.waitForTimeout(1200);
+  let g=page.frames().find(x=>x.url().includes('reaction.html'));assert.ok(g,'mini-jeu ouvert depuis la loupe');
+  assert.equal(await g.evaluate(()=>document.querySelectorAll('#levels [data-l]').length),4);
+  await g.click('#actBtn');const bb=await g.locator('#board').boundingBox();await page.mouse.click(bb.x+bb.width/2,bb.y+bb.height/3);await page.waitForTimeout(400);
+  assert.equal(await g.evaluate(()=>window.__nucleaJeu.st.phase),'run');
+  await page.goBack();await page.waitForTimeout(400);assert.ok(await page.evaluate(()=>document.querySelector('#visualViewer').hidden));
+  await page.evaluate(()=>{document.querySelector('[data-tab="table"]').click();showElement(92,true)});await page.waitForTimeout(300);
+  for(let i=0;i<3;i++)await page.click('#detailContent .detailhead .tile');await page.waitForTimeout(900);
+  assert.equal(await page.evaluate(()=>document.querySelector('#visualViewer').hidden),false);assert.ok(page.frames().some(x=>x.url().includes('reaction.html')),'mini-jeu ouvert depuis la fiche de l’uranium');
+  await page.goBack();await page.waitForTimeout(400);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth<=1),true);
-  await page.close();console.log(`${w}px ${scheme} : recherche (isotopes, éléments, formules, outils, phénomènes, parcours, exercices), navigation, Retour, clavier et vallée de la stabilité OK`);
+  await page.close();console.log(`${w}px ${scheme} : recherche (isotopes, éléments, formules, outils, phénomènes, parcours, exercices), navigation, Retour, clavier, vallée de la stabilité et mini-jeu caché OK`);
  }
  assert.deepEqual(errors,[]);
 }finally{await browser.close();server.close()}})().catch(e=>{console.error(e);server.close();process.exitCode=1});

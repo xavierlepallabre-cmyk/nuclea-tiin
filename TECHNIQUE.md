@@ -50,3 +50,7 @@ Quatre couches séparées :
 - Outils scientifiques : inchangés. Aucun nouveau simulateur, aucune dépendance.
 
 Démarrage : un élève qui n'a pas choisi « Explorer librement » arrive sur l'onglet Parcours ; après ce choix, l'application rouvre sur le tableau. Le parcours est indépendant du QCM de classe. Tests : `tests/parcours.test.cjs` (données, réponses recalculées depuis les données embarquées, suivi) et `tests/parcours-ui.cjs` (parcours complet dans un navigateur). Les tests d'interface historiques démarrent en mode « Explorer librement ».
+
+## Mini-jeu caché « Réaction en chaîne » — v0.27
+
+`visuels/reaction.html`, ouvert dans la visionneuse des phénomènes animés mais sans carte dans Explorer. Deux déclencheurs : taper « 235 » dans la loupe, ou toucher trois fois en moins de 1,5 s la case « U » de la fiche de l'uranium. Quatre niveaux (premier neutron, masse critique, enrichissement, pilotage par barres de contrôle). Seuls les niveaux débloqués et les étoiles sont gardés sur l'appareil (`nuclea-jeu-niveaux`, `nuclea-jeu-etoiles`), effacés avec les autres données locales. Modèle volontairement simplifié, signalé sous le plateau.
