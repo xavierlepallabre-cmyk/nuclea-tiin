@@ -75,7 +75,7 @@ const parcours=[
    {type:'text',html:'Plus bas, les <b>outils de calcul</b> : énergie de liaison et courbe d’Aston, puis <b>DATE</b> pour comparer des façons d’organiser une intervention.'},
    {type:'tool',label:'Montrer l’outil DATE',action:{tool:'spot',tab:'explore',target:'#dateTool'}}],
   essayer:[
-   {type:'read',id:'t-visuels',q:'Combien de phénomènes animés propose Explorer ?',action:{tool:'spot',tab:'explore',target:'#visualGrid'},answer:{value:5,tol:0},hint:'Compte les cartes sous « Phénomènes animés ».',explain:'5 visuels : décroissance, atténuation, distance, désintégrations, filiation.'},
+   {type:'read',id:'t-visuels',q:'Combien de phénomènes animés propose Explorer ?',action:{tool:'spot',tab:'explore',target:'#visualGrid'},answer:{value:6,tol:0},hint:'Compte les cartes sous « Phénomènes animés ».',explain:'6 visuels : décroissance, atténuation, distance, désintégrations, vallée de la stabilité, filiation.'},
    {type:'choice',id:'t-fermer',q:'Ouvre « Décroissance radioactive ». Comment revenir à Explorer ?',action:{tool:'visual',id:'decroissance'},options:['Avec « Fermer » ou le bouton Retour du téléphone','En fermant l’application','En rechargeant la page'],correct:0,explain:'« Fermer » ou Retour : tu retrouves Explorer là où tu l’avais laissé.'},
    {type:'choice',id:'t-zoom',q:'Sur la courbe d’Aston, à quoi sert le bouton « Zoom 7–9 MeV » ?',action:{tool:'spot',tab:'explore',target:'#energyTool'},options:['À séparer les noyaux autour du maximum de la courbe','À changer d’unité','À lancer une animation'],correct:0,explain:'En vue complète, les noyaux lourds se tassent en haut : le zoom les sépare.'}],
   retenir:[

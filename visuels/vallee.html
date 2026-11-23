@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="stylesheet" href="../assets/fonts/lexend.css">
+<script>try{const t=localStorage.getItem("nuclea-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}
+if(window.self!==window.top)document.documentElement.classList.add("embedded");</script>
+<title>Vallée de la stabilité</title>
+</head>
+<body>
+<style>
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+.embedded header h1{display:none}
+.embedded body{padding-top:12px}
+:root{
+  --bg:#F4F6FA; --panel:#FFFFFF; --ink:#0E1B36; --muted:#4A5A75; --line:#D5DDEA; --brand:#1A3C89; --accent:#F18A52; --accent-text:#A8501C;
+  /* modes de désintégration : code proche des cartes des nucléides usuelles */
+  --m-stable:#0E1B36; --m-bm:#3D6BD6; --m-bp:#D9483B; --m-a:#E0A400; --m-sf:#1E7A4F; --m-p:#F18A52; --m-n:#8A5CC2; --m-x:#B8C2D3;
+  --grid:#E3E9F2; --magic:#A8501C;
+  --f-body:Lexend,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0A1430; --panel:#12204A; --ink:#EEF2FA; --muted:#A9B6D3; --line:#2B3F72; --brand:#9DB8F5; --accent:#F6A06E; --accent-text:#F6A06E;
+  --m-stable:#FFFFFF; --m-bm:#6F98F2; --m-bp:#F0705F; --m-a:#F2C14E; --m-sf:#4FBF86; --m-p:#F6A06E; --m-n:#B08BE8; --m-x:#4A5C86;
+  --grid:#1A2C5C; --magic:#F6A06E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A1430; --panel:#12204A; --ink:#EEF2FA; --muted:#A9B6D3; --line:#2B3F72; --brand:#9DB8F5; --accent:#F6A06E; --accent-text:#F6A06E;
+  --m-stable:#FFFFFF; --m-bm:#6F98F2; --m-bp:#F0705F; --m-a:#F2C14E; --m-sf:#4FBF86; --m-p:#F6A06E; --m-n:#B08BE8; --m-x:#4A5C86;
+  --grid:#1A2C5C; --magic:#F6A06E; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:14px}
+header h1{font-weight:700;font-size:clamp(26px,4vw,36px);margin:0;color:var(--brand)}
+header p{margin:4px 0 0;color:var(--muted);max-width:75ch}
+.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:end;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.field{display:grid;gap:4px;min-width:0}
+.lab{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+button{font:inherit;cursor:pointer}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;width:max-content;background:var(--bg)}
+.seg button{border:0;background:transparent;color:var(--ink);padding:7px 14px;font-size:14px;min-height:38px}
+.seg button[aria-pressed="true"]{background:var(--brand);color:var(--panel);font-weight:600}
+.chk{display:flex;align-items:center;gap:7px;font-size:14px;min-height:38px;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--brand)}
+.find{display:flex;gap:6px}
+.find input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:7px 14px;width:170px;min-height:38px}
+.find button,.zoom button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 14px;min-height:38px;font-size:14px}
+.find button{background:var(--brand);border-color:var(--brand);color:var(--panel);font-weight:600}
+.zoom{display:flex;gap:6px;flex-wrap:wrap}
+.zoom button.ico{width:38px;padding:0;font-size:19px;font-weight:600}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.findmsg{font-size:13px;color:var(--accent-text);min-height:1em}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.chart{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+.chart svg{display:block;width:100%;height:min(68vh,620px);cursor:grab}
+.chart svg.drag{cursor:grabbing}
+.hint{display:block;font-size:12px;color:var(--muted);padding:6px 12px;border-top:1px solid var(--line)}
+.side{display:grid;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.card h2{font-size:15px;margin:0 0 8px;color:var(--brand)}
+.legend{display:grid;gap:5px;margin:0;padding:0;list-style:none;font-size:13.5px}
+.legend li{display:flex;align-items:center;gap:9px}
+.legend i{width:14px;height:14px;border-radius:3px;flex:none}
+.legend b{margin-left:auto;font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}
+.info .nuc{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.info .tile{width:62px;height:62px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-size:22px;color:#fff;position:relative;flex:none}
+.info .tile small{position:absolute;left:6px;top:3px;font-size:11px;font-weight:600}
+.info .tile.light{color:#0E1B36}
+.info h3{margin:0;font-size:17px}
+.info dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:6px 0 8px;font-size:14px}
+.info dt{color:var(--muted)}
+.info dd{margin:0;font-variant-numeric:tabular-nums}
+.info p{margin:6px 0 0;font-size:14px}
+.info .pos{padding:8px 10px;border-radius:8px;background:color-mix(in srgb,var(--accent) 12%,var(--panel));border-left:3px solid var(--accent)}
+.info .open{margin-top:10px;border:1px solid var(--brand);background:transparent;color:var(--brand);border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px}
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.keys .card p{margin:0;font-size:14px}
+.keys .card h3{margin:0 0 4px;font-size:15px;color:var(--brand)}
+.src{font-size:12.5px;color:var(--muted);margin:0}
+svg text{font-family:var(--f-body)}
+.ax text{fill:var(--muted);font-size:2.2px}
+.ax line{stroke:var(--grid);stroke-width:.12}
+.ax .title{fill:var(--ink);font-size:2.6px;font-weight:600}
+.magic line{stroke:var(--magic);stroke-width:.18;stroke-dasharray:.6 .5;opacity:.75}
+.magic text{fill:var(--magic);font-size:1.9px;font-weight:600}
+.nz line{stroke:var(--muted);stroke-width:.2;stroke-dasharray:1 .6}
+.nz text{fill:var(--muted);font-size:2.2px;font-weight:600}
+.cells rect{shape-rendering:crispEdges}
+.sel{fill:none;stroke:var(--accent);stroke-width:.35}
+.lbl text{fill:var(--ink);font-size:1.3px;font-weight:600;paint-order:stroke;stroke:var(--panel);stroke-width:.5px}
+@media (max-width:900px){.main{grid-template-columns:1fr}.chart svg{height:auto;aspect-ratio:1.35}}
+@media (max-width:520px){.find input{width:130px}.controls{gap:10px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<div class="wrap">
+<header>
+ <h1>Vallée de la stabilité</h1>
+ <p>Tous les noyaux connus, rangés selon leur nombre de neutrons N et de protons Z. Les noyaux stables dessinent une « vallée » ; de part et d’autre, les noyaux instables se désintègrent pour s’en rapprocher.</p>
+</header>
+
+<div class="controls">
+ <div class="field"><span class="lab" id="colLab">Couleur</span>
+  <div class="seg" role="group" aria-labelledby="colLab"><button type="button" data-col="mode" aria-pressed="true">Mode de désintégration</button><button type="button" data-col="half" aria-pressed="false">Demi-vie</button></div></div>
+ <div class="field"><span class="lab">Repères</span>
+  <div style="display:flex;gap:14px;flex-wrap:wrap"><label class="chk"><input type="checkbox" id="optNZ" checked>Droite N = Z</label><label class="chk"><input type="checkbox" id="optMagic">Nombres magiques</label></div></div>
+ <div class="field"><label class="lab" for="findIn">Aller à un noyau</label>
+  <form class="find" id="findForm"><input id="findIn" type="text" placeholder="U-235, Co 60, plomb 208…" autocomplete="off" spellcheck="false"><button type="submit">Voir</button></form>
+  <span class="findmsg" id="findMsg" role="status"></span></div>
+ <div class="field"><span class="lab">Vue</span>
+  <div class="zoom"><button type="button" class="ico" id="zIn" aria-label="Zoomer">+</button><button type="button" class="ico" id="zOut" aria-label="Dézoomer">−</button><button type="button" data-view="all">Tout</button><button type="button" data-view="light">Légers</button><button type="button" data-view="heavy">Lourds</button></div></div>
+</div>
+
+<div class="main">
+ <div class="chart" id="chart">
+  <svg id="svg" role="img" aria-label="Carte des noyaux : nombre de neutrons N en abscisse, nombre de protons Z en ordonnée. Touchez une case pour afficher le noyau." viewBox="0 0 10 10">
+   <g class="ax" id="ax"></g>
+   <g class="nz" id="nz"></g>
+   <g class="magic" id="magic" hidden></g>
+   <g class="cells" id="cells"></g>
+   <g class="lbl" id="lbl"></g>
+   <rect class="sel" id="sel" width="1" height="1" hidden></rect>
+  </svg>
+  <span class="hint" id="hint">Glisser pour déplacer · pincer ou molette pour zoomer · toucher une case</span>
+ </div>
+ <div class="side">
+  <div class="card"><h2 id="legTitle">Mode de désintégration principal</h2><ul class="legend" id="legend"></ul></div>
+  <div class="card info" id="info" aria-live="polite"><h2>Noyau choisi</h2><p>Touchez une case de la carte, ou tapez un noyau dans « Aller à ».</p></div>
+ </div>
+</div>
+
+<div class="keys">
+ <div class="card"><h3>Une vallée étroite</h3><p id="kStable">Seuls quelques centaines de noyaux sont stables, sur plus de trois mille connus. Ils forment une bande étroite : la vallée de la stabilité.</p></div>
+ <div class="card"><h3>De N = Z à N &gt; Z</h3><p>Pour les noyaux légers, la vallée suit la droite N = Z (carbone 12 : 6 p, 6 n). En montant, il faut de plus en plus de neutrons pour tenir le noyau : le plomb 208 a 126 neutrons pour 82 protons.</p></div>
+ <div class="card"><h3>Retour vers la vallée</h3><p><b style="color:var(--m-bm)">Trop de neutrons</b> (sous la vallée) : désintégration β⁻, un neutron devient proton. <b style="color:var(--m-bp)">Trop de protons</b> (au-dessus) : β⁺ ou capture électronique, un proton devient neutron.</p></div>
+ <div class="card"><h3>Les noyaux lourds</h3><p>Au-delà du plomb (Z = 82), aucun noyau n’est stable : les noyaux lourds émettent surtout des particules <b style="color:var(--m-a)">α</b> ; les plus lourds subissent aussi la <b style="color:var(--m-sf)">fission spontanée</b>. L’uranium 238, l’uranium 235 et le thorium 232 sont si lents à se désintégrer qu’on les trouve encore dans la nature.</p></div>
+</div>
+<p class="src">Données : états fondamentaux de l’AIEA (LiveChart, extraction du 18 octobre 2023), comme les fiches isotopiques de Nucléa. Chaque case est colorée selon le mode de désintégration le plus probable renseigné ; les branches secondaires ne sont pas représentées.</p>
+</div>
+
+<script src="../isotopes.js"></script>
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const NS='http://www.w3.org/2000/svg';
+const MAXZ=118;
+const CATS=[
+ {k:'stable',t:'Stable',v:'--m-stable'},
+ {k:'bm',t:'β⁻ (trop de neutrons)',v:'--m-bm'},
+ {k:'bp',t:'β⁺ ou capture électronique',v:'--m-bp'},
+ {k:'a',t:'α',v:'--m-a'},
+ {k:'sf',t:'Fission spontanée',v:'--m-sf'},
+ {k:'p',t:'Émission de proton',v:'--m-p'},
+ {k:'n',t:'Émission de neutron',v:'--m-n'},
+ {k:'x',t:'Non renseigné ou autre',v:'--m-x'}];
+const MODE_TXT={bm:'β⁻',bp:'β⁺ / capture électronique',a:'α',sf:'fission spontanée',p:'émission de proton',n:'émission de neutron'};
+const modeName=m=>{const c=cat(m);if(MODE_TXT[c])return MODE_TXT[c];if(/NE|MG|SI|14C/i.test(m))return 'émission d’un fragment ('+m.replace(/[{}+]/g,'')+')';if(m==='IT')return 'transition isomérique';return m};
+const sci=(v,d)=>{const [m,e]=v.toExponential(d).split('e');return m.replace('.',',')+'·10'+sup(String(+e)).replace('-','⁻')};
+const pct=p=>{const v=parseFloat(p);if(isNaN(v))return '';return ' '+(v>=0.01?v.toLocaleString('fr-FR',{maximumSignificantDigits:3}):sci(v,1))+' %'};
+function cat(mode){if(!mode)return 'x';const m=mode.toUpperCase();
+ if(m==='A')return 'a';if(m.includes('SF')&&!m.startsWith('B')&&!m.startsWith('EC'))return 'sf';if(m==='ECSF')return 'sf';
+ if(m.startsWith('B-')||m==='2B-')return 'bm';if(m.startsWith('B+')||m.startsWith('EC')||m==='2EC'||m==='2B+')return 'bp';
+ if(m==='P'||m==='2P')return 'p';if(m==='N'||m==='2N')return 'n';return 'x';}
+// Demi-vie : 8 classes de durée
+const HB=[{max:1,t:'< 1 s',c:'#FDE3A7'},{max:60,t:'1 s à 1 min',c:'#F8C171'},{max:3600,t:'1 min à 1 h',c:'#F09A55'},{max:86400,t:'1 h à 1 jour',c:'#DC7143'},{max:3.156e7,t:'1 jour à 1 an',c:'#BB4B3E'},{max:3.156e10,t:'1 an à 1 000 ans',c:'#8E2C4B'},{max:Infinity,t:'plus de 1 000 ans',c:'#5A1E5C'}];
+const SUP={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+const sup=n=>String(n).replace(/\d/g,d=>SUP[d]);
+let EL=[];const NUC=[];
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const clean=s=>String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+
+function build(){
+ for(const [zs,L] of Object.entries(isotopes)){const z=+zs;
+  for(const i of L){if(i.label)continue;const n=i.a-z;let best=null;
+   for(const d of i.decays){const p=parseFloat(d.percent);if(!best||(isNaN(p)?0:p)>(isNaN(parseFloat(best.percent))?0:parseFloat(best.percent)))best=d}
+   NUC.push({z,n,a:i.a,iso:i,c:i.stable?'stable':cat(best&&best.mode),sec:i.stable?Infinity:(i.seconds?Number(i.seconds):NaN)});}}
+ // bande des isotopes stables par élément
+ window.STAB={};for(const q of NUC)if(q.c==='stable'){const s=STAB[q.z]||(STAB[q.z]={min:q.n,max:q.n});s.min=Math.min(s.min,q.n);s.max=Math.max(s.max,q.n)}
+ const maxN=Math.max(...NUC.map(q=>q.n));window.W=maxN+8;window.H=MAXZ+6;
+ const stableCount=NUC.filter(q=>q.c==='stable').length;
+ $('#kStable').textContent=`Sur les ${NUC.length.toLocaleString('fr-FR')} noyaux de la carte, ${stableCount} seulement sont stables. Ils forment une bande étroite : la vallée de la stabilité.`;
+ // axes (origine en bas à gauche : y = H-4-Z)
+ const ax=$('#ax');let s='';
+ for(let n=0;n<=maxN;n+=10){s+=`<line x1="${n+4.5}" y1="0" x2="${n+4.5}" y2="${H-4}"/><text x="${n+4.5}" y="${H-1.2}" text-anchor="middle">${n}</text>`}
+ for(let z=0;z<=MAXZ;z+=10){const y=Y(z)+.5;s+=`<line x1="4" y1="${y}" x2="${W}" y2="${y}"/><text x="3.4" y="${y+.75}" text-anchor="end">${z}</text>`}
+ s+=`<text class="title" x="${W/2}" y="${H+1.4}" text-anchor="middle">Nombre de neutrons N →</text>`;
+ ax.innerHTML=s;
+ $('#nz').innerHTML=`<line x1="${X(0)}" y1="${Y(0)+1}" x2="${X(MAXZ)+1}" y2="${Y(MAXZ)}"/><text x="${X(MAXZ)-6}" y="${Y(MAXZ)+.5}" text-anchor="end">N = Z</text>`;
+ const MAG=[2,8,20,28,50,82,126];let m='';
+ for(const k of MAG){if(k<=MAXZ)m+=`<line x1="4" y1="${Y(k)+.5}" x2="${W}" y2="${Y(k)+.5}"/><text x="${W-1}" y="${Y(k)-.2}" text-anchor="end">Z = ${k}</text>`;
+  m+=`<line x1="${X(k)+.5}" y1="0" x2="${X(k)+.5}" y2="${H-4}"/><text x="${X(k)+1}" y="2.5">N = ${k}</text>`}
+ $('#magic').innerHTML=m;
+ // cases
+ const g=$('#cells');const frag=document.createDocumentFragment();
+ for(const q of NUC){const r=document.createElementNS(NS,'rect');r.setAttribute('x',X(q.n)+.06);r.setAttribute('y',Y(q.z)+.06);r.setAttribute('width',.88);r.setAttribute('height',.88);r.dataset.i=NUC.indexOf(q);q.el=r;frag.append(r)}
+ g.append(frag);
+ // étiquettes de quelques éléments repères
+ const L=[[1,'H'],[6,'C'],[8,'O'],[20,'Ca'],[26,'Fe'],[50,'Sn'],[82,'Pb'],[92,'U']];
+ $('#lbl').innerHTML=L.map(([z,s])=>{const n=Math.min(...NUC.filter(q=>q.z===z).map(q=>q.n));return `<text x="${X(n)-.6}" y="${Y(z)+.8}" text-anchor="end">${s}</text>`}).join('');
+}
+const X=n=>n+4, Y=z=>H-5-z;
+
+let colorBy='mode';
+function paint(){
+ const cv={};for(const c of CATS)cv[c.k]=css(c.v);
+ for(const q of NUC){let f;
+  if(colorBy==='mode')f=cv[q.c];
+  else{if(q.c==='stable')f=cv.stable;else if(isNaN(q.sec))f=cv.x;else f=HB.find(b=>q.sec<b.max).c}
+  q.el.setAttribute('fill',f)}
+ const lg=$('#legend');
+ if(colorBy==='mode'){$('#legTitle').textContent='Mode de désintégration principal';
+  lg.innerHTML=CATS.map(c=>`<li><i style="background:var(${c.v})"></i>${c.t}<b>${NUC.filter(q=>q.c===c.k).length}</b></li>`).join('')}
+ else{$('#legTitle').textContent='Demi-vie';
+  lg.innerHTML=`<li><i style="background:var(--m-stable)"></i>Stable<b>${NUC.filter(q=>q.c==='stable').length}</b></li>`+[...HB].reverse().map((b,i)=>{const lo=HB.indexOf(b)?HB[HB.indexOf(b)-1].max:0;return `<li><i style="background:${b.c}"></i>${b.t}<b>${NUC.filter(q=>q.c!=='stable'&&q.sec>=lo&&q.sec<b.max).length}</b></li>`}).join('')+`<li><i style="background:var(--m-x)"></i>Non renseignée<b>${NUC.filter(q=>q.c!=='stable'&&isNaN(q.sec)).length}</b></li>`}
+}
+
+/* ---------- Vue : zoom et déplacement ---------- */
+let vb;
+function setVB(x,y,w,h){const ar=svg.clientWidth/svg.clientHeight||1.6;
+ if(w/h<ar)w=h*ar;else h=w/ar;
+ const mw=W+6,mh=H+4;w=Math.min(w,mw*1.6);h=Math.min(h,mh*1.6);
+ x=Math.max(-w*.3,Math.min(x,mw-w*.7));y=Math.max(-h*.3,Math.min(y,mh-h*.7));
+ vb={x,y,w,h};svg.setAttribute('viewBox',`${x} ${y} ${w} ${h}`);
+ $('#lbl').style.display=w<90&&w>24?'':'none';}
+const VIEWS={all:()=>[-1,-1,W+4,H+4],light:()=>[2,Y(36),48,40],heavy:()=>[X(110)-2,Y(118)-2,72,46]};
+function view(k){const v=VIEWS[k]();setVB(...v)}
+function zoomAt(f,cx,cy){const nw=Math.max(14,vb.w*f),nh=vb.h*nw/vb.w;setVB(cx-(cx-vb.x)*nw/vb.w,cy-(cy-vb.y)*nh/vb.h,nw,nh)}
+function toSvg(e){const r=svg.getBoundingClientRect();return{x:vb.x+(e.clientX-r.left)/r.width*vb.w,y:vb.y+(e.clientY-r.top)/r.height*vb.h}}
+const svg=$('#svg');const ptr=new Map();let start=null,moved=false,pinch=null;
+svg.addEventListener('pointerdown',e=>{svg.setPointerCapture(e.pointerId);ptr.set(e.pointerId,{x:e.clientX,y:e.clientY});moved=false;
+ if(ptr.size===1)start={x:e.clientX,y:e.clientY,vb:{...vb}};
+ if(ptr.size===2){const [a,b]=[...ptr.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),vb:{...vb},c:toSvg({clientX:(a.x+b.x)/2,clientY:(a.y+b.y)/2})}}});
+svg.addEventListener('pointermove',e=>{if(!ptr.has(e.pointerId))return;ptr.set(e.pointerId,{x:e.clientX,y:e.clientY});const r=svg.getBoundingClientRect();
+ if(ptr.size===2&&pinch){const [a,b]=[...ptr.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);const f=pinch.d/d;moved=true;
+  const nw=Math.max(14,pinch.vb.w*f),nh=pinch.vb.h*nw/pinch.vb.w;setVB(pinch.c.x-(pinch.c.x-pinch.vb.x)*nw/pinch.vb.w,pinch.c.y-(pinch.c.y-pinch.vb.y)*nh/pinch.vb.h,nw,nh);return}
+ if(start&&ptr.size===1){const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.hypot(dx,dy)>6){moved=true;svg.classList.add('drag')}
+  if(moved)setVB(start.vb.x-dx/r.width*start.vb.w,start.vb.y-dy/r.height*start.vb.h,start.vb.w,start.vb.h)}});
+function up(e){const was=ptr.size===1&&!moved;ptr.delete(e.pointerId);if(ptr.size<2)pinch=null;if(!ptr.size){svg.classList.remove('drag');start=null}
+ if(was&&e.type==='pointerup'){const p=toSvg(e);const n=Math.floor(p.x)-4,z=H-5-Math.floor(p.y);const q=NUC.find(q=>q.n===n&&q.z===z);if(q)select(q)}}
+svg.addEventListener('pointerup',up);svg.addEventListener('pointercancel',up);
+svg.addEventListener('wheel',e=>{e.preventDefault();const p=toSvg(e);zoomAt(e.deltaY>0?1.18:1/1.18,p.x,p.y)},{passive:false});
+$('#zIn').onclick=()=>zoomAt(1/1.4,vb.x+vb.w/2,vb.y+vb.h/2);$('#zOut').onclick=()=>zoomAt(1.4,vb.x+vb.w/2,vb.y+vb.h/2);
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>view(b.dataset.view));
+addEventListener('resize',()=>vb&&setVB(vb.x,vb.y,vb.w,vb.h));
+
+/* ---------- Fiche du noyau ---------- */
+const UNIT={Y:'ans',D:'jours',H:'h',M:'min',S:'s',MS:'ms',US:'µs',NS:'ns',PS:'ps',FS:'fs',AS:'as'};
+function halfTxt(i){if(i.stable)return 'stable';if(!i.half)return 'non renseignée';const u=UNIT[String(i.unit).toUpperCase()];
+ const v=Number(i.half);const num=isFinite(v)?(v>=1e5||v<1e-3?sci(v,2):v.toLocaleString('fr-FR',{maximumSignificantDigits:4})):i.half;
+ if(u)return `${i.operator==='AP'?'≈ ':''}${num} ${u}`;
+ return i.seconds?`≈ ${sci(Number(i.seconds),1)} s`:'non renseignée';}
+function position(q){const s=STAB[q.z];
+ if(q.c==='stable')return 'Il est <b>dans la vallée</b> : ce noyau est stable.';
+ if(!s){if(q.z>82)return 'Au-delà du plomb, <b>aucun isotope de cet élément n’est stable</b> : le noyau est trop lourd et se désintègre, surtout par α ou fission.';
+  return 'Cet élément <b>n’a aucun isotope stable</b> (comme le technétium et le prométhium).';}
+ if(q.n>s.max)return `Il a <b>trop de neutrons</b> : ${q.n} contre ${s.max} au plus pour un isotope stable de cet élément. Il est sous la vallée.`;
+ if(q.n<s.min)return `Il a <b>trop de protons</b> pour ses ${q.n} neutrons : il en faudrait au moins ${s.min}. Il est au-dessus de la vallée.`;
+ return 'Il est au milieu des isotopes stables de son élément, mais n’est pas stable lui-même.';}
+function select(q){const e=EL.find(x=>x.z===q.z)||{s:'?',name:'?'};
+ const sel=$('#sel');sel.hidden=false;sel.setAttribute('x',X(q.n));sel.setAttribute('y',Y(q.z));
+ const modes=q.iso.decays.filter(d=>d.mode).map(d=>`${modeName(d.mode)}${pct(d.percent)}`).join(' · ');
+ const col=q.el.getAttribute('fill');const light=['a','p'].includes(q.c)&&colorBy==='mode';
+ $('#info').innerHTML=`<h2>Noyau choisi</h2><div class="nuc"><div class="tile${light?' light':''}" style="background:${col}"><small>${q.a}</small>${e.s}</div><div><h3>${e.name} ${q.a}</h3><span style="color:var(--muted);font-size:13px">${sup(q.a)}${e.s}</span></div></div>
+ <dl><dt>Protons Z</dt><dd>${q.z}</dd><dt>Neutrons N</dt><dd>${q.n}</dd><dt>N / Z</dt><dd>${q.z?(q.n/q.z).toLocaleString('fr-FR',{maximumFractionDigits:2}):'—'}</dd><dt>Demi-vie</dt><dd>${halfTxt(q.iso)}</dd>${q.c!=='stable'?`<dt>Désintégration</dt><dd>${modes||'non renseignée'}</dd>`:''}${q.iso.abundance?`<dt>Abondance</dt><dd>${String(q.iso.abundance).replace('.',',')} %</dd>`:''}</dl>
+ <p class="pos">${position(q)}</p>${window.parent!==window?`<button type="button" class="open" id="openSheet">Ouvrir la fiche de l’élément →</button>`:''}`;
+ const o=$('#openSheet');if(o)o.onclick=()=>parent.postMessage({type:'nuclea-open-isotope',z:q.z,a:q.a},location.origin);
+}
+/* ---------- Aller à un noyau ---------- */
+function find(txt){const t=clean(txt).replace(/[-_]/g,' ').replace(/\s+/g,' ');
+ const m=t.match(/^(\d+)\s*([a-z]+)$/)||t.match(/^([a-z]+)\s*(\d+)$/);if(!m)return null;
+ const [a,w]=/^\d/.test(m[1])?[+m[1],m[2]]:[+m[2],m[1]];
+ const e=EL.find(x=>clean(x.s)===w)||EL.find(x=>clean(x.name)===w)||EL.find(x=>clean(x.name).startsWith(w)&&w.length>=3);if(!e)return null;
+ return NUC.find(q=>q.z===e.z&&q.a===a)||{missing:true,e,a}}
+$('#findForm').onsubmit=ev=>{ev.preventDefault();const r=find($('#findIn').value);
+ if(!r){$('#findMsg').textContent='Noyau non reconnu : essayez « U-235 » ou « cobalt 60 ».';return}
+ if(r.missing){$('#findMsg').textContent=`${r.e.name} ${r.a} ne figure pas dans les données AIEA embarquées.`;return}
+ $('#findMsg').textContent='';const w=Math.min(vb.w,40),h=w*vb.h/vb.w;setVB(X(r.n)-w/2,Y(r.z)-h/2,w,h);select(r)};
+/* ---------- Commandes ---------- */
+document.querySelectorAll('[data-col]').forEach(b=>b.onclick=()=>{colorBy=b.dataset.col;document.querySelectorAll('[data-col]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));paint()});
+$('#optNZ').onchange=e=>{$('#nz').hidden=!e.target.checked};
+$('#optMagic').onchange=e=>{$('#magic').hidden=!e.target.checked};
+new MutationObserver(paint).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paint);
+
+fetch('../elements.json').then(r=>r.json()).catch(()=>[]).then(els=>{EL=els;build();paint();view('all');
+ const u=NUC.find(q=>q.z===92&&q.a===235);if(u&&!location.hash)select(u);
+ const h=decodeURIComponent(location.hash.slice(1));if(h){$('#findIn').value=h;$('#findForm').requestSubmit()}});
+</script>
+</body>
+</html>
