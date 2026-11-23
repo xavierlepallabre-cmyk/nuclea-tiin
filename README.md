@@ -8,8 +8,9 @@ Servir ce dossier en HTTPS (GitHub Pages) ou via un serveur local pour les tests
 
 - **Éléments** : recherche d’élément/isotope, dix filtres de familles, fiches, filiation et transferts vers les calculateurs.
 - **Formulaire** : calculateur de décroissance conservé et enrichi ; six rubriques en accordéons et 31 relations avec unités, hypothèses et exemples.
-- **Explorer** : énergie de liaison, nuage d’Aston et trois modes DATE.
+- **Explorer** : six phénomènes animés, dont la vallée de la stabilité (carte N-Z des 3 383 noyaux), énergie de liaison, nuage d’Aston et trois modes DATE.
 - **Exercices** : six thèmes, trois niveaux, valeurs variables, quatre aides et aucune note ni historique de réussite.
+- **Loupe** (ou touche « / ») : recherche dans toute l’application — éléments et isotopes (U-235, cobalt 60…), formules, outils, phénomènes animés, étapes de parcours et thèmes d’exercices ; un résultat ouvre directement le bon endroit. Rien n’est enregistré.
 - **ⓘ** : références, crédits, mise à jour et effacement des données locales.
 
 Le tableau se déplace dans sa zone dédiée. Un doigt ou la souris : déplacer ; deux doigts : zoomer ; double appui : zoomer ; molette : zoomer autour du pointeur ; boutons et touches +/− : ajuster ; Recentrer : rétablir la vue. Le défilement de la page reste natif hors de cette zone. La miniature tactile et les boutons restent disponibles sur téléphone. La recherche accepte uranium, U, 92, U235, U-235 et 235U. Sélectionner la suggestion ; si nécessaire, le filtre de famille est désactivé explicitement.

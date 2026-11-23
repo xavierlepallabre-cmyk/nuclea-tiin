@@ -1,5 +1,5 @@
 {
-  "executedAt": "2026-11-23T18:14:20.374Z",
+  "executedAt": "2026-11-23T18:21:21.310Z",
   "results": [
     {
       "suite": "data.test.cjs",
@@ -58,7 +58,7 @@
     {
       "suite": "version.test.cjs",
       "status": "passed",
-      "output": "Version v0.25 cohérente avec le cache nuclea-tiin-v025 : OK\n",
+      "output": "Version v0.26 cohérente avec le cache nuclea-tiin-v026 : OK\n",
       "error": ""
     }
   ]
