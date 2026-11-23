@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('#exerciseTheme .ex-theme').forEach((b,i)=>{const name=b.textContent.trim();
    IDX.push({g:'ex',t:`Exercices : ${name}`,s:'S’entraîner · trois niveaux, aides, sans note',k:clean(`exercice entrainement ${name} ${EX_KEYS[i]||''}`),go:()=>{show('exercises');b.click();b.scrollIntoView({block:'center'})}})});
  }
- const GROUPS=[['is','Isotope'],['el','Éléments'],['fo','Formules'],['to','Outils'],['vi','Phénomènes animés'],['pa','Parcours'],['ex','Exercices']];
+ const GROUPS=[['se','???'],['is','Isotope'],['el','Éléments'],['fo','Formules'],['to','Outils'],['vi','Phénomènes animés'],['pa','Parcours'],['ex','Exercices']];
 
  /* Un isotope tapé directement : U-235, 235U, uranium 235, Co 60, C14 */
  function isotopeHit(q){
@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  }
  function search(q){
   const toks=clean(q).split(/\s+/).filter(Boolean);if(!toks.length)return [];
+  if(clean(q).trim()==='235')return [{g:'se',t:'Un neutron, et tout bascule…',s:'Touche ici. Tu as trouvé quelque chose.',go:()=>window.NucleaVisuals?.open('reaction'),score:2000}];
   if(!IDX)build();
   const hits=[];const iso=isotopeHit(q);if(iso)hits.push({...iso,score:1000});
   const ct=clean(q).trim();

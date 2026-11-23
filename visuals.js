@@ -9,6 +9,8 @@
   {id:'vallee',title:'Vallée de la stabilité',text:'Les 3 383 noyaux connus dans le diagramme N-Z, stables et instables.',icon:'<path d="M4 20V4M4 20h16"/><path d="M6 17c3-1 5-4 7-7s4-4 7-5" stroke-dasharray="1.5 2"/><path d="M7 15l2-2M10 12l2-2M13 9l2-2"/>'},
   {id:'filiation',title:'Chaîne de filiation',text:'Équilibres séculaire et transitoire, générateur ⁹⁹Mo/⁹⁹ᵐTc.',icon:'<circle cx="6" cy="7" r="3"/><circle cx="18" cy="17" r="3"/><path d="M8.5 9 15.5 15"/><path d="M14 16.5l1.6-1.4.2 2.1"/>'}
  ];
+ // Mini-jeu caché : pas de carte dans Explorer ; il s'ouvre depuis la loupe (« 235 ») ou la fiche de l'uranium.
+ const SECRET={id:"reaction",title:"Réaction en chaîne"},ALL=[...VISUALS,SECRET];
  const grid=document.querySelector('#visualGrid'),viewer=document.querySelector('#visualViewer'),frame=document.querySelector('#visualFrame'),title=document.querySelector('#visualTitle');
  if(!grid||!viewer)return;
  let opener=null,open=null;
@@ -36,7 +38,7 @@
  document.querySelector('#closeVisual').onclick=close;
  window.addEventListener('popstate',()=>{
   const id=history.state?.nucleaVisual;
-  if(id){const v=VISUALS.find(x=>x.id===id);if(v&&open!==id)show(v,false)}else hide();
+  if(id){const v=ALL.find(x=>x.id===id);if(v&&open!==id)show(v,false)}else hide();
  });
  document.addEventListener('keydown',e=>{if(open&&e.key==='Escape'){e.preventDefault();close()}});
  // Depuis la vallée de la stabilité : ouvrir la fiche de l'élément sur l'isotope touché.
@@ -49,7 +51,10 @@
    if(typeof showElement==='function')showElement(z,true);},60);
  });
  // Ouverture depuis un autre module (parcours élève).
- window.NucleaVisuals={list:VISUALS.map(({id,title,text})=>({id,title,text})),open:id=>{const v=VISUALS.find(x=>x.id===id);if(v)show(v,true)}};
+ window.NucleaVisuals={list:VISUALS.map(({id,title,text})=>({id,title,text})),open:id=>{const v=ALL.find(x=>x.id===id);if(v)show(v,true)}};
+ // Trois appuis rapides sur la case « U » de la fiche de l'uranium : le mini-jeu caché.
+ let taps=[];document.addEventListener('click',e=>{const tile=e.target.closest('#detailContent .detailhead .tile');if(!tile||typeof selected==='undefined'||selected!==92){taps=[];return}
+  const now=Date.now();taps=taps.filter(x=>now-x<1500);taps.push(now);if(taps.length>=3){taps=[];show(SECRET,true)}});
  // Une page rechargée repart sur l'application : ne pas laisser un état de visionneuse orphelin.
  if(history.state?.nucleaVisual){const s={...history.state};delete s.nucleaVisual;history.replaceState(s,'')}
  // Le thème choisi dans l'application suit dans le visuel ouvert.

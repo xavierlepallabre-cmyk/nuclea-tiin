@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Réaction en chaîne</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../assets/fonts/lexend.css">
+<script>try{const t=localStorage.getItem("nuclea-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}
+if(window.self!==window.top)document.documentElement.classList.add("embedded");</script>
+<style>
+/* Nucléa TIIN v0.27 — mini-jeu caché (easter egg) : loupe « 235 » ou trois appuis sur la case U de la fiche de l'uranium.
+   VOICE  : un mini-jeu caché dans Nucléa TIIN, vif mais exact, pour des apprentis.
+   IDEA   : une cuve de réacteur vue de dessus ; un neutron, et tout bascule.
+   PICTURE: le plateau de jeu lui-même, noyaux d'uranium, neutrons, fragments, barres de contrôle.
+   COLOUR : charte TIIN — bleu Tocqueville profond, orange fission, gris uranium 238, violet plutonium.
+   TYPE / LAYOUT : Lexend ; titre modeste, plateau en vedette, barre d'action et compteurs dessous. */
+:root{color-scheme:light dark;
+ --bg:light-dark(#F4F6FA,#0A1430);--panel:light-dark(#FFFFFF,#12204A);--ink:light-dark(#0E1B36,#EEF2FA);--muted:light-dark(#4A5A75,#A9B6D3);
+ --line:light-dark(#D5DDEA,#2B3F72);--brand:light-dark(#1A3C89,#9DB8F5);--accent:#F18A52;--accent-ink:light-dark(#A8501C,#F6A06E);--primary:light-dark(#1A3C89,#2E5BC4);
+ --ok:#1E7A4F;--low:#3D6BD6;--bad:#D9483B}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+.embedded h1{display:none}
+.embedded .wrap{padding-top:12px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Lexend,system-ui,sans-serif;overflow-x:clip}
+.wrap{max-width:1100px;margin:0 auto;padding:18px max(4vw,16px) 28px;display:grid;gap:12px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-size:clamp(24px,3.4vw,34px);line-height:1.05;color:var(--brand);font-weight:800;letter-spacing:-.02em}
+h1 span{color:var(--accent-ink)}
+.levels{display:flex;gap:6px;flex-wrap:wrap}
+.levels button{font:600 14px Lexend,sans-serif;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:7px 13px;min-height:40px;cursor:pointer}
+.levels button[aria-current=true]{background:var(--primary);border-color:var(--primary);color:#fff}
+.levels button:disabled{opacity:.45;cursor:default}
+.levels .st{color:#E0A400;margin-left:4px;letter-spacing:-1px}
+.goal{margin:0;color:var(--muted);font-size:15px}
+.goal b{color:var(--ink)}
+.board{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:radial-gradient(120% 90% at 50% 40%,#16295f,#0a1430 70%);aspect-ratio:1000/620;touch-action:none;cursor:crosshair}
+.board canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.card{position:absolute;inset:0;display:grid;place-items:center;background:rgba(10,20,48,.62);padding:16px}
+.card[hidden]{display:none}
+.card>div{background:var(--panel);color:var(--ink);border-radius:16px;padding:20px 22px;max-width:540px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.35);max-height:100%;overflow:auto}
+.card h2{margin:0 0 6px;font-size:22px;color:var(--brand);line-height:1.15}
+.card p{margin:6px 0;font-size:15px}
+.card .big{font-size:38px;font-weight:800;color:var(--accent-ink);line-height:1;margin:6px 0;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.card .stars{font-size:30px;color:#E0A400;letter-spacing:2px}
+.card .stars i{color:var(--line);font-style:normal}
+.card .learn{background:color-mix(in srgb,var(--accent) 12%,var(--panel));border-left:3px solid var(--accent);padding:8px 12px;border-radius:8px;font-size:14.5px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn{font:600 15px Lexend,sans-serif;border-radius:999px;padding:10px 18px;min-height:44px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn:disabled{opacity:.5;cursor:default}
+.btn:focus-visible,.levels button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.act{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 10px 8px 14px;min-height:62px}
+.act p{margin:0;flex:1 1 260px;font-size:14.5px}
+.act .row{flex:1 1 280px}
+.act .row[hidden]{display:none}
+.act b{color:var(--accent-ink)}
+.hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.hud div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.hud small{display:block;color:var(--muted);font-size:12.5px}
+.hud b{font-size:22px;font-variant-numeric:tabular-nums}
+.pilot{display:none;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.pilot.on{display:grid}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.row label{font-weight:600;white-space:nowrap}
+.row input{flex:1;accent-color:var(--primary);height:32px;min-width:140px}
+.gauge{position:relative;height:30px;border-radius:8px;display:flex}
+.gauge span{display:grid;place-items:center;font-size:12px;font-weight:600;color:#fff;overflow:hidden;white-space:nowrap}
+.gauge .z1{background:var(--low);border-radius:8px 0 0 8px}.gauge .z2{background:var(--ok)}.gauge .z3{background:var(--bad);border-radius:0 8px 8px 0}
+.needle{position:absolute;top:-4px;bottom:-4px;width:6px;margin-left:-3px;border-radius:3px;background:#fff;box-shadow:0 0 0 2px #0E1B36,0 2px 6px rgba(0,0,0,.4);transition:left .15s}
+.state{font-weight:700}
+.prog{height:10px;border-radius:999px;background:var(--line);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--ok);width:0}
+.note{font-size:13px;color:var(--muted);margin:0}
+@media(max-width:600px){.board{aspect-ratio:1000/760}.hud b{font-size:19px}.gauge span{font-size:10.5px}}
+@media(prefers-reduced-motion:reduce){.needle{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="top">
+  <h1>Réaction <span>en chaîne</span></h1>
+  <nav class="levels" id="levels" aria-label="Niveaux"></nav>
+ </div>
+ <p class="goal" id="goal"></p>
+ <div class="board" id="board">
+  <canvas id="cv" aria-label="Plateau de jeu : noyaux d'uranium et neutrons"></canvas>
+  <div class="card" id="card" hidden><div id="cardBody"></div></div>
+ </div>
+ <div class="act" id="act"><p id="actTxt"></p><span class="row" id="tenRow" hidden><label for="tenIn">Teneur en U-235</label><input id="tenIn" type="range" min="20" max="80" step="10" value="70"><b id="tenVal">70 %</b></span><button class="btn primary" type="button" id="actBtn">Prêt : viser</button></div>
+ <div class="pilot" id="pilot">
+  <div class="row"><label for="rodIn">Barres de contrôle</label><input id="rodIn" type="range" min="0" max="100" value="50"><span id="rodVal">50 %</span></div>
+  <div class="gauge" aria-hidden="true"><span class="z1" id="z1">faible</span><span class="z2" id="z2">stable</span><span class="z3" id="z3">emballement</span><b class="needle" id="needle"></b></div>
+  <div class="row"><span>Population : <span class="state" id="state">—</span></span><span style="margin-left:auto;color:var(--muted)" id="inBand">0 s / 20 s</span></div>
+  <div class="prog"><i id="progI"></i></div>
+ </div>
+ <div class="hud" id="hud"></div>
+ <p class="note">Modèle très simplifié pour comprendre l’idée : en vrai, les neutrons sont aussi ralentis par l’eau du réacteur, et chaque fission d’uranium 235 libère environ 200 MeV et 2 à 3 neutrons (2,4 en moyenne).</p>
+</div>
+<script>
+{
+const $=s=>document.querySelector(s);
+const cv=$('#cv'),ctx=cv.getContext('2d'),board=$('#board');
+const W=1000;let H=620;
+let SH=.6,CAP=.5,NB=140,TEN=70;const R=13,SPEED=200,LIFE=4.5,MEV=200,RODS=[200,400,600,800],BAND=[12,40],OVER=90,HOLD=20;
+const LEVELS=[
+ {id:'n1',name:'1 · Premier neutron',goal:'Vise bien : <b>un seul neutron</b> doit faire fissionner au moins <b>60 %</b> des noyaux. Les noyaux sont regroupés en îlots : d’où partira la cascade ?',
+  prep:'Repère l’îlot le plus gros, puis touche « Prêt : viser » et touche le plateau.',stars:[60,70,85],life:1.1,setup:()=>islands()},
+ {id:'n2',name:'2 · Masse critique',goal:'Place toi-même <b>25 noyaux</b> d’uranium 235, puis tire un neutron. Objectif : <b>15 fissions</b>. La forme de ton tas compte !',
+  prep:'Touche le plateau pour poser un noyau (touche-le à nouveau pour l’enlever).',budget:25,stars:[15,19,23],abs:true,setup:()=>{nuc=[]}},
+ {id:'n3',name:'3 · Enrichissement',goal:'L’<b>uranium 238</b> (gris) capture des neutrons. Choisis la <b>teneur en uranium 235</b> du combustible : il faut que <b>la moitié</b> des noyaux d’uranium 235 fissionnent. Moins tu enrichis, plus tu gagnes d’étoiles (★★★ à 40 % ou moins).',
+  prep:'Règle la teneur, puis touche « Prêt : viser ».',enrich:true,stars:[50,50,50],setup:()=>fill(NB,1-TEN/100,false,R*2.55)},
+ {id:'n4',name:'4 · Piloter le réacteur',goal:'Garde la population de neutrons dans la <b>zone verte</b> pendant <b>20 secondes</b> avec les barres de contrôle. Au-delà : emballement !',
+  pilot:true,stars:[1,1,1],setup:()=>fill(84,0,true)}];
+let lvl=0,unlocked=1,best={},nuc=[],neu=[],frag=[],flash=[],st={},running=false,last=0;
+try{unlocked=Math.max(1,+localStorage.getItem('nuclea-jeu-niveaux')||1);best=JSON.parse(localStorage.getItem('nuclea-jeu-etoiles')||'{}')}catch(e){}
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const free=(x,y,d=R*3)=>!nuc.some(o=>Math.hypot(o.x-x,o.y-y)<d);
+
+function fill(n,share238,rods,gap){nuc=[];let t=0;
+ while(nuc.length<n&&t++<40000){const x=rnd(50,W-50),y=rnd(40,H-80);if(!free(x,y,gap||R*3))continue;
+  if(rods&&RODS.some(rx=>Math.abs(x-rx)<R+16))continue;nuc.push({x,y,t:Math.random()<share238?'238':'235',s:'ok',k:0})}}
+function islands(){nuc=[];const C=[];let t=0;const want=[150,72,64,58];
+ while(C.length<want.length&&t++<3000){const r=want[C.length],c={x:rnd(r+30,W-r-30),y:rnd(r+20,H-r-90),r};if(C.some(o=>Math.hypot(o.x-c.x,o.y-c.y)<o.r+c.r+150))continue;C.push(c)}
+ for(const c of C){const n=Math.round(c.r*c.r/520);let u=0,m=0;while(m<n&&u++<3000){const a=rnd(0,7),d=Math.sqrt(Math.random())*c.r,x=c.x+Math.cos(a)*d,y=c.y+Math.sin(a)*d;if(!free(x,y,R*2.7))continue;nuc.push({x,y,t:'235',s:'ok',k:0});m++}}}
+
+function reset(){const L=LEVELS[lvl];size();neu=[];frag=[];flash=[];
+ st={fis:0,cap:0,phase:L.pilot?'run':'prep',budget:L.budget||0,inBand:0,over:false,t:0,src:0,done:false,quiet:0,shot:false};L.setup();
+ $('#goal').innerHTML=L.goal;$('#pilot').classList.toggle('on',!!L.pilot);$('#act').style.display=L.pilot?'none':'';$('#card').hidden=true;
+ levels();act();hud();running=true;}
+function levels(){$('#levels').innerHTML=LEVELS.map((l,i)=>`<button type="button" data-l="${i}" aria-current="${i===lvl}" ${i>=unlocked?'disabled':''}>${l.name}${best[l.id]?`<span class="st">${'★'.repeat(best[l.id])}</span>`:''}</button>`).join('')}
+$('#levels').onclick=e=>{const b=e.target.closest('[data-l]');if(!b||b.disabled)return;lvl=+b.dataset.l;reset()};
+
+function act(){const L=LEVELS[lvl],b=$('#actBtn');
+ $('#tenRow').hidden=!(L.enrich&&st.phase==='prep');
+ if(st.phase==='prep'){$('#actTxt').innerHTML=`${L.prep} ${L.budget?`Reste : <b>${st.budget}</b>.`:''}`;b.textContent='Prêt : viser';b.disabled=L.id==='n2'&&nuc.length===0;b.hidden=false}
+ else if(st.phase==='aim'){$('#actTxt').innerHTML='Touche le plateau pour <b>tirer le neutron</b> depuis la source (en bas, au centre).';b.hidden=true}
+ else{$('#actTxt').innerHTML='La réaction est lancée…';b.hidden=true}}
+$('#tenIn').oninput=e=>{TEN=+e.target.value;$('#tenVal').textContent=TEN+' %';LEVELS[lvl].setup()};
+$('#actBtn').onclick=()=>{if(st.phase==='prep'){st.phase='aim';st.n0=nuc.length;st.ten=TEN;act()}};
+
+const src=()=>({x:W/2,y:H-22});
+function toLogic(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H}}
+board.addEventListener('pointerdown',e=>{if(!$('#card').hidden)return;const L=LEVELS[lvl],p=toLogic(e);
+ if(L.pilot){shoot(p.x,p.y,W/2,H-22);return}
+ if(st.phase==='prep'){
+  if(L.id==='n2'){const o=nuc.find(o=>Math.hypot(o.x-p.x,o.y-p.y)<R+4);
+   if(o){nuc.splice(nuc.indexOf(o),1);st.budget++}else if(st.budget>0&&p.y<H-60&&free(p.x,p.y,R*2.6)){nuc.push({x:p.x,y:p.y,t:'235',s:'ok',k:0});st.budget--}}
+  act();return}
+ if(st.phase==='aim'){st.phase='run';st.shot=true;const s=src();shoot(p.x,p.y,s.x,s.y);const n0=neu[neu.length-1];n0.first=true;n0.life=20;act()}});
+function shoot(tx,ty,sx,sy){const a=Math.atan2(ty-sy,tx-sx);neu.push({x:sx,y:sy,vx:Math.cos(a)*SPEED,vy:Math.sin(a)*SPEED,life:life()})}
+
+const life=()=>LEVELS[lvl].life||LIFE;
+const rodDepth=()=>LEVELS[lvl].pilot?(+$('#rodIn').value/100)*(H-60):0;
+function step(dt){const L=LEVELS[lvl];if(st.phase!=='run')return;st.t+=dt;
+ if(L.pilot){st.src-=dt;if(st.src<=0){st.src=1.2;const a=rnd(0,7);neu.push({x:rnd(100,W-100),y:rnd(60,H-120),vx:Math.cos(a)*SPEED,vy:Math.sin(a)*SPEED,life:life()})}
+  for(const o of nuc)if(o.s==='gone'){o.k-=dt;if(o.k<=0)o.s='ok'}}
+ const depth=rodDepth();
+ for(const n of neu){n.x+=n.vx*dt;n.y+=n.vy*dt;n.life-=dt;
+  if(n.x<0||n.x>W||n.y<0||n.y>H)n.life=0;
+  if(depth&&n.y<depth&&RODS.some(rx=>Math.abs(n.x-rx)<11))n.life=0;
+  if(n.life<=0)continue;
+  for(const o of nuc){if(o.s!=='ok'||Math.hypot(o.x-n.x,o.y-n.y)>R+3||n.skip===o)continue;
+   if(o.t==='238'&&(n.first||Math.random()>CAP)){n.skip=o;continue}
+   n.life=0;
+   if(o.t==='235'){o.s='gone';o.k=L.pilot?rnd(1.2,2.2):0;st.fis++;flash.push({x:o.x,y:o.y,t:0});
+    const k=Math.random()<.4?3:2;for(let i=0;i<k;i++){const a=rnd(0,7);neu.push({x:o.x,y:o.y,vx:Math.cos(a)*SPEED,vy:Math.sin(a)*SPEED,life:life()})}
+    for(let i=0;i<2;i++){const a=rnd(0,7);frag.push({x:o.x,y:o.y,vx:Math.cos(a)*60,vy:Math.sin(a)*60,life:1,c:i?'#F6A06E':'#C2513E'})}}
+   else{o.s='cap';o.k=1;st.cap++}
+   break}}
+ neu=neu.filter(n=>n.life>0);
+ for(const f of frag){f.x+=f.vx*dt;f.y+=f.vy*dt;f.life-=dt*.9}frag=frag.filter(f=>f.life>0);
+ for(const f of flash)f.t+=dt;flash=flash.filter(f=>f.t<.5);
+ for(const o of nuc)if(o.s==='cap'){o.k-=dt*.6;if(o.k<=0)o.s='pu'}
+ if(L.pilot){const n=neu.length;if(n>=BAND[0]&&n<=BAND[1])st.inBand+=dt;if(n>OVER){st.over=true;end()}else if(st.inBand>=HOLD)end()}
+ else if(st.shot&&!neu.length){st.quiet+=dt;if(st.quiet>.6)end()}}
+
+function size(){const r=board.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);cv.width=Math.round(r.width*d);cv.height=Math.round(r.height*d);H=Math.round(W*r.height/r.width)}
+addEventListener('resize',size);
+function draw(){const s=cv.width/W,L=LEVELS[lvl];ctx.setTransform(s,0,0,s,0,0);ctx.clearRect(0,0,W,H);
+ if(L.pilot){const d=rodDepth();for(const rx of RODS){const g=ctx.createLinearGradient(rx-11,0,rx+11,0);g.addColorStop(0,'#6b7a93');g.addColorStop(.5,'#c9d2e0');g.addColorStop(1,'#4a5a75');ctx.fillStyle=g;ctx.fillRect(rx-11,0,22,d);ctx.fillStyle='#0E1B36';ctx.fillRect(rx-11,d-6,22,6)}}
+ for(const f of flash){ctx.beginPath();ctx.arc(f.x,f.y,R+f.t*90,0,7);ctx.fillStyle=`rgba(255,214,150,${.55*(1-f.t/.5)})`;ctx.fill()}
+ ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='600 9px Lexend,sans-serif';
+ for(const o of nuc){if(o.s==='gone')continue;ctx.beginPath();ctx.arc(o.x,o.y,R,0,7);
+  const g=ctx.createRadialGradient(o.x-4,o.y-4,2,o.x,o.y,R);
+  if(o.s==='ok'&&o.t==='235'){g.addColorStop(0,'#FFD2B3');g.addColorStop(1,'#E2702F')}else if(o.s==='ok'){g.addColorStop(0,'#D5DDEA');g.addColorStop(1,'#6B7A93')}else{g.addColorStop(0,'#D7C2F2');g.addColorStop(1,'#8A5CC2')}
+  ctx.fillStyle=g;ctx.fill();if(o.en&&o.s==='ok'){ctx.lineWidth=2.5;ctx.strokeStyle='#FFE08A';ctx.stroke()}
+  ctx.fillStyle=o.s==='ok'&&o.t==='238'?'#0E1B36':'#3a1606';ctx.fillText(o.s==='ok'?o.t:'239',o.x,o.y+.5)}
+ for(const f of frag){ctx.globalAlpha=Math.max(0,f.life);ctx.beginPath();ctx.arc(f.x,f.y,7,0,7);ctx.fillStyle=f.c;ctx.fill()}ctx.globalAlpha=1;
+ for(const n of neu){ctx.beginPath();ctx.moveTo(n.x,n.y);ctx.lineTo(n.x-n.vx*.06,n.y-n.vy*.06);ctx.strokeStyle='rgba(157,184,245,.55)';ctx.lineWidth=3;ctx.stroke();ctx.beginPath();ctx.arc(n.x,n.y,4,0,7);ctx.fillStyle='#EEF2FA';ctx.fill()}
+ if(!L.pilot){const s0=src(),ready=st.phase==='aim';ctx.beginPath();ctx.arc(s0.x,s0.y,ready?14+Math.sin(performance.now()/180)*2:12,0,7);ctx.fillStyle=ready?'#9DB8F5':'#3b4f80';ctx.fill();ctx.fillStyle='#0A1430';ctx.font='700 11px Lexend,sans-serif';ctx.fillText('n',s0.x,s0.y+1);
+  if(L.id==='n2'&&st.phase==='prep'&&!nuc.length){ctx.fillStyle='rgba(238,242,250,.85)';ctx.font='600 20px Lexend,sans-serif';ctx.fillText('Touche ici pour poser tes noyaux d’uranium 235',W/2,H/2)}}}
+
+function score(){const L=LEVELS[lvl];if(L.pilot)return st.over?0:100;if(L.enrich)return Math.round(st.fis/Math.max(1,nuc.filter(o=>o.t==='235').length)*100);return L.abs?st.fis:Math.round(st.fis/Math.max(1,st.n0||nuc.length)*100)}
+function starsOf(v){const L=LEVELS[lvl];if(L.enrich)return v<50?0:st.ten<=40?3:st.ten<=50?2:1;return L.stars.filter(x=>v>=x).length}
+function hud(){const L=LEVELS[lvl];
+ let h=`<div><small>Fissions</small><b>${st.fis}</b></div><div><small>Énergie libérée</small><b>${(st.fis*MEV).toLocaleString('fr-FR')} MeV</b></div><div><small>Neutrons en vol</small><b>${neu.length}</b></div>`;
+ if(!L.pilot){const v=score();h+=`<div><small>${L.abs?'Objectif : '+L.stars[0]+' fissions':L.enrich?'U-235 fissionnés · objectif 50 %':'Fissionnés · objectif '+L.stars[0]+' %'}</small><b>${L.abs?v:v+' %'}</b></div>`;if(L.enrich)h+=`<div><small>Captures par U-238</small><b>${st.cap}</b></div>`}
+ $('#hud').innerHTML=h;
+ if(L.pilot){const n=neu.length,pos=Math.min(100,n/OVER*100);$('#needle').style.left=pos+'%';
+  $('#z1').style.flex=BAND[0];$('#z2').style.flex=BAND[1]-BAND[0];$('#z3').style.flex=OVER-BAND[1];
+  const s=n<BAND[0]?['trop faible : remonte les barres','var(--low)']:n<=BAND[1]?['stable','var(--ok)']:['trop forte : enfonce les barres','var(--bad)'];
+  $('#state').textContent=`${n} neutrons, ${s[0]}`;$('#state').style.color=s[1];
+  $('#inBand').textContent=`${st.inBand.toFixed(1).replace('.',',')} s / ${HOLD} s dans la zone verte`;$('#progI').style.width=Math.min(100,st.inBand/HOLD*100)+'%'}}
+$('#rodIn').oninput=e=>{$('#rodVal').textContent=e.target.value+' %'};
+
+const LEARN={
+ n1:'Chaque fission d’uranium 235 libère <b>2 à 3 neutrons</b>, qui peuvent provoquer d’autres fissions : c’est la <b>réaction en chaîne</b>. Elle saute difficilement d’un îlot à l’autre : il faut des noyaux nombreux et proches.',
+ n2:'Un tas <b>compact</b> garde ses neutrons : ils rencontrent un autre noyau avant de s’échapper. Un tas étalé les perd par les bords. C’est l’idée de la <b>masse critique</b> : en dessous d’une certaine quantité, et avec une forme défavorable, la chaîne ne s’entretient pas.',
+ n3:'L’uranium 238 <b>capture</b> les neutrons sans fissionner ; il devient de l’uranium 239, puis du <b>plutonium 239</b> (en violet). Plus il y a d’uranium 235, plus la chaîne se maintient : c’est pourquoi on <b>enrichit</b> l’uranium. Dans la réalité, l’uranium naturel ne contient que 0,7 % d’uranium 235 ; un REP utilise un combustible enrichi à quelques pour cent, car l’eau <b>ralentit</b> les neutrons, ce qui rend les fissions bien plus probables que dans ce jeu.',
+ n4w:'Tu as gardé la réaction <b>juste critique</b> : chaque fission en entraîne en moyenne <b>une seule</b> autre (k = 1). C’est le fonctionnement normal d’un réacteur : une puissance constante, réglée par les barres de contrôle et, dans un REP, par le bore dissous dans l’eau.',
+ n4l:'Quand chaque fission entraîne en moyenne <b>plus d’une</b> nouvelle fission, la population de neutrons grandit sans fin. On insère alors les <b>barres de contrôle</b>, qui absorbent les neutrons ; l’arrêt d’urgence les fait tomber entièrement.'};
+function end(){if(st.done)return;st.done=true;running=false;const L=LEVELS[lvl],v=score(),n=starsOf(v),win=n>0;let html;
+ if(L.pilot)html=st.over?`<h2>Emballement !</h2><p>Plus de ${OVER} neutrons en vol : la réaction n’est plus maîtrisée.</p><p class="learn">${LEARN.n4l}</p>`
+  :`<h2>Réacteur piloté !</h2><div class="big">${HOLD} s</div><p>${st.fis} fissions, ${(st.fis*MEV).toLocaleString('fr-FR')} MeV, sans emballement.</p><p class="learn">${LEARN.n4w}</p>`;
+ else{const val=L.abs?`${v} fission${v>1?'s':''}`:L.enrich?`${v} % des U-235`:`${v} %`;
+  html=`<h2>${n===3?'Parfait !':n?'Objectif atteint':'Pas encore…'}</h2><div class="big">${val}<span class="stars">${'★'.repeat(n)}<i>${'★'.repeat(3-n)}</i></span></div>
+  <p>${L.enrich?`Teneur choisie : ${st.ten} % d’uranium 235. ${win?'':'Il fallait que la moitié des noyaux d’uranium 235 fissionnent. '}Étoiles : réussite à 60 % ou plus ★, à 50 % ★★, à 40 % ou moins ★★★.`:`${win?'':`Objectif : ${L.abs?L.stars[0]+' fissions':L.stars[0]+' %'}. `}Étoiles : ${L.stars.map(x=>L.abs?x:x+' %').join(' · ')}.`}</p><p class="learn">${LEARN[L.id]}</p>`}
+ if(win){best[L.id]=Math.max(best[L.id]||0,L.pilot?3:n);if(lvl+1<LEVELS.length)unlocked=Math.max(unlocked,lvl+2);try{localStorage.setItem('nuclea-jeu-niveaux',unlocked);localStorage.setItem('nuclea-jeu-etoiles',JSON.stringify(best))}catch(e){}}
+ const next=win&&lvl+1<LEVELS.length;
+ html+=`<div class="btns"><button class="btn${next?'':' primary'}" type="button" id="again">Rejouer</button>${next?`<button class="btn primary" type="button" id="next">Niveau suivant →</button>`:''}</div>`;
+ $('#cardBody').innerHTML=html;$('#card').hidden=false;levels();act();
+ $('#again').onclick=reset;const nx=$('#next');if(nx){nx.onclick=()=>{lvl++;reset()};nx.focus()}else $('#again').focus()}
+
+function loop(ts){const dt=Math.min(.05,(ts-(last||ts))/1000);last=ts;if(running){for(let i=0;i<3;i++)step(dt/3);hud()}draw();requestAnimationFrame(loop)}
+reset();requestAnimationFrame(loop);
+window.__nucleaJeu={nb:v=>{NB=v},sh:v=>{SH=v},cap:v=>{CAP=v},get st(){return st},get neu(){return neu},get nuc(){return nuc},set:v=>{$("#rodIn").value=v;$("#rodVal").textContent=v+" %"},lvl:i=>{lvl=i;unlocked=4;reset()}};
+}
+</script>
+</body>
+</html>
