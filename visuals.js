@@ -6,6 +6,7 @@
   {id:'attenuation',title:'Atténuation des gamma',text:'Un faisceau traverse un écran : CDA, CDT et transmission.',icon:'<path d="M3 12h5M16 12h5M17.5 9.5 21 12l-3.5 2.5"/><rect x="9" y="4" width="5" height="16" rx="1"/>'},
   {id:'distance',title:'Débit de dose et distance',text:'Source ponctuelle en 1/d², tuyauterie en 1/d.',icon:'<circle cx="6" cy="12" r="2"/><path d="M10 8a6 6 0 0 1 0 8M13.5 5a10 10 0 0 1 0 14M17 2.5a13.5 13.5 0 0 1 0 19"/>'},
   {id:'desintegrations',title:'Désintégrations α, β, γ',text:'Dans le noyau et dans le diagramme N-Z.',icon:'<circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="9" ry="3.5"/><ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(-60 12 12)"/>'},
+  {id:'vallee',title:'Vallée de la stabilité',text:'Les 3 385 noyaux connus dans le diagramme N-Z, stables et instables.',icon:'<path d="M4 20V4M4 20h16"/><path d="M6 17c3-1 5-4 7-7s4-4 7-5" stroke-dasharray="1.5 2"/><path d="M7 15l2-2M10 12l2-2M13 9l2-2"/>'},
   {id:'filiation',title:'Chaîne de filiation',text:'Équilibres séculaire et transitoire, générateur ⁹⁹Mo/⁹⁹ᵐTc.',icon:'<circle cx="6" cy="7" r="3"/><circle cx="18" cy="17" r="3"/><path d="M8.5 9 15.5 15"/><path d="M14 16.5l1.6-1.4.2 2.1"/>'}
  ];
  const grid=document.querySelector('#visualGrid'),viewer=document.querySelector('#visualViewer'),frame=document.querySelector('#visualFrame'),title=document.querySelector('#visualTitle');
@@ -38,6 +39,15 @@
   if(id){const v=VISUALS.find(x=>x.id===id);if(v&&open!==id)show(v,false)}else hide();
  });
  document.addEventListener('keydown',e=>{if(open&&e.key==='Escape'){e.preventDefault();close()}});
+ // Depuis la vallée de la stabilité : ouvrir la fiche de l'élément sur l'isotope touché.
+ window.addEventListener('message',e=>{
+  if(e.origin!==location.origin||e.source!==frame.contentWindow||e.data?.type!=='nuclea-open-isotope')return;
+  const z=Number(e.data.z),a=Number(e.data.a);if(!Number.isInteger(z)||!Number.isInteger(a))return;
+  close();
+  setTimeout(()=>{document.querySelector('.tabs [data-tab="table"],[data-tab="table"]')?.click();
+   if(typeof isotopeSelection==='object')isotopeSelection[z]=String(a);
+   if(typeof showElement==='function')showElement(z,true);},60);
+ });
  // Ouverture depuis un autre module (parcours élève).
  window.NucleaVisuals={open:id=>{const v=VISUALS.find(x=>x.id===id);if(v)show(v,true)}};
  // Une page rechargée repart sur l'application : ne pas laisser un état de visionneuse orphelin.
